@@ -1,0 +1,32 @@
+spring:
+  cloud:
+    gateway:
+      routes:
+        - id: baas_route # 路由的id,没有规定规则但要求唯一,建议配合服务名
+          #匹配后提供服务的路由地址
+          uri: lb://baas-service
+          predicates:
+            - Path=/baas/** # 断言，路径相匹配的进行路由
+        #          filters:
+        #            - SetRequestHeader=clientType, C
+        - id: explorer_route # 路由的id
+          #匹配后提供服务的路由地址
+          uri: lb://dna2-explorer
+          predicates:
+            - Path=/explorer/** # 断言，路径相匹配的进行路由
+        - id: crosschain_route # 路由的id
+          #匹配后提供服务的路由地址
+          uri: lb://baas-crosschain
+          predicates:
+            - Path=/cross/** # 断言，路径相匹配的进行路由
+        
+  zipkin:
+    base-url: ${ZIPKIN:http://172.168.3.64:9411}
+  sleuth:
+    sampler:
+      #采样取值介于 0到1之间，1则表示全部收集
+      probability: 1
+
+jwt:
+  secret:
+    code: ${JWT_CODE:01234567}

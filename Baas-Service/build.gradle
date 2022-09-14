@@ -1,0 +1,74 @@
+buildscript {
+    ext {
+        springBootVersion = '2.2.2.RELEASE'
+        springBootManagementVersion = '1.0.8.RELEASE'
+        springCloudVersion = 'Hoxton.SR1'
+        springCloudAlibabaVersion = "2.1.0.RELEASE"
+    }
+    repositories {
+        maven { url "https://maven.aliyun.com/nexus/content/groups/public/" }
+        mavenCentral()
+    }
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+    }
+}
+
+allprojects {
+    group = 'com.onchain'
+//    version = '1.0-SNAPSHOT'
+}
+
+subprojects {
+    apply plugin: 'java'
+//    apply plugin: 'application'
+    apply plugin: 'idea'
+    apply plugin: 'org.springframework.boot'
+    apply plugin: 'io.spring.dependency-management'
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+
+    repositories {
+        maven { url "https://maven.aliyun.com/nexus/content/groups/public/" }
+        mavenCentral()
+    }
+
+    dependencies {
+        implementation(
+                'javax.xml.bind:jaxb-api:2.1',
+                'io.jsonwebtoken:jjwt-api:0.11.2',
+                'org.springframework.boot:spring-boot-starter-log4j2',
+                'com.alibaba.cloud:spring-cloud-starter-alibaba-nacos-discovery',
+                'com.alibaba.cloud:spring-cloud-starter-alibaba-nacos-config',
+                'com.alibaba:fastjson:1.2.24',
+                'org.projectlombok:lombok',
+                'org.springframework.boot:spring-boot-starter-aop',
+                'io.springfox:springfox-swagger2:2.7.0',
+                'io.springfox:springfox-swagger-ui:2.7.0',
+                'com.github.DNAProject:DNA-java-sdk:2.0.0',
+                'org.apache.logging.log4j:log4j-api:2.17.0',
+                'org.apache.logging.log4j:log4j-core:2.17.0',
+                'org.apache.logging.log4j:log4j-jul:2.17.0',
+                'org.apache.logging.log4j:log4j-slf4j-impl:2.17.0',
+        )
+
+        annotationProcessor 'org.projectlombok:lombok'
+
+        testImplementation(
+                "org.springframework:spring-test",
+                'org.springframework.boot:spring-boot-starter-test',
+                "junit:junit:4.12"
+        )
+    }
+
+    dependencyManagement {
+        imports {
+            mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+            mavenBom "com.alibaba.cloud:spring-cloud-alibaba-dependencies:${springCloudAlibabaVersion}"
+        }
+    }
+
+    configurations {
+        all*.exclude module: 'spring-boot-starter-logging'
+    }
+}

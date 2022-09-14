@@ -1,0 +1,16 @@
+bootJar {
+    enabled = false
+}
+jar {
+    enabled = true
+}
+dependencies {
+    implementation("org.springframework.cloud:spring-cloud-starter-openfeign",
+            "org.springframework.cloud:spring-cloud-starter-netflix-hystrix",
+            "com.itextpdf:itextpdf:5.5.11",
+            "com.itextpdf:itext-asian:5.2.0",
+            "javax.servlet:javax.servlet-api",
+            "org.springframework.boot:spring-boot-starter-validation",
+            'com.jcraft:jsch:0.1.54',
+    )
+}

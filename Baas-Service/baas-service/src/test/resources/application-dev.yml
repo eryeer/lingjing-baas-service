@@ -1,0 +1,46 @@
+spring:
+  datasource:
+    url: ${MYSQL_URL:jdbc:mysql://172.168.3.65:3306/scf_user?characterEncoding=utf-8&serverTimezone=Asia/Shanghai&allowMultiQueries=true&rewriteBatchedStatements=true}
+    username: ${MYSQL_USERNAME:root}
+    password: ${MYSQL_PASSWORD:root}
+
+  redis:
+    database: ${REDIS_DATABASE:0}
+    host: ${REDIS_HOST:172.168.3.66}
+    password: ${REDIS_PASSWORD:password}
+    port: ${REDIS_PORT:6379}
+
+  zipkin:
+    base-url: ${ZIPKIN:http://172.168.3.64:9411}
+  sleuth:
+    sampler:
+      #采样取值介于 0到1之间，1则表示全部收集
+      probability: 1
+
+dna:
+  node:
+    restUrl: ${NODE_URL:http://127.0.0.1:8545}
+    adminAccount: ${ADMIN_ACCOUNT:0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80}
+    walletDir: temp/wallets/
+
+jwt:
+  secret:
+    code: ${JWT_CODE:01234567}
+
+cloud:
+  cos:
+    secretId: AKIDczQ3ycrMTJsBKD6CKQXNwGg16uT1ovxj
+    secretKey: n1zg15IFuOcZFeJZZHm1zg50dz4vyvde
+    regionName: ap-shanghai
+    bucketName: onchain-bill-test-1302609605
+
+  sms:
+    endpoint: sms.tencentcloudapi.com
+    secretId: AKIDqXzB6l2t5wqCJc7nKa09UBbAV22KxSDe
+    secretKey: cS10XIGyhMlxxqufAO0OijTFtTmwvleE
+    appId: 1400471113
+    registerTempId: 857603
+    loginTempId: 857605
+    authTempId: 857608
+    sign: 分布科技
+    test: ${SMS_TEST:true}

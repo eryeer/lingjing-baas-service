@@ -1,0 +1,57 @@
+server:
+  port: ${PORT:8701} #服务端口
+  tomcat:
+    accept-count: 1200
+    max-connections: 1000
+    max-threads: 1000
+    min-spare-threads: 100
+
+spring:
+  application:
+    name: baas-service #指定服务名
+  profiles:
+    active: ${ENV:uat}
+  jackson:
+    serialization:
+      write-dates-as-timestamps: true
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+
+#设置feign客户端超时时间（OpenFeign默认支持ribbon）
+ribbon:
+  #指的是建立连接所用的时间，适用于网络状况正常的情况下，两端连接所用的实际
+  ReadTimeout: 5000
+  #指的是建立连接后从服务器读取到可用资源所用的时间
+  ConnectTimeout: 5000
+
+mybatis:
+  configuration:
+    map-underscore-to-camel-case: true
+
+pagehelper:
+  helper-dialect: mysql
+  reasonable: true
+  support-methods-arguments: true
+  params: count=countSql
+
+hikari:
+  master:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    minimum-idle: 10
+    maximum-pool-size: 15
+    connection-test-query: SELECT 1
+
+management:
+  endpoint:
+    health:
+      show-details: always
+  endpoints:
+    web:
+      exposure:
+        include: ${endPointInclude:health,metrics,loggers,prometheus,info,env}
+version: 0.1
+
+
+
