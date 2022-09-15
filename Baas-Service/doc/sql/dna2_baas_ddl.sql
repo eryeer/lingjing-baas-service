@@ -12,10 +12,11 @@ CREATE TABLE `tbl_user` (
     `status` varchar(20) NOT NULL DEFAULT '1' COMMENT '状态（默认字段,1:已启用 0:已删除 2:已停用）',
 
     `user_id` varchar(32) NOT NULL COMMENT '用户id',
+    `user_type` varchar(5) NOT NULL COMMENT '认证类型（INV 个人认证, CO 企业认证）',
     `user_name` varchar(32) NOT NULL COMMENT '用户姓名',
     `phone_number` varchar(20) NOT NULL COMMENT '手机',
     `password` varchar(64) NOT NULL COMMENT '密码',
-    `role` varchar(5) NOT NULL COMMENT '角色（枚举字段，例如 CU 企业管理员, PM 平台管理员）',
+    `role` varchar(5) NOT NULL COMMENT '角色（CU 普通用户, PM 平台管理员）',
     `id_number` varchar(18) NOT NULL COMMENT '身份证号',
 
     `company_name` varchar(50) NOT NULL COMMENT '企业名称',
@@ -29,7 +30,6 @@ CREATE TABLE `tbl_user` (
 
     -- files
     `business_license_file_uuid` varchar(32) NOT NULL COMMENT '营业执照正本',
-    `business_license_copy_file_uuid` varchar(32) NOT NULL COMMENT '营业执照副本',
     `ida_file_uuid` varchar(32) NOT NULL COMMENT '身份证正面（人像）',
     `idb_file_uuid` varchar(32) NOT NULL COMMENT '身份证反面（国徽）',
     `legal_person_ida_file_uuid` varchar(32) NOT NULL COMMENT '法人身份证正面',
@@ -41,11 +41,11 @@ CREATE TABLE `tbl_user` (
 ) COMMENT='用户信息表';
 
 -- 默认平台管理员(密码采用SHA256格式)
-insert into tbl_user (user_id,user_name,phone_number,password,role,
+insert into tbl_user (user_id,user_type，user_name,phone_number,password,role,
 id_number,company_name,uni_social_credit_code,legal_person_name,legal_person_idn,
 approve_status,approve_feedback,approve_time,ida_file_uuid,idb_file_uuid,
 legal_person_ida_file_uuid,legal_person_idb_file_uuid,business_license_file_uuid,business_license_copy_file_uuid)
-values ("admin","admin","18801791237","9a13ee20f791275ef0b253fe78c8bb8016c76e6d652e02dcbf65d8ad0dd3a6b0","PM",
+values ("admin","CO","admin","18801791237","9a13ee20f791275ef0b253fe78c8bb8016c76e6d652e02dcbf65d8ad0dd3a6b0","PM",
 '','','','','',
 'Approved','',now(),'','',
 '','','','');
@@ -118,61 +118,6 @@ CREATE TABLE `tbl_chain_account` (
     UNIQUE KEY `uk_user_id`(`user_id`),
     PRIMARY KEY (`id`)
 ) COMMENT='用户链账户表';
-
-DROP TABLE IF EXISTS tbl_contract_app;
-CREATE TABLE `tbl_contract_app` (
-    `id` bigint NOT NULL AUTO_INCREMENT COMMENT '自增id, 非用户id',
-    `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间（默认字段）',
-    `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间（默认字段）',
-    `status` varchar(20) NOT NULL DEFAULT '1' COMMENT '状态（默认字段,1:已启用 0:已删除 2:已停用）',
-
-    `user_id` varchar(32) NOT NULL COMMENT '用户id',
-    `app_name` varchar(32) NOT NULL COMMENT '应用名称',
-    `contract_status` varchar(42) NOT NULL COMMENT '部署状态',
-    `template_type` varchar(30) NOT NULL COMMENT '模板类型',
-    `deploy_time` datetime NULL COMMENT '最后部署时间',
-    `deploy_history` JSON NOT NULL COMMENT '部署历史记录',
-
-    -- files
-    `contract_file_uuids` JSON NOT NULL COMMENT '合约文件列表',
-    
-    KEY `idx_use_id`(`user_id`),
-    KEY `idx_app_name`(`app_name`),
-    PRIMARY KEY (`id`)  
-) COMMENT='用户应用表';
-
-DROP TABLE IF EXISTS tbl_pdfs_file;
-CREATE TABLE `tbl_pdfs_file` (
-  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '自增id',
-  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间（默认字段）',
-  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间（默认字段）',
-  `status` varchar(20) NOT NULL DEFAULT '1' COMMENT '状态（默认字段,1：有效  0：无效）',
-
-  `user_id` varchar(32) NOT NULL COMMENT '上传用户id',
-  `file_hash` varchar(66) NOT NULL COMMENT '文件哈希',
-  `tx_hash` varchar(66) NOT NULL COMMENT '交易哈希',
-  `file_suffix` varchar(8) NOT NULL COMMENT '文件后缀, jpg/png/pdf/sol/...',
-  `file_length` bigint NOT NULL COMMENT '文件大小, 字节数',
-  `file_name` varchar(255) NULL DEFAULT '' COMMENT '原始文件名',
-  `upload_time` DATETIME NOT NULL COMMENT '上传时间',
-  UNIQUE KEY `uk_file_hash`(`file_hash`),
-  KEY `idx_user_id`(`user_id`),
-  PRIMARY KEY (`id`)
-) COMMENT='PDFS文件上传信息表';
-
-DROP TABLE IF EXISTS tbl_pdfs_share;
-CREATE TABLE `tbl_pdfs_share` (
-  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '自增id',
-  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间（默认字段）',
-  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间（默认字段）',
-  `status` varchar(20) NOT NULL DEFAULT '1' COMMENT '状态（默认字段,1：有效  0：无效）',
-
-  `from_user_id` varchar(32) NOT NULL COMMENT '共享者用户id',
-  `to_user_id` varchar(32) NOT NULL COMMENT '接收用户id',
-  `file_hash` varchar(66) NOT NULL COMMENT 'pdfs文件哈希',
-  UNIQUE KEY `uk_user_id_hash`(`file_hash`, `to_user_id`),
-  PRIMARY KEY (`id`)
-) COMMENT='文件共享表';
 
 DROP TABLE IF EXISTS tbl_gas_apply;
 CREATE TABLE `tbl_gas_apply` (
