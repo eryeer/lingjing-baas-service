@@ -8,7 +8,6 @@ import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 
-import java.util.Date;
 import java.util.List;
 
 public interface UserMapper {
@@ -18,8 +17,12 @@ public interface UserMapper {
     String INSERT_VALS = " #{userId}, #{userName}, #{phoneNumber}, #{password}, #{role}, #{idNumber}, #{companyName}, #{uniSocialCreditCode}, #{legalPersonName}, #{legalPersonIdn}, #{applyTime}, #{approveStatus}, #{approveFeedback}, #{approveTime}, #{businessLicenseFileUuid}, #{businessLicenseCopyFileUuid}, #{idaFileUuid}, #{idbFileUuid}, #{legalPersonIdaFileUuid}, #{legalPersonIdbFileUuid} ";
 
     //根据手机号查询未删除用户
-    @Select("select " + BASIC_COLS + " from tbl_user where phone_number= #{phoneNumber} and status <> 0 and approve_status <> 'Rejected' limit 1")
+    @Select("select " + BASIC_COLS + " from tbl_user where phone_number= #{phoneNumber} and status <> 0 limit 1")
     User getUserByPhoneNumber(String phoneNumber);
+
+    //根据用户id查询未删除用户
+    @Select("select " + BASIC_COLS + " from tbl_user where user_id =#{userId} and status <> 0 and approve_status <> 'Rejected' ")
+    User getUserById(String userId);
 
     //根据会员号查询用户作为响应对象
     @Select("select " + BASIC_COLS + " from tbl_user where user_id =#{userId} and status <> 0 and approve_status <> 'Rejected' ")
@@ -33,18 +36,24 @@ public interface UserMapper {
     @Insert("insert into tbl_user (" + INSERT_COLS + ") " +
             "values ( " + INSERT_VALS + " )")
     void insertUser(User user);
-//
-//    //根据会员号更新会员信息, 不包含密码更新
-//    @Update("update tbl_user set user_name = #{userName}, phone_number = #{phoneNumber}, " +
-//            "role = #{role}, id_number = #{idNumber}, email = #{email}, ida_file_uuid = #{idaFileUuid}, idb_file_uuid = #{idbFileUuid}, " +
-//            "company_id = #{companyId}, company_name = #{companyName}, is_registered = #{isRegistered}, is_policy_signed = #{isPolicySigned} " +
-//            "where user_id = #{userId}")
-//    void updateUser(User user);
 
-    //更新用户密码
+    //根据用户id更新用户认证信息
+    @Update("update tbl_user set user_type = #{userType}, user_name = #{userName}, company_name = #{companyName}, " +
+            "id_number = #{idNumber}, uni_social_credit_code = #{uniSocialCreditCode}, legal_person_name = #{legalPersonName}, legal_person_idn = #{legalPersonIdn}, " +
+            "apply_time = #{applyTime},  ida_file_uuid = #{idaFileUuid}, idb_file_uuid = #{idbFileUuid}, " +
+            "business_license_file_uuid = #{businessLicenseFileUuid}, legal_person_ida_file_uuid = #{legalPersonIdaFileUuid}, legal_person_idb_file_uuid = #{legalPersonIdbFileUuid} " +
+            "where user_id = #{userId}")
+    void updateUser(User user);
+
+    // 更新用户密码
     @Update("update tbl_user set password = #{password} " +
             "where user_id = #{userId}")
     void updatePassword(String userId, String password);
+
+    // 更新用户手机号
+    @Update("update tbl_user set phone_number = #{phoneNumber} " +
+            "where user_id = #{userId}")
+    void updatePhoneNumber(String userId, String phoneNumber);
 
     // 审批用户
     @Update("update tbl_user set approve_status = #{approveStatus}, approve_feedback = #{approveFeedback}, approve_time = now() " +
@@ -61,18 +70,20 @@ public interface UserMapper {
 
     @Select("<script> " +
             "select " + BASIC_COLS + " from tbl_user " +
-            "<where> status != '0' and role !='PM' " +
-            "<if test='isPending == true'>AND approve_status = 'Pending' </if> " +
-            "<if test='isPending != true'>AND approve_status in ('Approved', 'Rejected') </if> " +
-            "<if test='userId != null'>AND user_Id = #{userId} </if> " +
+            "<where> status != '0' and role !='PM' and approve_status = #{approveStatus} " +
+            "<if test='userType != null'>AND user_Type = #{userType} </if> " +
             "<if test='userName != null'> AND user_name = #{userName} </if> " +
             "<if test='companyName != null'> AND company_name = #{companyName} </if> " +
             "<if test='phoneNumber != null'> AND phone_number = #{phoneNumber} </if> " +
-            "<if test='start != null'> AND apply_time between #{start} and #{end} </if> " +
+            "<if test='idNumber != null'> AND id_Number = #{idNumber} </if> " +
+            "<if test='uniSocialCreditCode != null'> AND uni_Social_Credit_Code = #{uniSocialCreditCode} </if> " +
+            "<if test='startApplyTime != null'> AND apply_time between #{startApplyTime} and #{endApplyTime} </if> " +
+            "<if test='startApproveTime != null'> AND approve_time between #{startApproveTime} and #{endApproveTime} </if> " +
             "</where>" +
             " order by update_time desc " +
             "</script>")
-    List<ResponseUser> getUserList(Boolean isPending, String userId, String userName, String companyName, String phoneNumber, Date start, Date end);
+    List<ResponseUser> getUserList(String approveStatus, String userType, String userName, String companyName, String phoneNumber,
+                                   String idNumber, String uniSocialCreditCode, Long startApplyTime, Long endApplyTime, Long startApproveTime, Long endApproveTime);
 
     //检查手机号是否重复
     @Select("select case  when   count(*)>0  then  1  else 0 end from tbl_user where  phone_number= #{phoneNumber} and status<>0")
@@ -83,9 +94,11 @@ public interface UserMapper {
     List<User> getUserByCompanyId(String centerId);
 
     //根据公司id批量更新
-    @Update("update tbl_user set  company_name = #{companyName} " +
+    @Update("update tbl_user set company_name = #{companyName} " +
             "where company_id = #{companyId}")
-    void updateUserList(User user);
+    void updateCompanyName(User user);
 
 
+    List<ResponseUser> getUserKycRecordList(String approveStatus, String userType, String kycType, String userName, String companyName, String phoneNumber,
+                                            String idNumber, String uniSocialCreditCode, Long startApproveTime, Long endApproveTime);
 }

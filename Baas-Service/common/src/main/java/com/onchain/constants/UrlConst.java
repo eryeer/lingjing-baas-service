@@ -15,9 +15,15 @@ public class UrlConst {
     public static final String LOGOUT = "/baas/user/logout";
     public static final String GET_USER_BY_ID = "/baas/user/getUserById";
     public static final String CHANGE_PASSWORD = "/baas/user/changePassword";
-    public static final String APPROVE_USER = "/baas/user/approveUser";
+    public static final String CHANGE_PHONE_NUMBER = "/baas/user/changePhoneNumber";
+    public static final String RESET_PASSWORD = "/baas/user/resetPassword";
+    public static final String SUBMIT_USER_KYC = "/baas/user/submitUserKyc";
+    public static final String APPROVE_USER_KYC = "/baas/user/approveUserKyc";
     public static final String GET_USER_LIST = "/baas/user/getUserList";
+    public static final String GET_USER_KYC_RECORD_LIST = "/baas/user/getUserKycRecordList";
 
+    public static final String APPROVE_USER = "/baas/user/approveUser";
+    
     public static final String SEND_REGISTER = "/baas/common/sendRegisterCode";
     public static final String SEND_LOGIN = "/baas/common/sendLoginCode";
     public static final String SEND_AUTH = "/baas/common/sendAuthCode";

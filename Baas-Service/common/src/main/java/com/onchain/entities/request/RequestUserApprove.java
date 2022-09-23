@@ -1,5 +1,6 @@
 package com.onchain.entities.request;
 
+import com.onchain.constants.CommonConst;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -7,6 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 
 @Data
 @Builder
@@ -18,7 +20,8 @@ public class RequestUserApprove {
 
     @ApiModelProperty(value = "审批状态")
     @NotNull
-    private Boolean isApproved;
+    @Pattern(regexp = CommonConst.APPROVE_STATUS)
+    private String approveStatus;
 
     @ApiModelProperty(value = "审批反馈信息")
     private String approveFeedback;

@@ -21,6 +21,8 @@ public class ResponseUser {
     private String status;
     @ApiModelProperty(value = "用户id")
     private String userId;
+    @ApiModelProperty(value = "认证类型")
+    private String userType;
     @ApiModelProperty(value = "用户姓名")
     private String userName;
     @ApiModelProperty(value = "手机")
@@ -48,8 +50,6 @@ public class ResponseUser {
 
     @ApiModelProperty(value = "营业执照正本文件id")
     private String businessLicenseFileUuid;
-    @ApiModelProperty(value = "营业执照副本id")
-    private String businessLicenseCopyFileUuid;
     @ApiModelProperty(value = "法人身份证正面文件id")
     private String legalPersonIdaFileUuid;
     @ApiModelProperty(value = "法人身份证反面文件id")
@@ -61,8 +61,6 @@ public class ResponseUser {
 
     @ApiModelProperty(value = "营业执照正本")
     private ResponseCosFile businessLicenseFile;
-    @ApiModelProperty(value = "营业执照副本")
-    private ResponseCosFile businessLicenseCopyFile;
     @ApiModelProperty(value = "法人身份证正面")
     private ResponseCosFile legalPersonIdaFile;
     @ApiModelProperty(value = "法人身份证反面")

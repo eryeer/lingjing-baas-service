@@ -7,6 +7,7 @@ import com.onchain.constants.ReturnCode;
 import com.onchain.entities.dao.User;
 import com.onchain.entities.request.RequestLogin;
 import com.onchain.entities.request.RequestRegister;
+import com.onchain.entities.request.RequestSubmitUserKyc;
 import com.onchain.entities.response.ResponseLogin;
 import com.onchain.entities.response.ResponseUser;
 import com.onchain.exception.CommonException;
@@ -53,8 +54,8 @@ public class UserService {
             throw new CommonException(ReturnCode.USER_INACTIVE);
         }
 
-        // 审批通过用户才能登录
-        if (!StringUtils.equals(CommonConst.APPROVED, user.getApproveStatus())) {
+        // 被拒绝用户不能登录
+        if (StringUtils.equals(CommonConst.REJECTED, user.getApproveStatus())) {
             throw new CommonException(ReturnCode.USER_PENDING);
         }
 
@@ -73,13 +74,12 @@ public class UserService {
         if (!smsService.verifyCode(requestRegister.getPhoneNumber(), CommonConst.SMS_REGISTER, requestRegister.getRegisterCode())) {
             throw new CommonException(ReturnCode.REGISTER_CODE_ERROR);
         }
-        // 失效验证码
-        smsService.disableCode(requestRegister.getPhoneNumber(), CommonConst.SMS_REGISTER, requestRegister.getRegisterCode());
         // 加密用户密码
         String encodedPassword = encodePassword(requestRegister.getPassword());
 
         User user = createDefaultUser();
-        BeanUtils.copyProperties(requestRegister, user);
+        user.setPhoneNumber(requestRegister.getPhoneNumber());
+//        BeanUtils.copyProperties(requestRegister, user);
         user.setPassword(encodedPassword);
         userMapper.insertUser(user);
         cosFileMapper.markFileUsed(Arrays.asList(user.getIdaFileUuid(), user.getIdbFileUuid(), user.getLegalPersonIdaFileUuid(), user.getLegalPersonIdbFileUuid(),
@@ -104,24 +104,7 @@ public class UserService {
     private User createDefaultUser() {
         return User.builder()
                 .userId(CommonUtil.getUUID())
-                .userName("")
-                .phoneNumber("")
-                .password("")
                 .role(CommonConst.CU)
-                .idNumber("")
-                .companyName("")
-                .uniSocialCreditCode("")
-                .legalPersonName("")
-                .legalPersonIdn("")
-                .applyTime(new Date())
-                .approveStatus(CommonConst.PENDING)
-                .approveFeedback("")
-                .businessLicenseFileUuid("")
-                .businessLicenseCopyFileUuid("")
-                .legalPersonIdaFileUuid("")
-                .legalPersonIdbFileUuid("")
-                .idaFileUuid("")
-                .idbFileUuid("")
                 .build();
     }
 
@@ -131,14 +114,12 @@ public class UserService {
         User user = checkLogin(request.getPhoneNumber());
         // 验证登录验证码
         if (!smsService.verifyCode(request.getPhoneNumber(), CommonConst.SMS_LOGIN, request.getLoginCode())) {
-            throw new CommonException(ReturnCode.LOGIN_CODE_ERROR);
+            throw new CommonException(ReturnCode.VERIFY_CODE_ERROR);
         }
         // 验证密码
         if (!checkPassword(user.getUserId(), request.getPassword())) {
             throw new CommonException(ReturnCode.USER_PASSWORD_ERROR);
         }
-        // 失效验证码
-        smsService.disableCode(request.getPhoneNumber(), CommonConst.SMS_LOGIN, request.getLoginCode());
         //登录日志
         loginLogMapper.insertLog(user.getUserId());
 
@@ -166,14 +147,14 @@ public class UserService {
         jwtService.logout(user.getUserId());
     }
 
-    public PageInfo<ResponseUser> getUserList(Integer pageNumber, Integer pageSize, Boolean isPending, String userId, String userName, String companyName, String phoneNumber, Date start, Date end) {
+    public PageInfo<ResponseUser> getUserList(Integer pageNumber, Integer pageSize, String approveStatus, String userType, String userName, String companyName, String phoneNumber,
+                                              String idNumber, String uniSocialCreditCode, Long startApplyTime, Long endApplyTime, Long startApproveTime, Long endApproveTime) {
         PageHelper.startPage(pageNumber, pageSize);
-        List<ResponseUser> users = userMapper.getUserList(isPending, userId, userName, companyName, phoneNumber, start, end);
+        List<ResponseUser> users = userMapper.getUserList(approveStatus, userType, userName, companyName, phoneNumber, idNumber, uniSocialCreditCode, startApplyTime, endApplyTime, startApproveTime, endApproveTime);
         for (ResponseUser user : users) {
             user.setIdaFile(cosService.getCosFile(user.getIdaFileUuid()));
             user.setIdbFile(cosService.getCosFile(user.getIdbFileUuid()));
             user.setBusinessLicenseFile(cosService.getCosFile(user.getBusinessLicenseFileUuid()));
-            user.setBusinessLicenseCopyFile(cosService.getCosFile(user.getBusinessLicenseCopyFileUuid()));
             user.setLegalPersonIdaFile(cosService.getCosFile(user.getLegalPersonIdaFileUuid()));
             user.setLegalPersonIdbFile(cosService.getCosFile(user.getLegalPersonIdbFileUuid()));
         }
@@ -189,7 +170,6 @@ public class UserService {
         user.setIdaFile(cosService.getCosFile(user.getIdaFileUuid()));
         user.setIdbFile(cosService.getCosFile(user.getIdbFileUuid()));
         user.setBusinessLicenseFile(cosService.getCosFile(user.getBusinessLicenseFileUuid()));
-        user.setBusinessLicenseCopyFile(cosService.getCosFile(user.getBusinessLicenseCopyFileUuid()));
         user.setLegalPersonIdaFile(cosService.getCosFile(user.getLegalPersonIdaFileUuid()));
         user.setLegalPersonIdbFile(cosService.getCosFile(user.getLegalPersonIdbFileUuid()));
         return user;
@@ -202,10 +182,53 @@ public class UserService {
         userMapper.updatePassword(userId, encodePassword(newPassword));
     }
 
-    public void approveUser(String userId, Boolean isApproved, String feedback) throws CommonException {
-        String approveStatus = isApproved ? CommonConst.APPROVED : CommonConst.REJECTED;
-        User user = User.builder().userId(userId).approveStatus(approveStatus).approveFeedback(feedback).build();
+    public void changePhoneNumber(String userId, String phoneNumber, String code) throws CommonException {
+        if (!smsService.verifyCode(phoneNumber, CommonConst.SMS_CHANGE_PHONE, code)) {
+            throw new CommonException(ReturnCode.VERIFY_CODE_ERROR);
+        }
+        userMapper.updatePhoneNumber(userId, phoneNumber);
+    }
+
+    public void approveUser(String userId, String approveStatus, String feedback) throws CommonException {
+        User user = User.builder().userId(userId).approveStatus(approveStatus).approveFeedback(feedback).approveTime(new Date().getTime()).build();
         userMapper.approveUser(user);
     }
 
+    public void resetPassword(String phoneNumber, String newPassword, String code) {
+        User user = getUserByPhoneNumber(phoneNumber);
+        if (user == null) {
+            throw new CommonException(ReturnCode.USER_NOT_EXIST);
+        }
+        if (!smsService.verifyCode(phoneNumber, CommonConst.SMS_CHANGE_PHONE, code)) {
+            throw new CommonException(ReturnCode.VERIFY_CODE_ERROR);
+        }
+        userMapper.updatePassword(user.getUserId(), newPassword);
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public void submitUserKyc(RequestSubmitUserKyc request, String userId) {
+        User user = userMapper.getUserById(userId);
+        if (user == null) {
+            throw new CommonException(ReturnCode.USER_NOT_EXIST);
+        }
+        BeanUtils.copyProperties(request, user);
+        user.setApplyTime(new Date().getTime());
+        userMapper.updateUser(user);
+        cosFileMapper.markFileUsed(Arrays.asList(user.getIdaFileUuid(), user.getIdbFileUuid(), user.getLegalPersonIdaFileUuid(), user.getLegalPersonIdbFileUuid(),
+                user.getBusinessLicenseCopyFileUuid(), user.getBusinessLicenseFileUuid()));
+    }
+
+    public PageInfo<ResponseUser> getUserKycRecordList(Integer pageNumber, Integer pageSize, String approveStatus, String userType, String kycType, String userName, String companyName, String phoneNumber,
+                                                       String idNumber, String uniSocialCreditCode, Long startApproveTime, Long endApproveTime) {
+        PageHelper.startPage(pageNumber, pageSize);
+        List<ResponseUser> users = userMapper.getUserKycRecordList(approveStatus, userType, kycType, userName, companyName, phoneNumber, idNumber, uniSocialCreditCode, startApproveTime, endApproveTime);
+        for (ResponseUser user : users) {
+            user.setIdaFile(cosService.getCosFile(user.getIdaFileUuid()));
+            user.setIdbFile(cosService.getCosFile(user.getIdbFileUuid()));
+            user.setBusinessLicenseFile(cosService.getCosFile(user.getBusinessLicenseFileUuid()));
+            user.setLegalPersonIdaFile(cosService.getCosFile(user.getLegalPersonIdaFileUuid()));
+            user.setLegalPersonIdbFile(cosService.getCosFile(user.getLegalPersonIdbFileUuid()));
+        }
+        return new PageInfo<>(users);
+    }
 }

@@ -53,7 +53,7 @@ public enum ReturnCode {
     USER_PENDING(19014, "用户未认证"),
 
     //验证码错误 【191xx】
-    LOGIN_CODE_ERROR(19101, "登录验证码错误"),
+    VERIFY_CODE_ERROR(19101, "验证码错误"),
     REGISTER_CODE_ERROR(19102, "注册验证码错误"),
     AUTH_CODE_ERROR(19103, "注册授权码错误"),
     SMS_INTERVAL_ERROR(19104, "用户验证码发送间隔太短"),

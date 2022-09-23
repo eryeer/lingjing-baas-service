@@ -2,7 +2,7 @@ spring:
   cloud:
     nacos:
       discovery:
-        server-addr: ${DISCOVERY:172.168.3.12:8848} # register center
+        server-addr: ${DISCOVERY:121.4.146.202:8848} # register center
       config:
-        server-addr: ${CONFIG:172.168.3.12:8848} # config center
+        server-addr: ${CONFIG:121.4.146.202:8848} # config center
         file-extension: yml

@@ -7,10 +7,7 @@ import com.onchain.constants.ReturnCode;
 import com.onchain.constants.UrlConst;
 import com.onchain.entities.ResponseFormat;
 import com.onchain.entities.dao.User;
-import com.onchain.entities.request.RequestChangePassword;
-import com.onchain.entities.request.RequestLogin;
-import com.onchain.entities.request.RequestRegister;
-import com.onchain.entities.request.RequestUserApprove;
+import com.onchain.entities.request.*;
 import com.onchain.entities.response.ResponseLogin;
 import com.onchain.entities.response.ResponseUser;
 import com.onchain.exception.CommonException;
@@ -26,8 +23,8 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
-import java.util.Date;
 
 @RestController
 @Slf4j
@@ -102,13 +99,41 @@ public class UserController {
         return new ResponseFormat<>();
     }
 
-    @PostMapping(value = UrlConst.APPROVE_USER)
-    @ApiOperation(value = "审批用户", notes = "审批用户")
+    @PostMapping(value = UrlConst.CHANGE_PHONE_NUMBER)
+    @ApiOperation(value = "修改用户手机号", notes = "修改用户手机号")
+    @OperLogAnnotation(description = "changePhoneNumber")
+    public ResponseFormat<?> changePhoneNumber(@Valid @RequestBody RequestChangePhoneNumber request,
+                                               @RequestHeader(CommonConst.HEADER_ACCESS_TOKEN) String accessToken) throws CommonException {
+        User user = jwtService.parseToken(accessToken);
+        userService.changePhoneNumber(user.getUserId(), request.getPhoneNumber(), request.getCode());
+        return new ResponseFormat<>();
+    }
+
+    @PostMapping(value = UrlConst.RESET_PASSWORD)
+    @ApiOperation(value = "忘记密码", notes = "忘记密码")
+    @OperLogAnnotation(description = "resetPassword")
+    public ResponseFormat<?> resetPassword(@Valid @RequestBody RequestResetPassword request) throws CommonException {
+        userService.resetPassword(request.getPhoneNumber(), request.getNewPassword(), request.getCode());
+        return new ResponseFormat<>();
+    }
+
+    @PostMapping(value = UrlConst.SUBMIT_USER_KYC)
+    @ApiOperation(value = "提交用户KYC", notes = "提交用户KYC")
+    @OperLogAnnotation(description = "submitUserKyc")
+    public ResponseFormat<?> submitUserKyc(@Valid @RequestBody RequestSubmitUserKyc request,
+                                           @RequestHeader(CommonConst.HEADER_ACCESS_TOKEN) String accessToken) throws CommonException {
+        User user = jwtService.parseToken(accessToken);
+        userService.submitUserKyc(request, user.getUserId());
+        return new ResponseFormat<>();
+    }
+
+    @PostMapping(value = UrlConst.APPROVE_USER_KYC)
+    @ApiOperation(value = "审批用户KYC", notes = "审批用户KYC")
     @OperLogAnnotation(description = "approveUser")
     public ResponseFormat<?> approveUser(@Valid @RequestBody RequestUserApprove request,
                                          @RequestHeader(CommonConst.HEADER_ACCESS_TOKEN) String accessToken) throws CommonException {
-        if ((!request.getIsApproved()) && StringUtils.isBlank(request.getApproveFeedback())) {
-            return new ResponseFormat<>(ReturnCode.PARAMETER_FAILED, "approveFeedback should not be blank when reject.");
+        if (!StringUtils.equals(CommonConst.APPROVED, request.getApproveStatus()) && StringUtils.isBlank(request.getApproveFeedback())) {
+            return new ResponseFormat<>(ReturnCode.PARAMETER_FAILED, "approveFeedback should not be blank when not approve.");
         }
 
         User user = jwtService.parseToken(accessToken);
@@ -116,7 +141,7 @@ public class UserController {
             return new ResponseFormat<>(ReturnCode.USER_ROLE_ERROR);
         }
 
-        userService.approveUser(request.getUserId(), request.getIsApproved(), request.getApproveFeedback());
+        userService.approveUser(request.getUserId(), request.getApproveStatus(), request.getApproveFeedback());
         return new ResponseFormat<>();
     }
 
@@ -125,34 +150,50 @@ public class UserController {
     @OperLogAnnotation(description = "getUserList")
     public ResponseFormat<PageInfo<ResponseUser>> getUserList(@RequestParam(name = "pageNumber") @Min(1) Integer pageNumber,
                                                               @RequestParam(name = "pageSize") @Min(1) @Max(50) Integer pageSize,
-                                                              @RequestParam(required = true) Boolean isPending,
-                                                              @RequestParam(required = false) String userId,
+                                                              @RequestParam(required = true) @NotBlank String approveStatus,
+                                                              @RequestParam(required = false) String userType,
+                                                              @RequestParam(required = false) String phoneNumber,
                                                               @RequestParam(required = false) String userName,
                                                               @RequestParam(required = false) String companyName,
-                                                              @RequestParam(required = false) String phoneNumber,
-                                                              @RequestParam(required = false) Long startTime,
-                                                              @RequestParam(required = false) Long endTime,
+                                                              @RequestParam(required = false) String idNumber,
+                                                              @RequestParam(required = false) String uniSocialCreditCode,
+                                                              @RequestParam(required = false) Long startApplyTime,
+                                                              @RequestParam(required = false) Long endApplyTime,
+                                                              @RequestParam(required = false) Long startApproveTime,
+                                                              @RequestParam(required = false) Long endApproveTime,
                                                               @RequestHeader(CommonConst.HEADER_ACCESS_TOKEN) String accessToken) throws CommonException {
-        if (isPending == null) {
-            return new ResponseFormat<>(ReturnCode.PARAMETER_FAILED, "isPending shouldn't be null");
+        User user = jwtService.parseToken(accessToken);
+        if (!StringUtils.equals(CommonConst.PM, user.getRole())) {
+            return new ResponseFormat<>(ReturnCode.USER_ROLE_ERROR);
         }
 
-        Date start = null;
-        Date end = null;
-        if (startTime != null) {
-            if (!(startTime <= endTime)) {
-                return new ResponseFormat<>(ReturnCode.PARAMETER_FAILED, "startTime should before endTime");
-            }
-            start = new Date(startTime);
-            end = new Date(endTime);
-        }
+        PageInfo<ResponseUser> result = userService.getUserList(pageNumber, pageSize, approveStatus, userType, userName, companyName, phoneNumber, idNumber, uniSocialCreditCode, startApplyTime, endApplyTime, startApproveTime, endApproveTime);
+        return new ResponseFormat<>(result);
+    }
+
+    @GetMapping(value = UrlConst.GET_USER_KYC_RECORD_LIST)
+    @ApiOperation(value = "获取用户KYC记录列表", notes = "获取用户KYC记录列表")
+    @OperLogAnnotation(description = "getUserKycRecordList")
+    public ResponseFormat<PageInfo<ResponseUser>> getUserKycRecordList(@RequestParam(name = "pageNumber") @Min(1) Integer pageNumber,
+                                                                       @RequestParam(name = "pageSize") @Min(1) @Max(50) Integer pageSize,
+                                                                       @RequestParam(required = false) String approveStatus,
+                                                                       @RequestParam(required = false) String userType,
+                                                                       @RequestParam(required = false) String kycType,
+                                                                       @RequestParam(required = false) String userName,
+                                                                       @RequestParam(required = false) String companyName,
+                                                                       @RequestParam(required = false) String phoneNumber,
+                                                                       @RequestParam(required = false) String idNumber,
+                                                                       @RequestParam(required = false) String uniSocialCreditCode,
+                                                                       @RequestParam(required = false) Long startApproveTime,
+                                                                       @RequestParam(required = false) Long endApproveTime,
+                                                                       @RequestHeader(CommonConst.HEADER_ACCESS_TOKEN) String accessToken) throws CommonException {
 
         User user = jwtService.parseToken(accessToken);
         if (!StringUtils.equals(CommonConst.PM, user.getRole())) {
             return new ResponseFormat<>(ReturnCode.USER_ROLE_ERROR);
         }
 
-        PageInfo<ResponseUser> result = userService.getUserList(pageNumber, pageSize, isPending, userId, userName, companyName, phoneNumber, start, end);
+        PageInfo<ResponseUser> result = userService.getUserKycRecordList(pageNumber, pageSize, approveStatus, userType, kycType, userName, companyName, phoneNumber, idNumber, uniSocialCreditCode, startApproveTime, endApproveTime);
         return new ResponseFormat<>(result);
     }
 }

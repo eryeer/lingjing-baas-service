@@ -98,7 +98,9 @@ public class CommonConst {
     // 验证码类型
     public static final String SMS_REGISTER = "R"; // 注册验证码
     public static final String SMS_LOGIN = "L"; // 登录验证码
-    public static final String SMS_AUTH = "RA"; // 注册授权码
+    public static final String SMS_CHANGE_PHONE = "CP"; // 修改手机号验证码
+    public static final String SMS_RESET = "RS"; // 重置验证码
+    public static final String CODE_TYPE_REGEX = "^(R)|(L)|(CP)|(RS)$";
 
     // COS 对象存储
     public static final String JPG = "image/jpeg";
@@ -135,6 +137,8 @@ public class CommonConst {
     public static final String PENDING = "Pending"; // 待审批
     public static final String APPROVED = "Approved"; // 审批通过
     public static final String REJECTED = "Rejected"; // 已拒绝
+    public static final String TO_BE_UPDATED = "ToBeUpdated"; // 需修改
+    public static final String APPROVE_STATUS = "^(Approved)|(Rejected)|(ToBeUpdated)$";
 
     //供应商列表待办 已办
     public static final String LIST_TYPE = "0";//待办

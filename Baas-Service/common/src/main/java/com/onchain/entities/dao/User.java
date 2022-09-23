@@ -2,8 +2,6 @@ package com.onchain.entities.dao;
 
 import lombok.*;
 
-import java.util.Date;
-
 @Data
 @EqualsAndHashCode(callSuper = true)
 @Builder
@@ -11,6 +9,7 @@ import java.util.Date;
 @AllArgsConstructor
 public class User extends Base {
     private String userId;
+    private String userType;
     private String userName;
     private String phoneNumber;
     private String password;
@@ -21,10 +20,10 @@ public class User extends Base {
     private String uniSocialCreditCode;
     private String legalPersonName;
     private String legalPersonIdn;
-    private Date applyTime;
+    private Long applyTime;
     private String approveStatus;
     private String approveFeedback;
-    private Date approveTime;
+    private Long approveTime;
 
     private String businessLicenseFileUuid;
     private String businessLicenseCopyFileUuid;

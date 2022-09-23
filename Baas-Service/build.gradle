@@ -40,7 +40,7 @@ subprojects {
                 'org.springframework.boot:spring-boot-starter-log4j2',
                 'com.alibaba.cloud:spring-cloud-starter-alibaba-nacos-discovery',
                 'com.alibaba.cloud:spring-cloud-starter-alibaba-nacos-config',
-                'com.alibaba:fastjson:1.2.24',
+                'com.alibaba:fastjson:1.2.83',
                 'org.projectlombok:lombok',
                 'org.springframework.boot:spring-boot-starter-aop',
                 'io.springfox:springfox-swagger2:2.7.0',

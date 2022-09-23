@@ -10,7 +10,7 @@ spring:
   application:
     name: baas-service #指定服务名
   profiles:
-    active: ${ENV:uat}
+    active: ${ENV:dev}
   jackson:
     serialization:
       write-dates-as-timestamps: true

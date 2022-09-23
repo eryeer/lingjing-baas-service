@@ -93,9 +93,6 @@ public class SmsService {
             case CommonConst.SMS_LOGIN:
                 templateId = paramsConfig.loginTempId;
                 break;
-            case CommonConst.SMS_AUTH:
-                templateId = paramsConfig.authTempId;
-                break;
             default:
                 throw new CommonException(ReturnCode.PARAMETER_FAILED, "codeType");
         }
@@ -125,23 +122,17 @@ public class SmsService {
         return sendCode(phoneNumber, CommonConst.SMS_LOGIN, LOGIN_CODE_VALID_SECONDS);
     }
 
-    // 注册授权码
-    public String sendAuthCode(String phoneNumber) throws CommonException {
-        return sendCode(phoneNumber, CommonConst.SMS_AUTH, AUTH_CODE_VALID_SECONDS);
-    }
-
     // 验证短信验证码
     public Boolean verifyCode(String phoneNumber, String codeType, String code) {
         SmsCode lastSmsCode = smsCodeMapper.getLastSmsCode(phoneNumber, codeType);
         if (lastSmsCode == null) {
             return false;
         }
-        return StringUtils.equals(code, lastSmsCode.getCode());
+        if (StringUtils.equals(code, lastSmsCode.getCode())) {
+            // 使短信验证码失效
+            smsCodeMapper.disableSmsCode(phoneNumber, codeType, code);
+            return true;
+        }
+        return false;
     }
-
-    // 使短信验证码失效
-    public void disableCode(String phoneNumber, String codeType, String code) {
-        smsCodeMapper.disableSmsCode(phoneNumber, codeType, code);
-    }
-
 }

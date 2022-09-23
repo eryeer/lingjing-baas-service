@@ -1,12 +1,12 @@
 spring:
   datasource:
-    url: ${MYSQL_URL:jdbc:mysql://172.168.3.12:3306/dna2_baas?characterEncoding=utf-8&serverTimezone=Asia/Shanghai&allowMultiQueries=true&rewriteBatchedStatements=true}
+    url: ${MYSQL_URL:jdbc:mysql://127.0.0.1:3306/lingjing_baas?characterEncoding=utf-8&serverTimezone=Asia/Shanghai&allowMultiQueries=true&rewriteBatchedStatements=true}
     username: ${MYSQL_USERNAME:root}
     password: ${MYSQL_PASSWORD:root}
 
   redis:
     database: ${REDIS_DATABASE:0}
-    host: ${REDIS_HOST:172.168.3.66}
+    host: ${REDIS_HOST:127.0.0.1}
     password: ${REDIS_PASSWORD:password}
     port: ${REDIS_PORT:6379}
 
