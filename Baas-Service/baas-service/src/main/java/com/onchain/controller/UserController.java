@@ -127,7 +127,7 @@ public class UserController {
         return new ResponseFormat<>();
     }
 
-    @PostMapping(value = UrlConst.APPROVE_USER_KYC)
+    @PostMapping(value = UrlConst.APPROVE_USER)
     @ApiOperation(value = "审批用户KYC", notes = "审批用户KYC")
     @OperLogAnnotation(description = "approveUser")
     public ResponseFormat<?> approveUser(@Valid @RequestBody RequestUserApprove request,

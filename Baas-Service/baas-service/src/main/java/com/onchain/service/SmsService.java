@@ -73,7 +73,7 @@ public class SmsService {
         }
     }
 
-    private String sendCode(String phoneNumber, String codeType, Integer seconds) throws CommonException {
+    public String sendCode(String phoneNumber, String codeType, Integer seconds) throws CommonException {
         Date now = new Date();
         Date expire = DateUtils.addSeconds(now, seconds);
         SmsCode smsCode = smsCodeMapper.getLastSmsCode(phoneNumber, codeType);
@@ -85,17 +85,7 @@ public class SmsService {
         }
 
         String code = RandomStringUtils.randomNumeric(6);
-        String templateId;
-        switch (codeType) {
-            case CommonConst.SMS_REGISTER:
-                templateId = paramsConfig.registerTempId;
-                break;
-            case CommonConst.SMS_LOGIN:
-                templateId = paramsConfig.loginTempId;
-                break;
-            default:
-                throw new CommonException(ReturnCode.PARAMETER_FAILED, "codeType");
-        }
+        String templateId = paramsConfig.verifyTempId;
         // 开发测试环境不发送
         if (!paramsConfig.smsTest) {
             sendVerifyCode(phoneNumber, code, templateId);
@@ -110,16 +100,6 @@ public class SmsService {
                 .build();
         smsCodeMapper.insertSmsCode(item);
         return code;
-    }
-
-    // 注册验证码
-    public String sendRegisterCode(String phoneNumber) throws CommonException {
-        return sendCode(phoneNumber, CommonConst.SMS_REGISTER, LOGIN_CODE_VALID_SECONDS);
-    }
-
-    // 登录验证码
-    public String sendLoginCode(String phoneNumber) throws CommonException {
-        return sendCode(phoneNumber, CommonConst.SMS_LOGIN, LOGIN_CODE_VALID_SECONDS);
     }
 
     // 验证短信验证码

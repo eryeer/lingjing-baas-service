@@ -24,7 +24,8 @@ public class CommonConst {
     public static final int GENESIS_MONTH = 1580486400; // 2020-02-01
 
     public static final int ONE_DAY_IN_SEC = 86400;
-
+    public static final int TEN_MINUTES = 10 * 60;
+    
     public static final String ADDR_DAILY_SUMMARY_NATIVETYPE = "0000000000000000000000000000000000000000";
 
     public static final int POOL_MAXTOTAL = 200;
@@ -101,6 +102,7 @@ public class CommonConst {
     public static final String SMS_CHANGE_PHONE = "CP"; // 修改手机号验证码
     public static final String SMS_RESET = "RS"; // 重置验证码
     public static final String CODE_TYPE_REGEX = "^(R)|(L)|(CP)|(RS)$";
+
 
     // COS 对象存储
     public static final String JPG = "image/jpeg";

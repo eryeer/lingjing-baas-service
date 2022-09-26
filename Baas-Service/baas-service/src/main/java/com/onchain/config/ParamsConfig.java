@@ -36,14 +36,8 @@ public class ParamsConfig {
     @Value("${cloud.sms.appId}")
     public String smsAppId;
 
-    @Value("${cloud.sms.registerTempId}")
-    public String registerTempId;
-
-    @Value("${cloud.sms.loginTempId}")
-    public String loginTempId;
-
-    @Value("${cloud.sms.authTempId}")
-    public String authTempId;
+    @Value("${cloud.sms.verifyTempId}")
+    public String verifyTempId;
 
     @Value("${cloud.sms.sign}")
     public String smsSign;

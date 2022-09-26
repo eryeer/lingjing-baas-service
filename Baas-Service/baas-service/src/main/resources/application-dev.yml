@@ -7,11 +7,11 @@ spring:
   redis:
     database: ${REDIS_DATABASE:0}
     host: ${REDIS_HOST:127.0.0.1}
-    password: ${REDIS_PASSWORD:password}
+    #    password: ${REDIS_PASSWORD:password}
     port: ${REDIS_PORT:6379}
 
   zipkin:
-    base-url: ${ZIPKIN:http://172.168.3.64:9411}
+    base-url: ${ZIPKIN:http://121.4.146.202:9411}
   sleuth:
     sampler:
       #采样取值介于 0到1之间，1则表示全部收集
@@ -38,7 +38,7 @@ pdfs:
 
 jwt:
   secret:
-    code: ${JWT_CODE:01234567}
+    code: ${JWT_CODE:lingjing2022}
 
 cloud:
   cos:
@@ -55,6 +55,6 @@ cloud:
     appId: 1400471113
     registerTempId: 857603
     loginTempId: 857605
-    authTempId: 857608
+    verifyTempId: 1551091
     sign: 分布科技
     test: ${SMS_TEST:true}

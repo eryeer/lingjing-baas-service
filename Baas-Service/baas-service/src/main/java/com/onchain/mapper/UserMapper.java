@@ -12,9 +12,9 @@ import java.util.List;
 
 public interface UserMapper {
     // password not in BASIC_COLS
-    String INSERT_COLS = " user_id, user_name, phone_number, password, role, id_number, company_name, uni_social_credit_code, legal_person_name, legal_person_idn, apply_time, approve_status, approve_feedback, approve_time, business_license_file_uuid, business_license_copy_file_uuid, ida_file_uuid, idb_file_uuid, legal_person_ida_file_uuid, legal_person_idb_file_uuid ";
+    String INSERT_COLS = " user_id, user_name, user_type, phone_number, password, role, id_number, company_name, uni_social_credit_code, legal_person_name, legal_person_idn, apply_time, approve_status, approve_feedback, approve_time, business_license_file_uuid, ida_file_uuid, idb_file_uuid, legal_person_ida_file_uuid, legal_person_idb_file_uuid ";
     String BASIC_COLS = " id, create_time, update_time, status, " + INSERT_COLS;
-    String INSERT_VALS = " #{userId}, #{userName}, #{phoneNumber}, #{password}, #{role}, #{idNumber}, #{companyName}, #{uniSocialCreditCode}, #{legalPersonName}, #{legalPersonIdn}, #{applyTime}, #{approveStatus}, #{approveFeedback}, #{approveTime}, #{businessLicenseFileUuid}, #{businessLicenseCopyFileUuid}, #{idaFileUuid}, #{idbFileUuid}, #{legalPersonIdaFileUuid}, #{legalPersonIdbFileUuid} ";
+    String INSERT_VALS = " #{userId}, #{userName}, #{userType}, #{phoneNumber}, #{password}, #{role}, #{idNumber}, #{companyName}, #{uniSocialCreditCode}, #{legalPersonName}, #{legalPersonIdn}, #{applyTime}, #{approveStatus}, #{approveFeedback}, #{approveTime}, #{businessLicenseFileUuid}, #{idaFileUuid}, #{idbFileUuid}, #{legalPersonIdaFileUuid}, #{legalPersonIdbFileUuid} ";
 
     //根据手机号查询未删除用户
     @Select("select " + BASIC_COLS + " from tbl_user where phone_number= #{phoneNumber} and status <> 0 limit 1")

@@ -40,25 +40,13 @@ public class CommonController {
     private final JwtService jwtService;
     private final ParamsConfig paramsConfig;
 
-    @PostMapping(value = UrlConst.SEND_REGISTER)
-    @ApiOperation(value = "发送注册短信验证码", notes = "发送注册短信验证码")
-    @OperLogAnnotation(description = "sendRegisterCode")
-    public ResponseFormat<String> sendRegisterCode(@RequestParam @Pattern(regexp = CommonConst.PHONE_REGEX) String phoneNumber) throws CommonException {
-        if (!userService.checkUserRegister(phoneNumber)) {
-            return new ResponseFormat<>(ReturnCode.USER_IS_REGISTER);
-        }
-        String code = smsService.sendRegisterCode(phoneNumber);
-        log.info("sendRegisterCode: " + phoneNumber + ", " + code);
-        return new ResponseFormat<>();
-    }
-
-    @PostMapping(value = UrlConst.SEND_LOGIN)
-    @ApiOperation(value = "发送登录短信验证码", notes = "发送登录短信验证码")
+    @PostMapping(value = UrlConst.SEND_VERIFY_CODE)
+    @ApiOperation(value = "发送短信验证码", notes = "发送短信验证码")
     @OperLogAnnotation(description = "sendLoginCode")
     public ResponseFormat<String> sendLoginCode(@RequestParam @Pattern(regexp = CommonConst.PHONE_REGEX) String phoneNumber,
                                                 @RequestParam @Pattern(regexp = CommonConst.CODE_TYPE_REGEX) String codeType) throws CommonException {
         userService.checkLogin(phoneNumber);
-        String code = smsService.sendLoginCode(phoneNumber);
+        String code = smsService.sendCode(phoneNumber, codeType, CommonConst.TEN_MINUTES);
         log.info("sendLoginCode: " + phoneNumber + ", " + code);
         return new ResponseFormat<>();
     }

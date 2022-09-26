@@ -18,15 +18,11 @@ public class UrlConst {
     public static final String CHANGE_PHONE_NUMBER = "/baas/user/changePhoneNumber";
     public static final String RESET_PASSWORD = "/baas/user/resetPassword";
     public static final String SUBMIT_USER_KYC = "/baas/user/submitUserKyc";
-    public static final String APPROVE_USER_KYC = "/baas/user/approveUserKyc";
+    public static final String APPROVE_USER = "/baas/user/approveUserKyc";
     public static final String GET_USER_LIST = "/baas/user/getUserList";
     public static final String GET_USER_KYC_RECORD_LIST = "/baas/user/getUserKycRecordList";
 
-    public static final String APPROVE_USER = "/baas/user/approveUser";
-    
-    public static final String SEND_REGISTER = "/baas/common/sendRegisterCode";
-    public static final String SEND_LOGIN = "/baas/common/sendLoginCode";
-    public static final String SEND_AUTH = "/baas/common/sendAuthCode";
+    public static final String SEND_VERIFY_CODE = "/baas/common/sendVerifyCode";
     public static final String UPLOAD_FILE = "/baas/common/uploadFile";
     public static final String UPDATE_FILE = "/baas/common/updateFile";
     public static final String GET_SERVER_TIME = "/baas/common/getServerTime";
@@ -80,16 +76,16 @@ public class UrlConst {
 
 
     // 不需要登录的接口
-    public static final String[] NOT_LOGIN_URLS = {REGISTER_USER, CHECK_USER_REGISTER, LOGIN, REFRESH_TOKEN, SEND_REGISTER, SEND_LOGIN, GET_SERVER_TIME, GET_RETURN_CODES, UPLOAD_FILE,};
+    public static final String[] NOT_LOGIN_URLS = {REGISTER_USER, CHECK_USER_REGISTER, LOGIN, REFRESH_TOKEN, SEND_VERIFY_CODE, GET_SERVER_TIME, GET_RETURN_CODES, UPLOAD_FILE, RESET_PASSWORD};
     // 所有角色都可以访问的接口
-    public static final String[] COMMON_URLS = {LOGOUT, GET_USER_BY_ID, CHANGE_PASSWORD, GET_PLATFORM_INFO, UPDATE_FILE, GET_TOOLS,
+    public static final String[] COMMON_URLS = {LOGOUT, GET_USER_BY_ID, CHANGE_PASSWORD, CHANGE_PHONE_NUMBER, GET_PLATFORM_INFO, UPDATE_FILE, GET_TOOLS,
             GET_BLOCK_LIST, GET_BLOCK, GET_TRANSACTION_LIST, GET_TRANSACTION, GET_ADDRESS_LIST, GET_ADDRESS, GET_TRANSACTION_LIST_BY_ADDRESS, GET_TOTAL_SUMMARY, GET_ADDRESS_SUMMARY, GET_BLOCK_SUMMARY, GET_TRANSACTION_SUMMARY};
     // 普通用户 可以访问的接口
     public static final String[] CU_URLS = {APP_CREATE, APP_REMOVE, GET_APP_LIST, GET_APP, GET_CONTRACT_TEMPLATES, DEPLOY, UPDATE_FILE_LIST,
             ACCOUNT_CREATE, GET_CHAIN_ACCOUNT, APPLY_GAS, GET_APPLY_LIST, UPLOAD_PDFS, GET_PDFS_LIST, DOWNLOAD_PDFS, SHARE_PDFS,
-            SEND_CROSS_CHAIN, GET_CROSS_CHAIN, GET_CROSS_CHAIN_LIST, SET_CROSS_DST, GET_CROSS_TBD_LIST};
+            SEND_CROSS_CHAIN, GET_CROSS_CHAIN, GET_CROSS_CHAIN_LIST, SET_CROSS_DST, GET_CROSS_TBD_LIST, SUBMIT_USER_KYC};
     // SM 可以访问的接口
-    public static final String[] PM_URLS = {APPROVE_USER, GET_USER_LIST};
+    public static final String[] PM_URLS = {APPROVE_USER, GET_USER_LIST, GET_USER_KYC_RECORD_LIST};
 
     // 不能通过网关访问的接口
     public static final String[] INTERNAL_URLS = {};

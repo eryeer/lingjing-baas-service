@@ -41,14 +41,14 @@ CREATE TABLE `tbl_user` (
 ) COMMENT='用户信息表';
 
 -- 默认平台管理员(密码采用SHA256格式)
-insert into tbl_user (user_id,user_type，user_name,phone_number,password,role,
+insert into tbl_user (user_id,user_type,user_name,phone_number,password,role,
 id_number,company_name,uni_social_credit_code,legal_person_name,legal_person_idn,
 approve_status,approve_feedback,approve_time,ida_file_uuid,idb_file_uuid,
-legal_person_ida_file_uuid,legal_person_idb_file_uuid,business_license_file_uuid,business_license_copy_file_uuid)
-values ("admin","CO","admin","18801791237","9a13ee20f791275ef0b253fe78c8bb8016c76e6d652e02dcbf65d8ad0dd3a6b0","PM",
+legal_person_ida_file_uuid,legal_person_idb_file_uuid,business_license_file_uuid)
+values ("admin","EC","admin","18801791237","9a13ee20f791275ef0b253fe78c8bb8016c76e6d652e02dcbf65d8ad0dd3a6b0","PM",
 '','','','','',
 'Approved','',now(),'','',
-'','','','');
+'','','');
 
 DROP TABLE IF EXISTS tbl_approve_history;
 CREATE TABLE `tbl_approve_history` (
@@ -73,6 +73,7 @@ CREATE TABLE `tbl_approve_history` (
     `approve_status` varchar(15) NOT NULL DEFAULT 'Pending' COMMENT '审批状态（Pending：待认证 Approved：已认证 Rejected：已拒绝 ToBeUpdated：待修改）',
     `approve_feedback` varchar(500) NOT NULL DEFAULT '' COMMENT '审批反馈信息',
     `approve_time` datetime NULL COMMENT '审批时间',
+    `kyc_type` varchar(10) NOT NULL DEFAULT 'NEW' COMMENT '核验类型（NEW 新用户KYC, UPDATE 用户认证信息变更）',
 
     -- files
     `business_license_file_uuid` varchar(32) NOT NULL DEFAULT '' COMMENT '营业执照正本',
@@ -170,8 +171,4 @@ CREATE TABLE `tbl_gas_apply` (
     KEY `idx_user_id`(`user_id`),
     PRIMARY KEY (`id`)
 ) COMMENT='燃料申领记录表';
-
-
-
-
 
