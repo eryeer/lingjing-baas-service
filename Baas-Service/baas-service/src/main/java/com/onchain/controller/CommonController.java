@@ -42,13 +42,18 @@ public class CommonController {
 
     @PostMapping(value = UrlConst.SEND_VERIFY_CODE)
     @ApiOperation(value = "发送短信验证码", notes = "发送短信验证码")
-    @OperLogAnnotation(description = "sendLoginCode")
-    public ResponseFormat<String> sendLoginCode(@RequestParam @Pattern(regexp = CommonConst.PHONE_REGEX) String phoneNumber,
-                                                @RequestParam @Pattern(regexp = CommonConst.CODE_TYPE_REGEX) String codeType) throws CommonException {
-        userService.checkLogin(phoneNumber);
+    @OperLogAnnotation(description = "sendVerifyCode")
+    public ResponseFormat<String> sendVerifyCode(@RequestParam @Pattern(regexp = CommonConst.PHONE_REGEX) String phoneNumber,
+                                                 @RequestParam @Pattern(regexp = CommonConst.CODE_TYPE_REGEX) String codeType) throws CommonException {
+        if (StringUtils.equalsAny(codeType, CommonConst.SMS_LOGIN, CommonConst.SMS_CHANGE_PHONE, CommonConst.SMS_RESET)) {
+            userService.checkLogin(phoneNumber);
+        }
+        if (StringUtils.equals(codeType, CommonConst.SMS_REGISTER) && !userService.checkUserRegister(phoneNumber)) {
+            return new ResponseFormat<>(ReturnCode.USER_EXIST);
+        }
         String code = smsService.sendCode(phoneNumber, codeType, CommonConst.TEN_MINUTES);
         log.info("sendLoginCode: " + phoneNumber + ", " + code);
-        return new ResponseFormat<>();
+        return new ResponseFormat<>(code);
     }
 
     @RequestLimit

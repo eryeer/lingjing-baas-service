@@ -127,7 +127,7 @@ public class UserController {
         return new ResponseFormat<>();
     }
 
-    @PostMapping(value = UrlConst.APPROVE_USER)
+    @PostMapping(value = UrlConst.APPROVE_USER_KYC)
     @ApiOperation(value = "审批用户KYC", notes = "审批用户KYC")
     @OperLogAnnotation(description = "approveUser")
     public ResponseFormat<?> approveUser(@Valid @RequestBody RequestUserApprove request,
@@ -141,7 +141,7 @@ public class UserController {
             return new ResponseFormat<>(ReturnCode.USER_ROLE_ERROR);
         }
 
-        userService.approveUser(request.getUserId(), request.getApproveStatus(), request.getApproveFeedback());
+        userService.approveUser(request.getUserId(), request.getApproveStatus(), request.getApproveFeedback(), request.getKycType());
         return new ResponseFormat<>();
     }
 

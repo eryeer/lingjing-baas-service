@@ -47,10 +47,6 @@ public class RequestSubmitUserKyc {
     @NotBlank
     private String businessLicenseFileUuid;
 
-    @ApiModelProperty(value = "营业执照副本")
-    @NotBlank
-    private String businessLicenseCopyFileUuid;
-
     @ApiModelProperty(value = "用户身份证正面")
     @NotBlank
     private String idaFileUuid;

@@ -41,14 +41,8 @@ CREATE TABLE `tbl_user` (
 ) COMMENT='用户信息表';
 
 -- 默认平台管理员(密码采用SHA256格式)
-insert into tbl_user (user_id,user_type,user_name,phone_number,password,role,
-id_number,company_name,uni_social_credit_code,legal_person_name,legal_person_idn,
-approve_status,approve_feedback,approve_time,ida_file_uuid,idb_file_uuid,
-legal_person_ida_file_uuid,legal_person_idb_file_uuid,business_license_file_uuid)
-values ("admin","EC","admin","18801791237","9a13ee20f791275ef0b253fe78c8bb8016c76e6d652e02dcbf65d8ad0dd3a6b0","PM",
-'','','','','',
-'Approved','',now(),'','',
-'','','');
+insert into tbl_user (user_id,user_type,user_name,phone_number,password,role,approve_status)
+values ("admin","EC","admin","18801791237","9a13ee20f791275ef0b253fe78c8bb8016c76e6d652e02dcbf65d8ad0dd3a6b0","PM",'Approved');
 
 DROP TABLE IF EXISTS tbl_approve_history;
 CREATE TABLE `tbl_approve_history` (
@@ -56,6 +50,8 @@ CREATE TABLE `tbl_approve_history` (
     `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间（默认字段）',
     `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间（默认字段）',
     `status` varchar(20) NOT NULL DEFAULT '1' COMMENT '状态（默认字段,1:已启用 0:已删除 2:已停用）',
+
+    `kyc_type` varchar(10) NOT NULL DEFAULT 'NEW' COMMENT '核验类型（NEW 新用户KYC, UPDATE 用户认证信息变更）',
 
     `user_id` varchar(32) NOT NULL COMMENT '用户id',
     `user_type` varchar(5) NOT NULL DEFAULT '' COMMENT '认证类型（PC 个人认证, EC 企业认证）',
@@ -69,11 +65,10 @@ CREATE TABLE `tbl_approve_history` (
     `uni_social_credit_code` varchar(18) NOT NULL DEFAULT '' COMMENT '统一社会信用代码（必须为18位的字母数字组合）',
     `legal_person_name` varchar(10) NOT NULL DEFAULT '' COMMENT '法人姓名',
     `legal_person_idn` varchar(18) NOT NULL DEFAULT '' COMMENT '法人身份证号码',
-    `apply_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '申请时间',
+    `apply_time` bigint NOT NULL DEFAULT 0 COMMENT '申请时间',
     `approve_status` varchar(15) NOT NULL DEFAULT 'Pending' COMMENT '审批状态（Pending：待认证 Approved：已认证 Rejected：已拒绝 ToBeUpdated：待修改）',
     `approve_feedback` varchar(500) NOT NULL DEFAULT '' COMMENT '审批反馈信息',
-    `approve_time` datetime NULL COMMENT '审批时间',
-    `kyc_type` varchar(10) NOT NULL DEFAULT 'NEW' COMMENT '核验类型（NEW 新用户KYC, UPDATE 用户认证信息变更）',
+    `approve_time` bigint NOT NULL DEFAULT 0 COMMENT '审批时间',
 
     -- files
     `business_license_file_uuid` varchar(32) NOT NULL DEFAULT '' COMMENT '营业执照正本',

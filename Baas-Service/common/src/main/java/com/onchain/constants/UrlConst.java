@@ -18,7 +18,7 @@ public class UrlConst {
     public static final String CHANGE_PHONE_NUMBER = "/baas/user/changePhoneNumber";
     public static final String RESET_PASSWORD = "/baas/user/resetPassword";
     public static final String SUBMIT_USER_KYC = "/baas/user/submitUserKyc";
-    public static final String APPROVE_USER = "/baas/user/approveUserKyc";
+    public static final String APPROVE_USER_KYC = "/baas/user/approveUserKyc";
     public static final String GET_USER_LIST = "/baas/user/getUserList";
     public static final String GET_USER_KYC_RECORD_LIST = "/baas/user/getUserKycRecordList";
 
@@ -85,7 +85,7 @@ public class UrlConst {
             ACCOUNT_CREATE, GET_CHAIN_ACCOUNT, APPLY_GAS, GET_APPLY_LIST, UPLOAD_PDFS, GET_PDFS_LIST, DOWNLOAD_PDFS, SHARE_PDFS,
             SEND_CROSS_CHAIN, GET_CROSS_CHAIN, GET_CROSS_CHAIN_LIST, SET_CROSS_DST, GET_CROSS_TBD_LIST, SUBMIT_USER_KYC};
     // SM 可以访问的接口
-    public static final String[] PM_URLS = {APPROVE_USER, GET_USER_LIST, GET_USER_KYC_RECORD_LIST};
+    public static final String[] PM_URLS = {APPROVE_USER_KYC, GET_USER_LIST, GET_USER_KYC_RECORD_LIST};
 
     // 不能通过网关访问的接口
     public static final String[] INTERNAL_URLS = {};

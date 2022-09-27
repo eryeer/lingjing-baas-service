@@ -26,4 +26,8 @@ public class RequestUserApprove {
     @ApiModelProperty(value = "审批反馈信息")
     private String approveFeedback;
 
+    @ApiModelProperty(value = "核验类型")
+    @Pattern(regexp = CommonConst.KYC_TYPE_REGEX)
+    private String kycType;
+
 }

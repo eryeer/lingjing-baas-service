@@ -8,8 +8,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Date;
-
 @Data
 @Builder
 @NoArgsConstructor
@@ -40,13 +38,13 @@ public class ResponseUser {
     @ApiModelProperty(value = "法人身份证号码")
     private String legalPersonIdn;
     @ApiModelProperty(value = "认证申请时间")
-    private Date applyTime;
+    private Long applyTime;
     @ApiModelProperty(value = "审批状态")
     private String approveStatus;
     @ApiModelProperty(value = "审批反馈信息")
     private String approveFeedback;
     @ApiModelProperty(value = "审批时间")
-    private Date approveTime;
+    private Long approveTime;
 
     @ApiModelProperty(value = "营业执照正本文件id")
     private String businessLicenseFileUuid;

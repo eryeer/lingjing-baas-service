@@ -29,16 +29,21 @@ public interface UserMapper {
     ResponseUser getResponseUserById(String userId);
 
     //根据会员号和密码查询用户(验证密码)
-    @Select("select count(1) > 0 as valid from tbl_user where user_id = #{userId} and password = #{password} and status = " + CommonConst.ACTIVE + " and approve_status = 'Approved'")
+    @Select("select count(1) > 0 as valid from tbl_user where user_id = #{userId} and password = #{password} ")
     Boolean checkPassword(String userId, String password);
 
     //添加用户
-    @Insert("insert into tbl_user (" + INSERT_COLS + ") " +
-            "values ( " + INSERT_VALS + " )")
+    @Insert("insert into tbl_user (user_id, phone_number, password, role) " +
+            "values ( #{userId}, #{phoneNumber}, #{password}, #{role} )")
     void insertUser(User user);
 
+    //添加审批记录
+    @Insert("insert into tbl_approve_history ( kyc_type, " + INSERT_COLS + ") " +
+            "select #{kycType}, " + INSERT_COLS + " from tbl_user where user_id = #{userId}")
+    void insertApproveHistory(String userId, String kycType);
+
     //根据用户id更新用户认证信息
-    @Update("update tbl_user set user_type = #{userType}, user_name = #{userName}, company_name = #{companyName}, " +
+    @Update("update tbl_user set approve_status = #{approveStatus}, user_type = #{userType}, user_name = #{userName}, company_name = #{companyName}, " +
             "id_number = #{idNumber}, uni_social_credit_code = #{uniSocialCreditCode}, legal_person_name = #{legalPersonName}, legal_person_idn = #{legalPersonIdn}, " +
             "apply_time = #{applyTime},  ida_file_uuid = #{idaFileUuid}, idb_file_uuid = #{idbFileUuid}, " +
             "business_license_file_uuid = #{businessLicenseFileUuid}, legal_person_ida_file_uuid = #{legalPersonIdaFileUuid}, legal_person_idb_file_uuid = #{legalPersonIdbFileUuid} " +
@@ -56,7 +61,7 @@ public interface UserMapper {
     void updatePhoneNumber(String userId, String phoneNumber);
 
     // 审批用户
-    @Update("update tbl_user set approve_status = #{approveStatus}, approve_feedback = #{approveFeedback}, approve_time = now() " +
+    @Update("update tbl_user set approve_status = #{approveStatus}, approve_feedback = #{approveFeedback}, approve_time = #{approveTime} " +
             "where user_id = #{userId} ")
     void approveUser(User user);
 
@@ -98,7 +103,21 @@ public interface UserMapper {
             "where company_id = #{companyId}")
     void updateCompanyName(User user);
 
-
+    @Select("<script> " +
+            "select " + BASIC_COLS + " from tbl_approve_history " +
+            "<where> status != '0' and role !='PM' " +
+            "<if test='approveStatus != null'>AND approve_Status = #{approveStatus} </if> " +
+            "<if test='userType != null'>AND user_Type = #{userType} </if> " +
+            "<if test='kycType != null'>AND kyc_Type = #{kycType} </if> " +
+            "<if test='userName != null'> AND user_name = #{userName} </if> " +
+            "<if test='companyName != null'> AND company_name = #{companyName} </if> " +
+            "<if test='phoneNumber != null'> AND phone_number = #{phoneNumber} </if> " +
+            "<if test='idNumber != null'> AND id_Number = #{idNumber} </if> " +
+            "<if test='uniSocialCreditCode != null'> AND uni_Social_Credit_Code = #{uniSocialCreditCode} </if> " +
+            "<if test='startApproveTime != null'> AND approve_time between #{startApproveTime} and #{endApproveTime} </if> " +
+            "</where>" +
+            " order by update_time desc " +
+            "</script>")
     List<ResponseUser> getUserKycRecordList(String approveStatus, String userType, String kycType, String userName, String companyName, String phoneNumber,
                                             String idNumber, String uniSocialCreditCode, Long startApproveTime, Long endApproveTime);
 }

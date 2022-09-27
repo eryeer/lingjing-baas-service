@@ -25,7 +25,7 @@ public class CommonConst {
 
     public static final int ONE_DAY_IN_SEC = 86400;
     public static final int TEN_MINUTES = 10 * 60;
-    
+
     public static final String ADDR_DAILY_SUMMARY_NATIVETYPE = "0000000000000000000000000000000000000000";
 
     public static final int POOL_MAXTOTAL = 200;
@@ -142,35 +142,10 @@ public class CommonConst {
     public static final String TO_BE_UPDATED = "ToBeUpdated"; // 需修改
     public static final String APPROVE_STATUS = "^(Approved)|(Rejected)|(ToBeUpdated)$";
 
-    //供应商列表待办 已办
-    public static final String LIST_TYPE = "0";//待办
-
-    // 授信额度业务类型
-    public static final String CREATE = "Create"; // 已保存
-    public static final String UPDATE = "Update"; // 待审批
-
-    // 授信额度状态
-    public static final String CREDIT_PENDING = "Pending"; // 待授信
-    public static final String CREDIT_WAITING = "Waiting"; // 已授信
-    public static final String CREDIT_ACTIVE = "Active"; // 已启用
-    public static final String CREDIT_EXPIRED = "Expired"; // 已过期
-
-    // 债权凭证状态
-    public static final String DEBT_SAVED = "Saved"; // 待提交
-    public static final String DEBT_PENDING = "Pending"; // 待签收
-    public static final String DEBT_ACCEPTED = "Accepted"; // 已签收
-    public static final String DEBT_REJECTED = "Rejected"; // 已拒绝
-    public static final String DEBT_TRANSFERRING = "Transferring"; // 流转中
-    public static final String DEBT_TRANSFERRED = "Transferred"; // 已流转
-    // 凭证类型
-    public static final String DEBT_ROOT = "Root"; // 开立
-    public static final String DEBT_TRANSFER = "Transfer"; // 转让
-    public static final String DEBT_REMAIN = "Remain"; // 自留
-    // 债权凭证转让方式
-    public static final String DEBT_ALL = "All"; // 全额转让
-    public static final String DEBT_PART = "Part"; // 拆分转让
-    // 结算方式
-    public static final String DEBT_AUTO = "Auto"; // 到期自动划扣
+    // 核验类型
+    public static final String KYC_NEW = "NEW"; // 审批通过
+    public static final String KYC_UPDATE = "UPDATE"; // 审批通过
+    public static final String KYC_TYPE_REGEX = "^(NEW)|(UPDATE)$";
 
     public static final String LatestBlockNumberKey = "latest";
     // 模板类型

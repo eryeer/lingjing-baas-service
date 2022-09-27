@@ -18,6 +18,7 @@ import com.onchain.util.CommonUtil;
 import com.onchain.util.ECCUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.NotImplementedException;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
@@ -95,7 +96,7 @@ public class UserService {
         return userMapper.checkPassword(userId, encodePassword(password));
     }
 
-    // 校验注册手机号和角色, 已拒绝的手机号可重新注册
+    // 校验注册手机号和角色, 已删除用户可以重新注册
     public Boolean checkUserRegister(String phoneNumber) {
         User user = userMapper.getUserByPhoneNumber(phoneNumber);
         return user == null;
@@ -136,9 +137,9 @@ public class UserService {
         if (!StringUtils.equals(CommonConst.ACTIVE, record.getStatus())) {
             throw new CommonException(ReturnCode.USER_INACTIVE);
         }
-        if (!StringUtils.equals(CommonConst.APPROVED, record.getApproveStatus())) {
-            throw new CommonException(ReturnCode.USER_PENDING);
-        }
+//        if (!StringUtils.equals(CommonConst.APPROVED, record.getApproveStatus())) {
+//            throw new CommonException(ReturnCode.USER_PENDING);
+//        }
         return jwtService.refresh(refreshToken);
     }
 
@@ -189,9 +190,19 @@ public class UserService {
         userMapper.updatePhoneNumber(userId, phoneNumber);
     }
 
-    public void approveUser(String userId, String approveStatus, String feedback) throws CommonException {
-        User user = User.builder().userId(userId).approveStatus(approveStatus).approveFeedback(feedback).approveTime(new Date().getTime()).build();
-        userMapper.approveUser(user);
+    @Transactional(rollbackFor = Exception.class)
+    public void approveUser(String userId, String approveStatus, String feedback, String kycType) throws CommonException {
+        if (StringUtils.equals(CommonConst.KYC_NEW, kycType)) {
+            User user = User.builder().userId(userId).approveStatus(approveStatus).approveFeedback(feedback).approveTime(new Date().getTime()).build();
+            if (StringUtils.equalsAny(user.getApproveStatus(), CommonConst.PENDING)) {
+                throw new CommonException(ReturnCode.USER_APPROVE_STATUS_ERROR);
+            }
+            userMapper.approveUser(user);
+            userMapper.insertApproveHistory(user.getUserId(), kycType);
+        }
+        if (StringUtils.equals(CommonConst.KYC_UPDATE, kycType)) {
+            throw new NotImplementedException("核验变更未实现");
+        }
     }
 
     public void resetPassword(String phoneNumber, String newPassword, String code) {
@@ -211,8 +222,12 @@ public class UserService {
         if (user == null) {
             throw new CommonException(ReturnCode.USER_NOT_EXIST);
         }
+        if (StringUtils.equalsAny(user.getApproveStatus(), CommonConst.APPROVED, CommonConst.REJECTED)) {
+            throw new CommonException(ReturnCode.USER_APPROVE_STATUS_ERROR);
+        }
         BeanUtils.copyProperties(request, user);
         user.setApplyTime(new Date().getTime());
+        user.setApproveStatus(CommonConst.PENDING);
         userMapper.updateUser(user);
         cosFileMapper.markFileUsed(Arrays.asList(user.getIdaFileUuid(), user.getIdbFileUuid(), user.getLegalPersonIdaFileUuid(), user.getLegalPersonIdbFileUuid(),
                 user.getBusinessLicenseCopyFileUuid(), user.getBusinessLicenseFileUuid()));
