@@ -45,10 +45,10 @@ public class CommonController {
     @OperLogAnnotation(description = "sendVerifyCode")
     public ResponseFormat<String> sendVerifyCode(@RequestParam @Pattern(regexp = CommonConst.PHONE_REGEX) String phoneNumber,
                                                  @RequestParam @Pattern(regexp = CommonConst.CODE_TYPE_REGEX) String codeType) throws CommonException {
-        if (StringUtils.equalsAny(codeType, CommonConst.SMS_LOGIN, CommonConst.SMS_CHANGE_PHONE, CommonConst.SMS_RESET)) {
+        if (StringUtils.equalsAny(codeType, CommonConst.SMS_LOGIN, CommonConst.SMS_RESET)) {
             userService.checkLogin(phoneNumber);
         }
-        if (StringUtils.equals(codeType, CommonConst.SMS_REGISTER) && !userService.checkUserRegister(phoneNumber)) {
+        if (StringUtils.equalsAny(codeType, CommonConst.SMS_REGISTER, CommonConst.SMS_CHANGE_PHONE) && !userService.checkUserRegister(phoneNumber)) {
             return new ResponseFormat<>(ReturnCode.USER_EXIST);
         }
         String code = smsService.sendCode(phoneNumber, codeType, CommonConst.TEN_MINUTES);

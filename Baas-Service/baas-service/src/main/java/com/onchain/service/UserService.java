@@ -130,7 +130,7 @@ public class UserService {
     public String refreshToken(String refreshToken) throws CommonException {
         User user = jwtService.parseToken(refreshToken);
         // 校验当前用户状态，停用或删除不能获取token
-        User record = userMapper.getUserByPhoneNumber(user.getPhoneNumber());
+        User record = userMapper.getUserById(user.getUserId());
         if (record == null) {
             throw new CommonException(ReturnCode.USER_NOT_EXIST);
         }
@@ -210,10 +210,10 @@ public class UserService {
         if (user == null) {
             throw new CommonException(ReturnCode.USER_NOT_EXIST);
         }
-        if (!smsService.verifyCode(phoneNumber, CommonConst.SMS_CHANGE_PHONE, code)) {
+        if (!smsService.verifyCode(phoneNumber, CommonConst.SMS_RESET, code)) {
             throw new CommonException(ReturnCode.VERIFY_CODE_ERROR);
         }
-        userMapper.updatePassword(user.getUserId(), newPassword);
+        userMapper.updatePassword(user.getUserId(), encodePassword(newPassword));
     }
 
     @Transactional(rollbackFor = Exception.class)
