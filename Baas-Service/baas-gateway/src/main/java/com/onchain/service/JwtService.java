@@ -7,6 +7,7 @@ import com.onchain.constants.UrlConst;
 import com.onchain.entities.dao.User;
 import com.onchain.exception.CommonException;
 import com.onchain.util.JwtUtil;
+import com.onchain.util.SHA;
 import io.jsonwebtoken.Claims;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
+import java.nio.charset.StandardCharsets;
 
 @Service
 @Slf4j
@@ -25,7 +27,7 @@ public class JwtService {
 
     // 签名私钥
     private SecretKey createSecretKey() {
-        byte[] encodedKey = secretCode.getBytes();
+        byte[] encodedKey = SHA.SHA256(secretCode).getBytes(StandardCharsets.UTF_8);
         return new SecretKeySpec(encodedKey, ""); // 签名算法不在key中指定
     }
 

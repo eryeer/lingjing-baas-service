@@ -6,8 +6,8 @@ spring:
 
   redis:
     database: ${REDIS_DATABASE:0}
-    host: ${REDIS_HOST:127.0.0.1}
-    #    password: ${REDIS_PASSWORD:password}
+    host: ${REDIS_HOST:121.4.146.202}
+    password: ${REDIS_PASSWORD:password}
     port: ${REDIS_PORT:6379}
 
   zipkin:

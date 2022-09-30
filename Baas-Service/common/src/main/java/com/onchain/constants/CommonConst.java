@@ -103,7 +103,6 @@ public class CommonConst {
     public static final String SMS_RESET = "RS"; // 重置验证码
     public static final String CODE_TYPE_REGEX = "^(R)|(L)|(CP)|(RS)$";
 
-
     // COS 对象存储
     public static final String JPG = "image/jpeg";
     public static final String PNG = "image/png";
@@ -135,6 +134,11 @@ public class CommonConst {
     public static final String FILE_SOL = "SOL"; // 智能合约文件
     public static final String FILE_WALLET = "WAL"; // 钱包文件
 
+    // 用户类型
+    public static final String PC = "PC";  // 个人认证
+    public static final String EC = "EC"; // 企业认证
+    public static final String USER_TYPE_REGEX = "^(PC)|(EC)$";
+    
     // 用户认证状态
     public static final String PENDING = "Pending"; // 待审批
     public static final String APPROVED = "Approved"; // 审批通过
@@ -143,8 +147,8 @@ public class CommonConst {
     public static final String APPROVE_STATUS = "^(Approved)|(Rejected)|(ToBeUpdated)$";
 
     // 核验类型
-    public static final String KYC_NEW = "NEW"; // 审批通过
-    public static final String KYC_UPDATE = "UPDATE"; // 审批通过
+    public static final String KYC_NEW = "NEW"; // 新用户认证
+    public static final String KYC_UPDATE = "UPDATE"; // 认证信息变更
     public static final String KYC_TYPE_REGEX = "^(NEW)|(UPDATE)$";
 
     public static final String LatestBlockNumberKey = "latest";

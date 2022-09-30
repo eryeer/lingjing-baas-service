@@ -1,5 +1,6 @@
 package com.onchain.entities.request;
 
+import com.onchain.constants.CommonConst;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
@@ -8,6 +9,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Pattern;
 
 @Data
 @Builder
@@ -17,6 +19,7 @@ import javax.validation.constraints.NotBlank;
 public class RequestSubmitUserKyc {
     @ApiModelProperty(value = "认证类型")
     @NotBlank
+    @Pattern(regexp = CommonConst.USER_TYPE_REGEX)
     private String userType;
 
     @ApiModelProperty(value = "企业名称")
