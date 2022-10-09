@@ -24,6 +24,9 @@ public class JwtService {
 
     @Value("${jwt.secret.code}")
     private String secretCode;
+    private static final String TYPE_ACCESS = "access";
+    private static final String TYPE_REFRESH = "refresh";
+    private static final String TYPE = "tokenType";
 
     // 签名私钥
     private SecretKey createSecretKey() {
@@ -34,6 +37,9 @@ public class JwtService {
     public User parseToken(String token) throws CommonException {
         SecretKey secretKey = this.createSecretKey();
         Claims body = JwtUtil.parseToken(secretKey, token);
+        if (!StringUtils.equals(body.get(TYPE).toString(), TYPE_ACCESS)) {
+            throw new CommonException(ReturnCode.ACCESS_TOKEN_FAIL);
+        }
         return JSON.parseObject(body.getSubject(), User.class);
     }
 

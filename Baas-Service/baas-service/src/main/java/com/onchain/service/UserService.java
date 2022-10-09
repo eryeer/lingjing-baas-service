@@ -128,7 +128,7 @@ public class UserService {
     }
 
     public String refreshToken(String refreshToken) throws CommonException {
-        User user = jwtService.parseToken(refreshToken);
+        User user = jwtService.parseRefreshToken(refreshToken);
         // 校验当前用户状态，停用或删除不能获取token
         User record = userMapper.getUserById(user.getUserId());
         if (record == null) {

@@ -28,6 +28,7 @@ public class JwtService {
     private static final long REFRESH_EXPIRE_SECONDS = 7 * 24 * 60 * 60; // 7 days
     private static final String TYPE_ACCESS = "access";
     private static final String TYPE_REFRESH = "refresh";
+    private static final String TYPE = "tokenType";
     @Value("${jwt.secret.code}")
     private String secretCode;
 
@@ -45,7 +46,7 @@ public class JwtService {
         log.info("JwtService.createToken userId={},tokenType={}", userId, tokenType);
         SignatureAlgorithm signatureAlgorithm = SignatureAlgorithm.HS256; //指定签名的时候使用的签名算法
         Claims claims = Jwts.claims();//创建payload的私有声明（根据特定的业务需要添加，如果要拿这个做验证，一般是需要和jwt的接收方提前沟通好验证方式的）
-        claims.put("tokenType", tokenType);
+        claims.put(TYPE, tokenType);
         SecretKey secretKey = createSecretKey();//生成签名的时候使用的秘钥secret,这个方法本地封装了的，一般可以从本地配置文件中读取，切记这个秘钥不能外露哦。它就是你服务端的私钥，在任何场景都不应该流露出去。一旦客户端得知这个secret, 那就意味着客户端是可以自我签发jwt了。
         // 删除敏感信息
         user.setPassword("");
@@ -72,7 +73,7 @@ public class JwtService {
 
     public String refresh(String refreshToken) throws CommonException {
         log.info("JwtService.refresh refreshDto={}", refreshToken);
-        User userEntity = parseToken(refreshToken);
+        User userEntity = parseRefreshToken(refreshToken);
         String refreshTokenServer = redisService.getValue(CommonConst.USER_REFRESH_TOKEN + userEntity.getUserId());
         log.info("JwtService.refresh redisService.getValue refreshTokenServer={}", refreshTokenServer);
         if (!StringUtils.equals(refreshToken, refreshTokenServer)) {
@@ -91,6 +92,18 @@ public class JwtService {
     public User parseToken(String token) throws CommonException {
         SecretKey secretKey = this.createSecretKey();
         Claims body = JwtUtil.parseToken(secretKey, token);
+        if (!StringUtils.equals(body.get(TYPE).toString(), TYPE_ACCESS)) {
+            throw new CommonException(ReturnCode.ACCESS_TOKEN_FAIL);
+        }
+        return JSON.parseObject(body.getSubject(), User.class);
+    }
+
+    public User parseRefreshToken(String token) throws CommonException {
+        SecretKey secretKey = this.createSecretKey();
+        Claims body = JwtUtil.parseToken(secretKey, token);
+        if (!StringUtils.equals(body.get(TYPE).toString(), TYPE_REFRESH)) {
+            throw new CommonException(ReturnCode.REFRESH_TOKEN_FAIL);
+        }
         return JSON.parseObject(body.getSubject(), User.class);
     }
 }
