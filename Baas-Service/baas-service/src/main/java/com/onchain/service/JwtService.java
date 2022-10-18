@@ -38,7 +38,7 @@ public class JwtService {
     // 签名私钥
     private SecretKey createSecretKey() {
         byte[] encodedKey = SHA.SHA256(secretCode).getBytes(StandardCharsets.UTF_8);
-        return new SecretKeySpec(encodedKey, SignatureAlgorithm.HS256.getJcaName()); // 签名算法不在key中指定
+        return new SecretKeySpec(encodedKey, SignatureAlgorithm.HS256.getJcaName());
     }
 
     public String createToken(User user, String tokenType) {

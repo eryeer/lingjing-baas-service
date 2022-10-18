@@ -44,7 +44,7 @@ public class UserService {
         return userMapper.getUserByPhoneNumber(phoneNumber);
     }
 
-    // 检查用户手机可用于登录
+    // 检查用户手机可用于登录，手机号已注册并处于启用状态
     public User checkLogin(String phoneNumber) throws CommonException {
         User user = userMapper.getUserByPhoneNumber(phoneNumber);
         if (user == null) {
@@ -54,13 +54,6 @@ public class UserService {
         if (StringUtils.equals(CommonConst.INACTIVE, user.getStatus())) {
             throw new CommonException(ReturnCode.USER_INACTIVE);
         }
-
-        // 被拒绝用户不能登录
-        if (StringUtils.equals(CommonConst.REJECTED, user.getApproveStatus())) {
-            throw new CommonException(ReturnCode.USER_PENDING);
-        }
-
-        // 手机号已注册并处于启用状态
         return user;
     }
 
@@ -121,6 +114,10 @@ public class UserService {
         if (!checkPassword(user.getUserId(), request.getPassword())) {
             throw new CommonException(ReturnCode.USER_PASSWORD_ERROR);
         }
+        // 被拒绝用户不能登录
+        if (StringUtils.equals(CommonConst.REJECTED, user.getApproveStatus())) {
+            throw new CommonException(ReturnCode.USER_REJECTED, user.getApproveFeedback());
+        }
         //登录日志
         loginLogMapper.insertLog(user.getUserId());
 
@@ -137,9 +134,9 @@ public class UserService {
         if (!StringUtils.equals(CommonConst.ACTIVE, record.getStatus())) {
             throw new CommonException(ReturnCode.USER_INACTIVE);
         }
-//        if (!StringUtils.equals(CommonConst.APPROVED, record.getApproveStatus())) {
-//            throw new CommonException(ReturnCode.USER_PENDING);
-//        }
+        if (StringUtils.equals(CommonConst.REJECTED, record.getApproveStatus())) {
+            throw new CommonException(ReturnCode.USER_REJECTED);
+        }
         return jwtService.refresh(refreshToken);
     }
 

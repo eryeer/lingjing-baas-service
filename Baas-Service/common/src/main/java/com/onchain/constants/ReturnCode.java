@@ -50,7 +50,7 @@ public enum ReturnCode {
     USER_URL_ERROR(19011, "用户访问地址或角色错误"),
     USER_REGISTER_ERROR(19012, "用户手机号或角色不满足注册条件"),
     USER_ORIGINAL_PASSWORD_ERROR(19013, "原密码错误"),
-    USER_PENDING(19014, "用户未认证"),
+    USER_REJECTED(19014, "用户认证被拒绝"),
     USER_APPROVE_STATUS_ERROR(19015, "用户认证状态错误"),
 
     //验证码错误 【191xx】

@@ -24,7 +24,7 @@ CREATE TABLE `tbl_user` (
     `legal_person_name` varchar(10) NOT NULL DEFAULT '' COMMENT '法人姓名',
     `legal_person_idn` varchar(18) NOT NULL DEFAULT '' COMMENT '法人身份证号码',
     `apply_time` bigint NOT NULL DEFAULT 0 COMMENT '申请时间',
-    `approve_status` varchar(15) NOT NULL DEFAULT 'Pending' COMMENT '审批状态（Pending：待认证 Approved：已认证 Rejected：已拒绝 ToBeUpdated：待修改）',
+    `approve_status` varchar(15) NOT NULL DEFAULT '' COMMENT '审批状态（'': 未提交, Pending：待认证 Approved：已认证 Rejected：已拒绝 ToBeUpdated：待修改）',
     `approve_feedback` varchar(500) NOT NULL DEFAULT '' COMMENT '审批反馈信息',
     `approve_time` bigint NOT NULL DEFAULT 0 COMMENT '审批时间',
 
