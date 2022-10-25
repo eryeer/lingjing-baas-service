@@ -113,9 +113,59 @@
 - 行为：PM查询用户核验记录列表
 - 校验：accessToken校验，角色校验，查询条件校验
 
-## 2.2. 公共接口
+## 2.2. 链账户管理
 
-### 2.2.1. sendVerifyCode
+### 2.2.1. accountCreate
+
+- 功能说明：创建链账户（关联链账户也适用）
+- url: /baas/chain/accountCreate
+- auth: 企业用户/个人用户
+- 行为：链账户表新增记录，保存链账户名称和地址
+- 校验：accessToken校验，校验签名
+
+### 2.2.2. privateKeyCustody
+
+- 功能说明：托管链账户私钥
+- url: /baas/chain/privateKeyCustody
+- auth: 企业用户/个人用户
+- 行为：加密保存用户的私钥
+- 校验：accessToken校验，链账户地址和私钥需要能对应
+
+### 2.2.3. downloadPrivateKey
+
+- 功能说明：下载链账户私钥
+- url: /baas/chain/downloadPrivateKey
+- auth: 企业用户/个人用户
+- 行为：根据链账户地址下载私钥明文
+- 校验：accessToken校验，校验地址是否存在，是否已托管
+
+### 2.2.4. getChainAccount
+
+- 功能说明：根据用户id获取链账户
+- url: /baas/chain/getChainAccount
+- auth: 所有角色
+- 行为：根据用户id获取链账户，支持账户名称、地址、托管状态、燃料可转账状态、创建时间的筛选
+- 校验：accessToken校验，userId非空校验
+
+### 2.2.5. deleteChainAccount
+
+- 功能说明：根据地址批量删除链账户
+- url: /baas/chain/deleteChainAccount
+- auth: 企业用户/个人用户
+- 行为：批量删除链账户，同时关闭燃料可转账状态
+- 校验：accessToken校验，校验地址是否存在
+
+### 2.2.6. changeGasTransferStatus
+
+- 功能说明：批量开启/关闭燃料转账
+- url: /baas/chain/changeGasTransferStatus
+- auth: 企业用户/个人用户
+- 行为：链上调用批量开启/关闭燃料转账，同时结果同步数据库
+- 校验：accessToken校验，校验地址列表是否存在
+
+## 2.3. 公共接口
+
+### 2.3.1. sendVerifyCode
 
 - 功能说明：发送注册短信验证码
 - url: /baas/common/sendVerifyCode
@@ -123,7 +173,7 @@
 - 行为：通过参数指定发送的是注册、登录、修改手机号、忘记密码的短信验证码，返回发送成功或失败
 - 校验：手机号格式校验，注册条件校验
 
-### 2.2.2. uploadFile
+### 2.3.2. uploadFile
 
 - 功能说明：上传文件
 - url: /baas/common/uploadFile
@@ -131,7 +181,7 @@
 - 行为：上传文件到COS，返回文件uuid,原始文件名和临时url
 - 校验：文件大小校验（7M），格式校验（jpg, jpeg, bmp, png，pdf）,图片类型校验（jpg, jpeg, bmp, png）
 
-### 2.2.3. updateFile
+### 2.3.3. updateFile
 
 - 功能说明：更新上传文件
 - url: /baas/common/updateFile
@@ -141,7 +191,7 @@
 
 --------以下接口未使用---------
 
-### 2.2.4. getTools
+### 2.3.4. getTools
 
 - 功能说明：获取开发组件列表
 - url: /baas/common/getTools
@@ -149,9 +199,9 @@
 - 行为：获取开发组件列表
 - 校验：登录校验
 
-## 2.3. 链账户管理
+## 2.4. 链账户管理
 
-### 2.3.1. accountCreate
+### 2.4.1. accountCreate
 
 - 功能说明：创建链账户
 - url: /baas/chain/accountCreate
@@ -159,7 +209,7 @@
 - 行为：链账户表新增记录
 - 校验：accessToken校验，钱包密码非空校验，用户链账户未创建
 
-### 2.3.2. getChainAccount
+### 2.4.2. getChainAccount
 
 - 功能说明：根据用户id获取链账户
 - url: /baas/chain/getChainAccount
@@ -167,7 +217,7 @@
 - 行为：根据用户id获取链账户
 - 校验：accessToken校验，userId非空校验
 
-### 2.3.3. applyGas
+### 2.4.3. applyGas
 
 - 功能说明：申领燃料
 - url: /baas/chain/applyGas
@@ -175,7 +225,7 @@
 - 行为：申领燃料
 - 校验：accessToken校验，申领时间校验
 
-### 2.3.4. getApplyList
+### 2.4.4. getApplyList
 
 - 功能说明：获取燃料申领记录
 - url: /baas/chain/getApplyList
