@@ -231,9 +231,9 @@ public class UserService {
     }
 
     public PageInfo<ResponseUser> getUserKycRecordList(Integer pageNumber, Integer pageSize, String approveStatus, String userType, String kycType, String userName, String companyName, String phoneNumber,
-                                                       String idNumber, String uniSocialCreditCode, Long startApproveTime, Long endApproveTime) {
+                                                       String idNumber, String uniSocialCreditCode, Long startApplyTime, Long endApplyTime, Long startApproveTime, Long endApproveTime) {
         PageHelper.startPage(pageNumber, pageSize);
-        List<ResponseUser> users = userMapper.getUserKycRecordList(approveStatus, userType, kycType, userName, companyName, phoneNumber, idNumber, uniSocialCreditCode, startApproveTime, endApproveTime);
+        List<ResponseUser> users = userMapper.getUserKycRecordList(approveStatus, userType, kycType, userName, companyName, phoneNumber, idNumber, uniSocialCreditCode, startApplyTime, endApplyTime, startApproveTime, endApproveTime);
         for (ResponseUser user : users) {
             user.setIdaFile(cosService.getCosFile(user.getIdaFileUuid()));
             user.setIdbFile(cosService.getCosFile(user.getIdbFileUuid()));

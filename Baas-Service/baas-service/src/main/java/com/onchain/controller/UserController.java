@@ -184,6 +184,8 @@ public class UserController {
                                                                        @RequestParam(required = false) String phoneNumber,
                                                                        @RequestParam(required = false) String idNumber,
                                                                        @RequestParam(required = false) String uniSocialCreditCode,
+                                                                       @RequestParam(required = false) Long startApplyTime,
+                                                                       @RequestParam(required = false) Long endApplyTime,
                                                                        @RequestParam(required = false) Long startApproveTime,
                                                                        @RequestParam(required = false) Long endApproveTime,
                                                                        @RequestHeader(CommonConst.HEADER_ACCESS_TOKEN) String accessToken) throws CommonException {
@@ -193,7 +195,7 @@ public class UserController {
             return new ResponseFormat<>(ReturnCode.USER_ROLE_ERROR);
         }
 
-        PageInfo<ResponseUser> result = userService.getUserKycRecordList(pageNumber, pageSize, approveStatus, userType, kycType, userName, companyName, phoneNumber, idNumber, uniSocialCreditCode, startApproveTime, endApproveTime);
+        PageInfo<ResponseUser> result = userService.getUserKycRecordList(pageNumber, pageSize, approveStatus, userType, kycType, userName, companyName, phoneNumber, idNumber, uniSocialCreditCode, startApplyTime, endApplyTime, startApproveTime, endApproveTime);
         return new ResponseFormat<>(result);
     }
 }

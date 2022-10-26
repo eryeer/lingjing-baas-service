@@ -114,10 +114,11 @@ public interface UserMapper {
             "<if test='phoneNumber != null'> AND phone_number = #{phoneNumber} </if> " +
             "<if test='idNumber != null'> AND id_Number = #{idNumber} </if> " +
             "<if test='uniSocialCreditCode != null'> AND uni_Social_Credit_Code = #{uniSocialCreditCode} </if> " +
+            "<if test='startApplyTime != null'> AND apply_time between #{startApplyTime} and #{endApplyTime} </if> " +
             "<if test='startApproveTime != null'> AND approve_time between #{startApproveTime} and #{endApproveTime} </if> " +
             "</where>" +
             " order by update_time desc " +
             "</script>")
     List<ResponseUser> getUserKycRecordList(String approveStatus, String userType, String kycType, String userName, String companyName, String phoneNumber,
-                                            String idNumber, String uniSocialCreditCode, Long startApproveTime, Long endApproveTime);
+                                            String idNumber, String uniSocialCreditCode, Long startApplyTime, Long endApplyTime, Long startApproveTime, Long endApproveTime);
 }
