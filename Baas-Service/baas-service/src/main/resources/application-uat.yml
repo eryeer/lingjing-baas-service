@@ -58,3 +58,8 @@ cloud:
     authTempId: 857608
     sign: 分布科技
     test: ${SMS_TEST:false}
+
+privatekey:
+  encode:
+    key: ${ENCODE_KEY:aGVsbG9vbmNoYWluYnJvdA==}
+    offset: ${ENCODE_OFFSET:1234567890123456}

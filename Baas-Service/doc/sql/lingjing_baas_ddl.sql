@@ -135,19 +135,14 @@ CREATE TABLE `tbl_chain_account` (
     `id` bigint NOT NULL AUTO_INCREMENT COMMENT '自增id, 非用户id',
     `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间（默认字段）',
     `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间（默认字段）',
-    `status` varchar(20) NOT NULL DEFAULT '1' COMMENT '状态（默认字段,1:已启用 0:已删除 2:已停用）',
-
+    `status` varchar(32) NOT NULL DEFAULT '1' COMMENT '状态（默认字段,1:已启用 0:已删除 2:已停用）',
     `user_id` varchar(32) NOT NULL COMMENT '用户id',
+    `name` varchar(32) NOT NULL COMMENT '链用户名称',
+    `is_gas_transfer` tinyint NOT NULL COMMENT '链用户是否可以gas 转账  1:允许 0:不允许',
     `user_address` varchar(42) NOT NULL COMMENT '链账户地址',
-    `balance` varchar(30) NOT NULL COMMENT '账户燃料余额',
-    `apply_time` datetime NULL COMMENT '最近申领燃料时间',
-    `private_key` varchar(66) NOT NULL COMMENT '链账户私钥',
-    `wallet_pass` varchar(30) NOT NULL COMMENT '钱包文件密码',
-    
-    -- files
-    `wallet_file_uuid` varchar(32) NOT NULL COMMENT '钱包文件uuid',
-
-    UNIQUE KEY `uk_user_id`(`user_id`),
+    `encode_key` varchar(108) NULL COMMENT '链账户私钥 经过 aes 与 base64处理过的密文',
+    KEY `idx_user_id`(`user_id`),
+    KEY `idx_user_address`(`user_address`),
     PRIMARY KEY (`id`)
 ) COMMENT='用户链账户表';
 

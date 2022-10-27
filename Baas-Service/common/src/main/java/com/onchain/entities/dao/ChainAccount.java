@@ -12,9 +12,7 @@ import java.util.Date;
 public class ChainAccount extends Base {
     private String userId;
     private String userAddress;
-    private String balance;
-    private Date applyTime;
-    private String privateKey;
-    private String walletPass;
-    private String walletFileUuid;
+    private String name;
+    private Boolean isGasTransfer;
+    private String encodeKey;
 }

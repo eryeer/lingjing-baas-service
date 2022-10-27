@@ -86,15 +86,15 @@ public class ContractController {
         return new ResponseFormat<>(result);
     }
 
-    @PostMapping(value = UrlConst.DEPLOY)
-    @ApiOperation(value = "合约部署", notes = "合约部署")
-    @OperLogAnnotation(description = "deploy")
-    public ResponseFormat<ResponseContractDepoly> deploy(@Valid @RequestBody RequestContractDeploy request,
-                                                         @RequestHeader(CommonConst.HEADER_ACCESS_TOKEN) String accessToken) throws Exception {
-        User user = jwtService.parseToken(accessToken);
-        ResponseContractDepoly result = contractService.deploy(user.getUserId(), request);
-        return new ResponseFormat<>(result);
-    }
+//    @PostMapping(value = UrlConst.DEPLOY)
+//    @ApiOperation(value = "合约部署", notes = "合约部署")
+//    @OperLogAnnotation(description = "deploy")
+//    public ResponseFormat<ResponseContractDepoly> deploy(@Valid @RequestBody RequestContractDeploy request,
+//                                                         @RequestHeader(CommonConst.HEADER_ACCESS_TOKEN) String accessToken) throws Exception {
+//        User user = jwtService.parseToken(accessToken);
+//        ResponseContractDepoly result = contractService.deploy(user.getUserId(), request);
+//        return new ResponseFormat<>(result);
+//    }
 
     @PostMapping(value = UrlConst.UPDATE_FILE_LIST)
     @ApiOperation(value = "更新合约文件列表", notes = "更新合约文件列表")

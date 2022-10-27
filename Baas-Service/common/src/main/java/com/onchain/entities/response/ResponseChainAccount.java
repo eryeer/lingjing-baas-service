@@ -1,5 +1,6 @@
 package com.onchain.entities.response;
 
+import com.onchain.entities.dao.ChainAccount;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -13,18 +14,18 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ResponseChainAccount {
+    @ApiModelProperty(value = "链户id")
+    private Long Id;
+    @ApiModelProperty(value = "链户名称")
+    private String name;
     @ApiModelProperty(value = "用户id")
     private String userId;
     @ApiModelProperty(value = "用户链账户地址")
     private String userAddress;
-    @ApiModelProperty(value = "用户燃料余额")
-    private String balance;
-    @ApiModelProperty(value = "最近申领燃料时间")
-    private Date applyTime;
+    @ApiModelProperty(value = "链账户是否可以进行gas转账")
+    private Boolean isGasTransfer;
+    @ApiModelProperty(value = "私钥")
+    private String privateKey;
     @ApiModelProperty(value = "创建时间")
     private Date createTime;
-    @ApiModelProperty(value = "用户钱包文件uuid")
-    private String walletFileUuid;
-    @ApiModelProperty(value = "用户钱包文件uuid")
-    private ResponseCosFile walletFile;
 }

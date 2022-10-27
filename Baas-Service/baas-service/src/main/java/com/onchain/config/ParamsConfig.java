@@ -69,4 +69,11 @@ public class ParamsConfig {
     @Value("${pdfs.cli.uploadFolder}")
     public String pdfsUploadFolder;
 
+    //privateKey encode
+    @Value("${privatekey.encode.key}")
+    public String privateEncodeKey;
+
+    @Value("${privatekey.encode.offset}")
+    public String privateEncodeOffset;
+
 }

@@ -1,16 +1,20 @@
 package com.onchain.untils;
 
+import org.web3j.abi.datatypes.NumericType;
 import org.web3j.abi.datatypes.Type;
-import org.web3j.crypto.Credentials;
+import org.web3j.crypto.*;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.methods.response.TransactionReceipt;
 import org.web3j.protocol.exceptions.TransactionException;
 import org.web3j.protocol.http.HttpService;
 import org.web3j.tx.RawTransactionManager;
 import org.web3j.tx.response.PollingTransactionReceiptProcessor;
+import org.web3j.utils.Numeric;
 
 import java.io.IOException;
 import java.math.BigInteger;
+import java.util.Arrays;
+import java.util.Locale;
 
 public class Web3jUtil {
 
@@ -60,5 +64,58 @@ public class Web3jUtil {
                 throw new RuntimeException("parse Block Chain Type error");
         }
     }
+
+    public static String getAddressFromETHPrivateKey(String privateKey){
+        ECKeyPair publicKey = ECKeyPair.create(Numeric.toBigInt(privateKey));
+        return Keys.toChecksumAddress(Keys.getAddress(publicKey));
+    }
+
+    public static boolean isSignatureValid(String signature, String message, String address) {
+        if (address == null || address.length() != 42 || signature == null || signature.length() != 132 || message == null || message.equals("")) {
+            return false;
+        }
+        address = address.toLowerCase(Locale.ROOT);
+        byte[] sigBytes = Numeric.hexStringToByteArray(signature);
+        Sign.SignatureData signatureData = sigFromByteArray(sigBytes);
+        String addressRecoverd = null;
+        byte[] digest = Hash.sha3(message.getBytes());
+        byte[] data = getEthereumMessageHash(digest);
+        for (int i = 0; i < 4; i++) {
+            BigInteger pubkey = Sign.recoverFromSignature((byte) i,
+                    new ECDSASignature(new BigInteger(1, signatureData.getR()), new BigInteger(1, signatureData.getS())),
+                    data);
+            if (pubkey != null) {
+                addressRecoverd = "0x" + Keys.getAddress(pubkey);
+                if (addressRecoverd.equals(address)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    public static Sign.SignatureData sigFromByteArray(byte[] sig) {
+        if (sig.length < 64 || sig.length > 65) return null;
+
+        byte subv = sig[64];
+        if (subv < 27) subv += 27;
+        byte[] rBytes = Arrays.copyOfRange(sig, 0, 32);
+        byte[] sBytes = Arrays.copyOfRange(sig, 32, 64);
+
+        return new Sign.SignatureData(subv, rBytes, sBytes);
+    }
+
+    public static byte[] getEthereumMessageHash(byte[] message) {
+        String MESSAGE_PREFIX = "\u0019Ethereum Signed Message:\n";
+        byte[] prefix = MESSAGE_PREFIX.concat(String.valueOf(message.length)).getBytes();
+
+        byte[] result = new byte[prefix.length + message.length];
+        System.arraycopy(prefix, 0, result, 0, prefix.length);
+        System.arraycopy(message, 0, result, prefix.length, message.length);
+
+        return Hash.sha3(result);
+    }
+
+
 
 }

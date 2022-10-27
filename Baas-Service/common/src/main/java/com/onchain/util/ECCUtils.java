@@ -38,18 +38,17 @@ public class ECCUtils {
      * in:  base64 String, base64 String,
      * out: String,
      */
-    private static String decryptBySecret(String cipherData, String secret) throws Exception {
+    public static String decryptBySecret(String cipherData, String secret, String ivOffset) throws Exception {
 
         // secret evolve from String to byte[]
         byte[] secretByte = decodeBase64(secret);
-        byte[] cipherByte = decodeBase64(cipherData);
+        byte[] encryptedbuf = decodeBase64(cipherData);
 
         SecretKeySpec skeySpec = new SecretKeySpec(secretByte, "AES");
         Cipher cipher = Cipher.getInstance(ENCRYPT_ALGORITHM);
 
         //get iv and encrypted from cipherData
-        byte[] ivbuf = silceBytes(cipherByte, 0, 16);
-        byte[] encryptedbuf = silceBytes(cipherByte, 16, (cipherByte.length - 16));
+        byte[] ivbuf = ivOffset.getBytes();
         IvParameterSpec iv = new IvParameterSpec(ivbuf);
 
         //decrypt data
@@ -58,6 +57,23 @@ public class ECCUtils {
 
         String originalString = new String(original, "utf-8");
         return originalString;
+    }
+
+    /*解密
+     * in:  base64 String, base64 String,
+     * out: String,
+     */
+    public static String encryptBySecret(String cipherData, String secret, String ivOffset) throws Exception {
+
+        // secret evolve from String to byte[]
+        byte[] secretByte = decodeBase64(secret);
+
+        Cipher cipher = Cipher.getInstance(ENCRYPT_ALGORITHM);
+        SecretKeySpec skeySpec = new SecretKeySpec(secretByte, "AES");
+        cipher.init(Cipher.ENCRYPT_MODE, skeySpec, new IvParameterSpec(ivOffset.getBytes()));
+        byte[] aesEncodeKey =  cipher.doFinal(cipherData.getBytes());
+        String encodeString = encodeBase64(aesEncodeKey);
+        return encodeString;
     }
 
     public static byte[] decodeBase64(String value) {

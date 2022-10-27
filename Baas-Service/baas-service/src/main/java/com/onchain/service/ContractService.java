@@ -121,68 +121,68 @@ public class ContractService {
         return app;
     }
 
-    public ResponseContractDepoly deploy(String userId, RequestContractDeploy request) throws Exception {
-        ContractApp app = contractAppMapper.getContractApp(userId, request.getAppName());
-        if (app == null) {
-            throw new CommonException(ReturnCode.APP_NOT_EXIST);
-        }
-
-        ChainAccount chainAccount = chainAccountMapper.getChainAccount(userId);
-        List<Type> params;
-        if (StringUtils.equals(CommonConst.PROOF, app.getTemplateType())) {
-            if (request.getConstructorParameterList().size() != 1 || !"string".equals(request.getConstructorParameterList().get(0).getType())) {
-                throw new CommonException(ReturnCode.PARAMETER_FAILED, "存证合约参数错误");
-            }
-            request.setBytecode(CommonConst.PROOF_BIN);
-            request.setContractName(CommonConst.PROOF);
-            request.getConstructorParameterList().add(RequestContractParameter.builder().type("address").content(chainAccount.getUserAddress()).build());
-            params = request.getConstructorParameterList().stream()
-                    .map(p -> Web3jUtil.parseStringToBCType(p.getType(), p.getContent())).collect(Collectors.toList());
-        } else if (StringUtils.equals(CommonConst.VOTE, app.getTemplateType())) {
-            if (request.getConstructorParameterList().size() <= 1) {
-                throw new CommonException(ReturnCode.PARAMETER_FAILED);
-            }
-            request.setBytecode(CommonConst.VOTE_BIN);
-            request.setContractName(CommonConst.VOTE);
-            List<String> candidateNames = request.getConstructorParameterList().stream().map(RequestContractParameter::getContent).collect(Collectors.toList());
-            params = Collections.singletonList(new DynamicArray<>(
-                    Utf8String.class,
-                    Utils.typeMap(candidateNames, Utf8String.class)));
-        } else {
-            if (StringUtils.isBlank(request.getBytecode())) {
-                throw new CommonException(ReturnCode.PARAMETER_FAILED, "字节码不能为空");
-            }
-            params = request.getConstructorParameterList().stream()
-                    .map(p -> Web3jUtil.parseStringToBCType(p.getType(), p.getContent())).collect(Collectors.toList());
-        }
-
-        String encodedConstructor = FunctionEncoder.encodeConstructor(params);
-        log.info("encoded constructor param: " + encodedConstructor);
-        ResponseContractDepoly result = deployWithEncodedConstructorParam(request.getBytecode(), encodedConstructor, chainAccount.getPrivateKey());
-
-        Date now = new Date();
-        ContractDeploy contractDeploy = ContractDeploy.builder()
-                .userId(userId)
-                .appName(request.getAppName())
-                .templateType(app.getTemplateType())
-                .deployTime(now)
-                .contractFileUuid(request.getContractFileUuid())
-
-                .contractName(request.getContractName())
-                .bytecode(request.getBytecode())
-                .contractAddress(result.getContractAddress())
-                .constructorJson(JSON.toJSONString(request.getConstructorParameterList()))
-                .build();
-
-        List<ContractDeploy> history = JSON.parseArray(app.getDeployHistory(), ContractDeploy.class);
-        history.add(contractDeploy);
-        app.setDeployHistory(JSON.toJSONString(history));
-        app.setDeployTime(now);
-        app.setContractStatus("1");
-        contractAppMapper.updateContractApp(app);
-        chainService.updateBalance(app.getUserId());
-        return result;
-    }
+//    public ResponseContractDepoly deploy(String userId, RequestContractDeploy request) throws Exception {
+//        ContractApp app = contractAppMapper.getContractApp(userId, request.getAppName());
+//        if (app == null) {
+//            throw new CommonException(ReturnCode.APP_NOT_EXIST);
+//        }
+//
+//        ChainAccount chainAccount = chainAccountMapper.getChainAccount(userId);
+//        List<Type> params;
+//        if (StringUtils.equals(CommonConst.PROOF, app.getTemplateType())) {
+//            if (request.getConstructorParameterList().size() != 1 || !"string".equals(request.getConstructorParameterList().get(0).getType())) {
+//                throw new CommonException(ReturnCode.PARAMETER_FAILED, "存证合约参数错误");
+//            }
+//            request.setBytecode(CommonConst.PROOF_BIN);
+//            request.setContractName(CommonConst.PROOF);
+//            request.getConstructorParameterList().add(RequestContractParameter.builder().type("address").content(chainAccount.getUserAddress()).build());
+//            params = request.getConstructorParameterList().stream()
+//                    .map(p -> Web3jUtil.parseStringToBCType(p.getType(), p.getContent())).collect(Collectors.toList());
+//        } else if (StringUtils.equals(CommonConst.VOTE, app.getTemplateType())) {
+//            if (request.getConstructorParameterList().size() <= 1) {
+//                throw new CommonException(ReturnCode.PARAMETER_FAILED);
+//            }
+//            request.setBytecode(CommonConst.VOTE_BIN);
+//            request.setContractName(CommonConst.VOTE);
+//            List<String> candidateNames = request.getConstructorParameterList().stream().map(RequestContractParameter::getContent).collect(Collectors.toList());
+//            params = Collections.singletonList(new DynamicArray<>(
+//                    Utf8String.class,
+//                    Utils.typeMap(candidateNames, Utf8String.class)));
+//        } else {
+//            if (StringUtils.isBlank(request.getBytecode())) {
+//                throw new CommonException(ReturnCode.PARAMETER_FAILED, "字节码不能为空");
+//            }
+//            params = request.getConstructorParameterList().stream()
+//                    .map(p -> Web3jUtil.parseStringToBCType(p.getType(), p.getContent())).collect(Collectors.toList());
+//        }
+//
+//        String encodedConstructor = FunctionEncoder.encodeConstructor(params);
+//        log.info("encoded constructor param: " + encodedConstructor);
+//        ResponseContractDepoly result = deployWithEncodedConstructorParam(request.getBytecode(), encodedConstructor, chainAccount.getPrivateKey());
+//
+//        Date now = new Date();
+//        ContractDeploy contractDeploy = ContractDeploy.builder()
+//                .userId(userId)
+//                .appName(request.getAppName())
+//                .templateType(app.getTemplateType())
+//                .deployTime(now)
+//                .contractFileUuid(request.getContractFileUuid())
+//
+//                .contractName(request.getContractName())
+//                .bytecode(request.getBytecode())
+//                .contractAddress(result.getContractAddress())
+//                .constructorJson(JSON.toJSONString(request.getConstructorParameterList()))
+//                .build();
+//
+//        List<ContractDeploy> history = JSON.parseArray(app.getDeployHistory(), ContractDeploy.class);
+//        history.add(contractDeploy);
+//        app.setDeployHistory(JSON.toJSONString(history));
+//        app.setDeployTime(now);
+//        app.setContractStatus("1");
+//        contractAppMapper.updateContractApp(app);
+////        chainService.updateBalance(app.getUserId());
+//        return result;
+//    }
 
     public ResponseContractDepoly deployWithEncodedConstructorParam(String bytecode, String encodedConstructor, String privateKey) throws IOException, TransactionException {
         StaticGasProvider gasProvider = new StaticGasProvider(BigInteger.valueOf(4_100_000_000L), BigInteger.valueOf(1_000_000));

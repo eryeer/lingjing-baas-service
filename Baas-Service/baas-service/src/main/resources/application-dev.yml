@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: ${MYSQL_URL:jdbc:mysql://127.0.0.1:3306/lingjing_baas?characterEncoding=utf-8&serverTimezone=Asia/Shanghai&allowMultiQueries=true&rewriteBatchedStatements=true}
+    url: ${MYSQL_URL:jdbc:mysql://121.4.146.202:3306/lingjing_baas?characterEncoding=utf-8&serverTimezone=Asia/Shanghai&allowMultiQueries=true&rewriteBatchedStatements=true&useSSL=false}
     username: ${MYSQL_USERNAME:root}
     password: ${MYSQL_PASSWORD:root}
 
@@ -58,3 +58,8 @@ cloud:
     verifyTempId: 1551091
     sign: 分布科技
     test: ${SMS_TEST:true}
+
+privatekey:
+  encode:
+    key: ${ENCODE_KEY:aGVsbG9vbmNoYWluYnJvdA==}
+    offset: ${ENCODE_OFFSET:1234567890123456}

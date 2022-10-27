@@ -42,6 +42,8 @@ public class UrlConst {
     public static final String GET_CHAIN_ACCOUNT = "/baas/chain/getChainAccount";
     public static final String APPLY_GAS = "/baas/chain/applyGas";
     public static final String GET_APPLY_LIST = "/baas/chain/getApplyList";
+    public static final String PRIVATE_KEY_CUSTODY = "/baas/chain/privateKeyCustody";
+    public static final String DOWNLOAD_PRIVATE_KEY = "/baas/chain/downloadPrivateKey";
 
     public static final String UPLOAD_PDFS = "/baas/pdfs/uploadPdfs";
     public static final String GET_PDFS_LIST = "/baas/pdfs/getPdfsList";
@@ -83,7 +85,7 @@ public class UrlConst {
     // 普通用户 可以访问的接口
     public static final String[] CU_URLS = {APP_CREATE, APP_REMOVE, GET_APP_LIST, GET_APP, GET_CONTRACT_TEMPLATES, DEPLOY, UPDATE_FILE_LIST,
             ACCOUNT_CREATE, GET_CHAIN_ACCOUNT, APPLY_GAS, GET_APPLY_LIST, UPLOAD_PDFS, GET_PDFS_LIST, DOWNLOAD_PDFS, SHARE_PDFS,
-            SEND_CROSS_CHAIN, GET_CROSS_CHAIN, GET_CROSS_CHAIN_LIST, SET_CROSS_DST, GET_CROSS_TBD_LIST, SUBMIT_USER_KYC};
+            SEND_CROSS_CHAIN, GET_CROSS_CHAIN, GET_CROSS_CHAIN_LIST, SET_CROSS_DST, GET_CROSS_TBD_LIST, SUBMIT_USER_KYC, PRIVATE_KEY_CUSTODY, DOWNLOAD_PRIVATE_KEY};
     // SM 可以访问的接口
     public static final String[] PM_URLS = {APPROVE_USER_KYC, GET_USER_LIST, GET_USER_KYC_RECORD_LIST};
 

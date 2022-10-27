@@ -13,7 +13,19 @@ import javax.validation.constraints.NotBlank;
 @NoArgsConstructor
 @AllArgsConstructor
 public class RequestAccountCreate {
-    @ApiModelProperty(value = "钱包文件密码")
+    @ApiModelProperty(value = "链账户地址")
     @NotBlank
-    private String walletPass;
+    private String chainAddress;
+
+    @ApiModelProperty(value = "链账户名称")
+    @NotBlank
+    private String chainUserName;
+
+    @ApiModelProperty(value = "签名信息")
+    @NotBlank
+    private String message;
+
+    @ApiModelProperty(value = "经过签名处理的签名信息")
+    @NotBlank
+    private String signedMessage;
 }
