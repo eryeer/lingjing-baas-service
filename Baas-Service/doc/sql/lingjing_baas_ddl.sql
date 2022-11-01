@@ -139,6 +139,7 @@ CREATE TABLE `tbl_chain_account` (
     `user_id` varchar(32) NOT NULL COMMENT '用户id',
     `name` varchar(32) NOT NULL COMMENT '链用户名称',
     `is_gas_transfer` tinyint NOT NULL COMMENT '链用户是否可以gas 转账  1:允许 0:不允许',
+    `is_custody` tinyint NOT NULL COMMENT '链用户私钥是否托管 1:托管 0:不托管',
     `user_address` varchar(42) NOT NULL COMMENT '链账户地址',
     `encode_key` varchar(108) NULL COMMENT '链账户私钥 经过 aes 与 base64处理过的密文',
     KEY `idx_user_id`(`user_id`),

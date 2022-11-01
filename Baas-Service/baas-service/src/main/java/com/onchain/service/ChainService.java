@@ -1,46 +1,34 @@
 package com.onchain.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.util.BeanUtil;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import com.onchain.config.ParamsConfig;
-import com.onchain.constants.CommonConst;
 import com.onchain.constants.ReturnCode;
+import com.onchain.contracts.Maas;
 import com.onchain.entities.dao.ChainAccount;
 import com.onchain.entities.dao.GasApply;
 import com.onchain.entities.request.RequestAccountCreate;
 import com.onchain.entities.response.ResponseChainAccount;
-import com.onchain.entities.response.ResponseFile;
 import com.onchain.exception.CommonException;
 import com.onchain.mapper.ChainAccountMapper;
 import com.onchain.mapper.GasApplyMapper;
 import com.onchain.untils.Web3jUtil;
 import com.onchain.util.ECCUtils;
-import com.sun.org.apache.bcel.internal.generic.NEW;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.time.DateUtils;
-import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.web3j.crypto.*;
+import org.web3j.crypto.Credentials;
 import org.web3j.protocol.Web3j;
-import org.web3j.protocol.core.DefaultBlockParameter;
 import org.web3j.protocol.core.DefaultBlockParameterName;
 import org.web3j.protocol.core.methods.response.EthGetTransactionCount;
-import org.web3j.protocol.core.methods.response.TransactionReceipt;
-import org.web3j.tx.RawTransactionManager;
-import org.web3j.tx.Transfer;
-import org.web3j.utils.Convert;
+import org.web3j.tx.gas.ContractGasProvider;
+import org.web3j.tx.gas.StaticGasProvider;
 
-import javax.crypto.Cipher;
-import javax.crypto.spec.IvParameterSpec;
-import javax.crypto.spec.SecretKeySpec;
-import java.io.File;
 import java.io.IOException;
-import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.Base64;
 import java.util.Date;
 import java.util.List;
 
@@ -60,14 +48,14 @@ public class ChainService {
     public ResponseChainAccount accountCreate(String userId, RequestAccountCreate request) {
         String userAddress = request.getChainAddress();
         String chainUserName = request.getChainUserName();
-        if (!Web3jUtil.isSignatureValid(request.getSignedMessage(), request.getMessage(), request.getChainAddress())){
+        if (!Web3jUtil.isSignatureValid(request.getSignedMessage(), request.getMessage(), request.getChainAddress())) {
             throw new CommonException(ReturnCode.CHAIN_ACCOUNT_SIGNATURE_ERROR);
         }
         ResponseChainAccount account = chainAccountMapper.getChainAccountByAddress(userAddress);
         if (account != null) {
             throw new CommonException(ReturnCode.CHAIN_ACCOUNT_EXIST);
         }
-        if (!userAddress.startsWith("0x")){
+        if (!userAddress.startsWith("0x")) {
             userAddress = "0x" + userAddress;
         }
 
@@ -93,7 +81,7 @@ public class ChainService {
         if (account == null) {
             throw new CommonException(ReturnCode.CHAIN_ACCOUNT_NOT_EXIST);
         }
-        if (!account.getUserAddress().equals(Web3jUtil.getAddressFromETHPrivateKey(privateKey))){
+        if (!account.getUserAddress().equals(Web3jUtil.getAddressFromETHPrivateKey(privateKey))) {
             throw new CommonException(ReturnCode.PRIVATE_KEY_CHAIN_ACCOUNT_UN_MATCH);
         }
 
@@ -111,7 +99,7 @@ public class ChainService {
         if (account == null) {
             throw new CommonException(ReturnCode.CHAIN_ACCOUNT_NOT_EXIST);
         }
-        if (StringUtils.isEmpty(account.getEncodeKey())){
+        if (StringUtils.isEmpty(account.getEncodeKey())) {
             throw new CommonException(ReturnCode.PRIVATE_KEY_UN_CUSTOD);
         }
         ResponseChainAccount responseChainAccount = ResponseChainAccount.builder().Id(account.getId()).
@@ -131,12 +119,11 @@ public class ChainService {
         }
     }
 
-//    public ResponseChainAccount getChainAccount(String userId) {
-//        ResponseChainAccount account = chainAccountMapper.getChainAccountByUserId(userId);
+//    public List<ResponseChainAccount> getChainAccount(String userId) {
+//        List<ResponseChainAccount> account = chainAccountMapper.getChainAccountByUserId(userId);
 //        if (account == null) {
 //            throw new CommonException(ReturnCode.CHAIN_ACCOUNT_NOT_EXIST);
 //        }
-//        account.setWalletFile(cosService.getCosFile(account.getWalletFileUuid()));
 //        return account;
 //    }
 
@@ -178,5 +165,33 @@ public class ChainService {
 
     public List<GasApply> getApplyList(String userId) {
         return gasApplyMapper.getApplyList(userId);
+    }
+
+    public PageInfo<ResponseChainAccount> getChainAccount(Integer pageNumber, Integer pageSize, String userId, String name, String userAddress, Boolean isGasTransfer, Long startTime, Long endTime) {
+        PageHelper.startPage(pageNumber, pageSize);
+        Date start = null, end = null;
+        if (startTime != null && endTime != null) {
+            start = new Date(startTime);
+            end = new Date(endTime);
+        }
+        List<ResponseChainAccount> users = chainAccountMapper.getChainAccount(userId, name, userAddress, isGasTransfer, start, end);
+        return new PageInfo<>(users);
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public void changeGasTransferStatus(String userId, List<Long> ids, Boolean isGasTransfer) throws Exception {
+        ContractGasProvider gasProvider = new StaticGasProvider(BigInteger.valueOf(100_000_000L), BigInteger.valueOf(30_000_000L));
+        Credentials credentials = Credentials.create(paramsConfig.maasAdminAccount);
+        Maas maasConfig = Maas.load(paramsConfig.maasConfigAddress, web3j, credentials, gasProvider);
+        List<String> addresses = chainAccountMapper.getUserAddressListById(userId, ids);
+        if (addresses.isEmpty()) {
+            throw new CommonException(ReturnCode.CHAIN_ACCOUNT_NOT_EXIST);
+        }
+        maasConfig.setGasUsers(addresses, isGasTransfer).send();
+        chainAccountMapper.updateAccountStatusById(userId, ids, "1", isGasTransfer);
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public void deleteChainAccount(String userId, List<Long> request) {
     }
 }

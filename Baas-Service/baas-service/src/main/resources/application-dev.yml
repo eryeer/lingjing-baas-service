@@ -17,12 +17,11 @@ spring:
       #采样取值介于 0到1之间，1则表示全部收集
       probability: 1
 
-dna:
-  account:
-    adminAccount: ${ADMIN_ACCOUNT:0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80}
-    walletDir: ${WALLET_DIR:temp/wallets/}
-  node:
-    restUrl: ${NODE_URL:http://127.0.0.1:8545}
+chain:
+  maas:
+    adminAccount: ${ADMIN_ACCOUNT:4b0c9b9d685db17ac9f295cb12f9d7d2369f5bf524b3ce52ce424031cafda1ae}
+    rpcUrl: ${NODE_URL:https://maas-test-node.onchain.com}
+    configAddress: 0xD62B67170A6bb645f1c59601FbC6766940ee12e5
 
 pdfs:
   cli:

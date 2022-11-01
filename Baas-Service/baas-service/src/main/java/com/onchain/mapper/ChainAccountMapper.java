@@ -2,12 +2,12 @@ package com.onchain.mapper;
 
 
 import com.onchain.entities.dao.ChainAccount;
-import com.onchain.entities.dao.User;
 import com.onchain.entities.response.ResponseChainAccount;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 
+import java.util.Date;
 import java.util.List;
 
 public interface ChainAccountMapper {
@@ -43,4 +43,24 @@ public interface ChainAccountMapper {
             "where id = #{id}")
     void updateEncodeKey(Long id, String encodeKey);
 
+    @Select("<script> " +
+            "select " + BASIC_COLS + " from tbl_chain_account " +
+            "<where> status != '0' and user_id = #{userId} " +
+            "<if test='name != null'>AND name = #{name} </if> " +
+            "<if test='userAddress != null'> AND user_Address = #{userAddress} </if> " +
+            "<if test='isGasTransfer != null'> AND is_Gas_Transfer = #{isGasTransfer} </if> " +
+            "<if test='startTime != null && endTime != null''> AND create_time between #{startTime} and #{endTime} </if> " +
+            "</where>" +
+            " order by update_time desc " +
+            "</script>")
+    List<ResponseChainAccount> getChainAccount(String userId, String name, String userAddress, Boolean isGasTransfer, Date startTime, Date endTime);
+
+    // 根据用户id和链户id查询地址列表
+    @Select("select user_address from tbl_chain_account where id= #{id} and status != 0 limit 1")
+    List<String> getUserAddressListById(String userId, List<Long> ids);
+
+    // 根据用户id和链户id更新转账和删除状态
+    @Update("update tbl_chain_account set status = #{status}, is_gas_transfer = #{isGasTransfer} " +
+            "where user_id = #{userId} and id in () ")
+    List<String> updateAccountStatusById(String userId, List<Long> ids, String status, Boolean isGasTransfer);
 }

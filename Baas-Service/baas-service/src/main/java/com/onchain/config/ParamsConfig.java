@@ -45,29 +45,15 @@ public class ParamsConfig {
     @Value("${cloud.sms.test}")
     public Boolean smsTest;
 
-    @Value("${dna.account.walletDir}")
-    public String localWalletDir;
+    // maas chain config
+    @Value("${chain.maas.adminAccount}")
+    public String maasAdminAccount;
 
-    @Value("${dna.account.adminAccount}")
-    public String adminAccount;
+    @Value("${chain.maas.rpcUrl}")
+    public String maasRpcUrl;
 
-    // PDFS config
-    @Value("${pdfs.rpc.uploadUrl}")
-    public String pdfsUploadUrl;
-    @Value("${pdfs.rpc.downloadUrl}")
-    public String pdfsDownloadUrl;
-    @Value("${pdfs.cli.username}")
-    public String pdfsUsername;
-    @Value("${pdfs.cli.password}")
-    public String pdfsPassword;
-    @Value("${pdfs.cli.host}")
-    public String pdfsHost;
-    @Value("${pdfs.cli.port}")
-    public Integer pdfsPort;
-    @Value("${pdfs.cli.baseDir}")
-    public String pdfsBaseDir;
-    @Value("${pdfs.cli.uploadFolder}")
-    public String pdfsUploadFolder;
+    @Value("${chain.maas.ConfigAddress}")
+    public String maasConfigAddress;
 
     //privateKey encode
     @Value("${privatekey.encode.key}")

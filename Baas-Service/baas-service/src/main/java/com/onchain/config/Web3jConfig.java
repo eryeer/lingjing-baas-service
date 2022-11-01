@@ -9,7 +9,7 @@ import org.web3j.protocol.http.HttpService;
 @Configuration
 public class Web3jConfig {
 
-    @Value("${dna.node.restUrl}")
+    @Value("${chain.maas.rpcUrl}")
     private String nodeAddress;
 
     @Bean
