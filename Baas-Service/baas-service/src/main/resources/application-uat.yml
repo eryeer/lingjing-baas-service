@@ -17,24 +17,11 @@ spring:
       #采样取值介于 0到1之间，1则表示全部收集
       probability: 1
 
-dna:
-  account:
-    adminAccount: ${ADMIN_ACCOUNT:0830f5f331eccb3d4fd90caad770781bb088e52d80144b56544f1dc04f9bcb51}
-    walletDir: ${WALLET_DIR:temp/wallets/}
-  node:
-    restUrl: ${NODE_URL:http://42.192.185.27:8545}
-
-pdfs:
-  cli:
-    host: ${PDFS_HOST:172.168.3.13}
-    port: ${PDFS_PORT:22}
-    username: ${PDFS_USER:ubuntu}
-    password: ${PDFS_PASS:Onchain@2019}
-    baseDir: ${PDFS_BASE_FOLDER:/home/ubuntu/pdfs/pdfs-cli}
-    uploadFolder: ${PDFS_UPLOAD:temp/upload}
-  rpc:
-    uploadUrl: ${PDFS_UPLOAD_URL:http://172.168.3.13:21337/api/v1/uploadFile}
-    downloadUrl: ${PDFS_DOWNLOAD_URL:http://172.168.3.13:21337/api/v1/downloadbyhash}
+chain:
+  maas:
+    adminAccount: ${ADMIN_ACCOUNT:4b0c9b9d685db17ac9f295cb12f9d7d2369f5bf524b3ce52ce424031cafda1ae}
+    rpcUrl: ${NODE_URL:https://maas-test-node.onchain.com}
+    configAddress: 0xD62B67170A6bb645f1c59601FbC6766940ee12e5
 
 jwt:
   secret:

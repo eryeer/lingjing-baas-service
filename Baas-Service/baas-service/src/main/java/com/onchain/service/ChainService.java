@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.onchain.config.ParamsConfig;
+import com.onchain.constants.CommonConst;
 import com.onchain.constants.ReturnCode;
 import com.onchain.contracts.Maas;
 import com.onchain.entities.dao.ChainAccount;
@@ -31,6 +32,7 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -180,18 +182,36 @@ public class ChainService {
 
     @Transactional(rollbackFor = Exception.class)
     public void changeGasTransferStatus(String userId, List<Long> ids, Boolean isGasTransfer) throws Exception {
-        ContractGasProvider gasProvider = new StaticGasProvider(BigInteger.valueOf(100_000_000L), BigInteger.valueOf(30_000_000L));
-        Credentials credentials = Credentials.create(paramsConfig.maasAdminAccount);
-        Maas maasConfig = Maas.load(paramsConfig.maasConfigAddress, web3j, credentials, gasProvider);
-        List<String> addresses = chainAccountMapper.getUserAddressListById(userId, ids);
-        if (addresses.isEmpty()) {
+        List<ChainAccount> accounts = chainAccountMapper.getUserAccountListById(userId, ids);
+        if (accounts.isEmpty()) {
             throw new CommonException(ReturnCode.CHAIN_ACCOUNT_NOT_EXIST);
         }
-        maasConfig.setGasUsers(addresses, isGasTransfer).send();
-        chainAccountMapper.updateAccountStatusById(userId, ids, "1", isGasTransfer);
+        List<String> addresses = accounts.stream().filter(p -> p.getIsGasTransfer() != isGasTransfer).map(ChainAccount::getUserAddress).collect(Collectors.toList());
+        if (addresses.isEmpty()) {
+            return;
+        }
+        setGasUsers(addresses, isGasTransfer);
+        chainAccountMapper.updateAccountStatusById(userId, ids, CommonConst.ACTIVE, isGasTransfer);
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public void deleteChainAccount(String userId, List<Long> request) {
+    private void setGasUsers(List<String> addresses, Boolean isGasTransfer) throws Exception {
+        ContractGasProvider gasProvider = new StaticGasProvider(BigInteger.valueOf(100_000_000L), BigInteger.valueOf(30_000_000L));
+        Credentials credentials = Credentials.create(paramsConfig.maasAdminAccount);
+        Maas maasConfig = Maas.load(paramsConfig.maasConfigAddress, web3j, credentials, gasProvider);
+        maasConfig.setGasUsers(addresses, isGasTransfer).send();
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public void deleteChainAccount(String userId, List<Long> ids) throws Exception {
+        List<ChainAccount> accounts = chainAccountMapper.getUserAccountListById(userId, ids);
+        if (accounts.isEmpty()) {
+            throw new CommonException(ReturnCode.CHAIN_ACCOUNT_NOT_EXIST);
+        }
+        List<String> addresses = accounts.stream().filter(ChainAccount::getIsGasTransfer).map(ChainAccount::getUserAddress).collect(Collectors.toList());
+        if (!addresses.isEmpty()) {
+            setGasUsers(addresses, false);
+        }
+        chainAccountMapper.updateAccountStatusById(userId, ids, CommonConst.DELETED, false);
     }
 }

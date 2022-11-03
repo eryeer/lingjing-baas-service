@@ -49,18 +49,28 @@ public interface ChainAccountMapper {
             "<if test='name != null'>AND name = #{name} </if> " +
             "<if test='userAddress != null'> AND user_Address = #{userAddress} </if> " +
             "<if test='isGasTransfer != null'> AND is_Gas_Transfer = #{isGasTransfer} </if> " +
-            "<if test='startTime != null && endTime != null''> AND create_time between #{startTime} and #{endTime} </if> " +
+            "<if test='startTime != null and endTime != null'> AND create_time between #{startTime} and #{endTime} </if> " +
             "</where>" +
             " order by update_time desc " +
             "</script>")
     List<ResponseChainAccount> getChainAccount(String userId, String name, String userAddress, Boolean isGasTransfer, Date startTime, Date endTime);
 
     // 根据用户id和链户id查询地址列表
-    @Select("select user_address from tbl_chain_account where id= #{id} and status != 0 limit 1")
-    List<String> getUserAddressListById(String userId, List<Long> ids);
+    @Select("<script> " +
+            "select " + BASIC_COLS + " from tbl_chain_account where user_Id = #{userId} and status != 0 and id in " +
+            "<foreach collection='list' index='index' item='item' open='(' separator=',' close=')'> " +
+            "#{ids} " +
+            "</foreach> " +
+            "</script>")
+    List<ChainAccount> getUserAccountListById(String userId, List<Long> ids);
 
     // 根据用户id和链户id更新转账和删除状态
-    @Update("update tbl_chain_account set status = #{status}, is_gas_transfer = #{isGasTransfer} " +
-            "where user_id = #{userId} and id in () ")
+    @Update("<script> " +
+            "update tbl_chain_account set status = #{status}, is_gas_transfer = #{isGasTransfer} " +
+            "where user_id = #{userId} and id in " +
+            "<foreach collection='list' index='index' item='item' open='(' separator=',' close=')'> " +
+            "#{ids} " +
+            "</foreach> " +
+            "</script>")
     List<String> updateAccountStatusById(String userId, List<Long> ids, String status, Boolean isGasTransfer);
 }

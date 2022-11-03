@@ -52,7 +52,7 @@ public class ParamsConfig {
     @Value("${chain.maas.rpcUrl}")
     public String maasRpcUrl;
 
-    @Value("${chain.maas.ConfigAddress}")
+    @Value("${chain.maas.configAddress}")
     public String maasConfigAddress;
 
     //privateKey encode
