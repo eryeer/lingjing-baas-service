@@ -191,17 +191,18 @@ public class ChainService {
         if (addresses.isEmpty()) {
             return;
         }
-        setGasUsers(addresses, isGasTransfer);
         chainAccountMapper.updateAccountStatusById(userId, ids, CommonConst.ACTIVE, isGasTransfer);
+        setGasUsers(addresses, isGasTransfer);
     }
 
     @Transactional(rollbackFor = Exception.class)
     private void setGasUsers(List<String> addresses, Boolean isGasTransfer) throws Exception {
         Credentials credentials = Credentials.create(paramsConfig.maasAdminAccount);
         String netVersion = web3j.netVersion().send().getNetVersion();
-        ContractGasProvider gasProvider = new StaticGasProvider(BigInteger.valueOf(100_000_000L), BigInteger.valueOf(30_000_000L));
+        ContractGasProvider gasProvider = new StaticGasProvider(BigInteger.valueOf(1000_000_000L), BigInteger.valueOf(30_000_000L));
         RawTransactionManager rawTransactionManager = Web3jUtil.getTransactionManager(web3j, credentials, netVersion);
-        Maas maasConfig = Maas.load(paramsConfig.maasConfigAddress, web3j, rawTransactionManager, gasProvider);
+        String contract = paramsConfig.maasConfigAddress;
+        Maas maasConfig = Maas.load(contract, web3j, rawTransactionManager, gasProvider);
         maasConfig.setGasUsers(addresses, isGasTransfer).send();
     }
 
@@ -212,9 +213,9 @@ public class ChainService {
             throw new CommonException(ReturnCode.CHAIN_ACCOUNT_NOT_EXIST);
         }
         List<String> addresses = accounts.stream().filter(ChainAccount::getIsGasTransfer).map(ChainAccount::getUserAddress).collect(Collectors.toList());
+        chainAccountMapper.updateAccountStatusById(userId, ids, CommonConst.DELETED, false);
         if (!addresses.isEmpty()) {
             setGasUsers(addresses, false);
         }
-        chainAccountMapper.updateAccountStatusById(userId, ids, CommonConst.DELETED, false);
     }
 }

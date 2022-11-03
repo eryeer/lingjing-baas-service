@@ -21,7 +21,7 @@ chain:
   maas:
     adminAccount: ${ADMIN_ACCOUNT:4b0c9b9d685db17ac9f295cb12f9d7d2369f5bf524b3ce52ce424031cafda1ae}
     rpcUrl: ${NODE_URL:https://maas-test-node.onchain.com}
-    configAddress: 0xD62B67170A6bb645f1c59601FbC6766940ee12e5
+    configAddress: ${CONFIG_CONTRACT:0xD62B67170A6bb645f1c59601FbC6766940ee12e5}
 
 jwt:
   secret:

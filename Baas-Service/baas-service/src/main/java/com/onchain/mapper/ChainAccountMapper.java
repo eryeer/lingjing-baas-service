@@ -73,5 +73,5 @@ public interface ChainAccountMapper {
             "#{item} " +
             "</foreach> " +
             "</script>")
-    List<String> updateAccountStatusById(String userId, List<Long> ids, String status, Boolean isGasTransfer);
+    void updateAccountStatusById(String userId, List<Long> ids, String status, Boolean isGasTransfer);
 }
