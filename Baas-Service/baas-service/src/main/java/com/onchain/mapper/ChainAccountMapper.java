@@ -39,7 +39,7 @@ public interface ChainAccountMapper {
     ResponseChainAccount getChainAccountByAddress(String address);
 
     //根据链户id更新加密后的私钥
-    @Update("update tbl_chain_account set encode_key = #{encodeKey} " +
+    @Update("update tbl_chain_account set encode_key = #{encodeKey} , is_custody = 1  " +
             "where id = #{id}")
     void updateEncodeKey(Long id, String encodeKey);
 

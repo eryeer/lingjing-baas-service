@@ -98,6 +98,7 @@ public enum ReturnCode {
     PRIVATE_KEY_CHAIN_ACCOUNT_UN_MATCH(32007, "链户与私钥不匹配"),
     PRIVATE_KEY_UN_CUSTOD(32008, "链户未托管私钥"),
     CHAIN_ACCOUNT_SIGNATURE_ERROR(32009, "链户地址与签名信息有问题"),
+    SIGNATURE_ORIGIN_TEXT_FORMAT_ERROR(32010, "签名原文格式有问题"),
 
     // 跨链错误 [33xxx]
     SRC_CONTRACT_ADDRESS_ERROR(33001, "跨链源合约地址错误"),

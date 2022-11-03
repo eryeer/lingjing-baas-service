@@ -33,7 +33,11 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.stream.Collectors;
+
+import static com.onchain.constants.CommonConst.ADDRESS_HEADER;
+import static com.onchain.constants.CommonConst.NONCE_HEADER;
 
 @Service
 @Slf4j
@@ -51,6 +55,27 @@ public class ChainService {
     public ResponseChainAccount accountCreate(String userId, RequestAccountCreate request) {
         String userAddress = request.getChainAddress();
         String chainUserName = request.getChainUserName();
+        String originMessage = request.getMessage();
+        // 校验 签名原文 是否有问题
+        if (StringUtils.isEmpty(originMessage)){
+            throw new CommonException(ReturnCode.SIGNATURE_ORIGIN_TEXT_FORMAT_ERROR);
+        }
+        if (!originMessage.contains(ADDRESS_HEADER) || !originMessage.contains(NONCE_HEADER)){
+            throw new CommonException(ReturnCode.SIGNATURE_ORIGIN_TEXT_FORMAT_ERROR);
+        }
+        int startIndex = originMessage.indexOf(ADDRESS_HEADER) + ADDRESS_HEADER.length();
+        int endIndex = originMessage.indexOf(NONCE_HEADER);
+        if (startIndex > endIndex){
+            throw new CommonException(ReturnCode.SIGNATURE_ORIGIN_TEXT_FORMAT_ERROR);
+        }
+        String addressInSignature = originMessage.substring(startIndex, endIndex);
+        if (StringUtils.isEmpty(addressInSignature)){
+            throw new CommonException(ReturnCode.SIGNATURE_ORIGIN_TEXT_FORMAT_ERROR);
+        }
+        if (!addressInSignature.toLowerCase(Locale.ROOT).replace(" ", "").equals(request.getChainAddress().toLowerCase(Locale.ROOT))){
+            throw new CommonException(ReturnCode.SIGNATURE_ORIGIN_TEXT_FORMAT_ERROR);
+        }
+        // 校验签名
         if (!Web3jUtil.isSignatureValid(request.getSignedMessage(), request.getMessage(), request.getChainAddress())) {
             throw new CommonException(ReturnCode.CHAIN_ACCOUNT_SIGNATURE_ERROR);
         }

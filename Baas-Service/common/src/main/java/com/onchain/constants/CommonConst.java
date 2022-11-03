@@ -170,4 +170,8 @@ public class CommonConst {
     public static final String SELF = "SELF";
     public static final String OTHER = "OTHER";
 
+    // 签名相关
+    public static final String ADDRESS_HEADER = "Wallet address:";
+    public static final String NONCE_HEADER = "Nonce:";
+
 }
