@@ -136,7 +136,7 @@
 - 功能说明：下载链账户私钥
 - url: /baas/chain/downloadPrivateKey
 - auth: 企业用户/个人用户
-- 行为：根据链账户地址下载私钥明文
+- 行为：根据链账户ID下载私钥明文
 - 校验：accessToken校验，校验地址是否存在，是否已托管
 
 ### 2.2.4. getChainAccount
