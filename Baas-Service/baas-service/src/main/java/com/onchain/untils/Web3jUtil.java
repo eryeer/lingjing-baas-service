@@ -1,6 +1,5 @@
 package com.onchain.untils;
 
-import org.web3j.abi.datatypes.NumericType;
 import org.web3j.abi.datatypes.Type;
 import org.web3j.crypto.*;
 import org.web3j.protocol.Web3j;
@@ -13,6 +12,7 @@ import org.web3j.utils.Numeric;
 
 import java.io.IOException;
 import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Locale;
 
@@ -65,7 +65,7 @@ public class Web3jUtil {
         }
     }
 
-    public static String getAddressFromETHPrivateKey(String privateKey){
+    public static String getAddressFromETHPrivateKey(String privateKey) {
         ECKeyPair publicKey = ECKeyPair.create(Numeric.toBigInt(privateKey));
         return Keys.toChecksumAddress(Keys.getAddress(publicKey));
     }
@@ -78,7 +78,7 @@ public class Web3jUtil {
         byte[] sigBytes = Numeric.hexStringToByteArray(signature);
         Sign.SignatureData signatureData = sigFromByteArray(sigBytes);
         String addressRecoverd = null;
-        byte[] digest = Hash.sha3(message.getBytes());
+        byte[] digest = message.getBytes(StandardCharsets.UTF_8);
         byte[] data = getEthereumMessageHash(digest);
         for (int i = 0; i < 4; i++) {
             BigInteger pubkey = Sign.recoverFromSignature((byte) i,
@@ -115,7 +115,6 @@ public class Web3jUtil {
 
         return Hash.sha3(result);
     }
-
 
 
 }

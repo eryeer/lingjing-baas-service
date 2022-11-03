@@ -12,9 +12,9 @@ import java.util.List;
 
 public interface ChainAccountMapper {
 
-    String INSERT_COLS = " user_id, user_address, is_gas_transfer, encode_key, name";
+    String INSERT_COLS = " user_id, user_address, is_gas_transfer, is_custody, encode_key, name";
     String BASIC_COLS = " id, create_time, update_time, status, " + INSERT_COLS;
-    String INSERT_VALS = " #{userId}, #{userAddress}, #{isGasTransfer}, #{encodeKey}, #{name}";
+    String INSERT_VALS = " #{userId}, #{userAddress}, #{isGasTransfer}, #{isCustody}, #{encodeKey}, #{name}";
 
     //根据用户id查询链账户作为响应对象
     @Select("select " + BASIC_COLS + " from tbl_chain_account where user_id= #{userId} and status != 0")
@@ -49,11 +49,12 @@ public interface ChainAccountMapper {
             "<if test='name != null'>AND name = #{name} </if> " +
             "<if test='userAddress != null'> AND user_Address = #{userAddress} </if> " +
             "<if test='isGasTransfer != null'> AND is_Gas_Transfer = #{isGasTransfer} </if> " +
+            "<if test='isCustody != null'> AND is_custody = #{isCustody} </if> " +
             "<if test='startTime != null and endTime != null'> AND create_time between #{startTime} and #{endTime} </if> " +
             "</where>" +
             " order by update_time desc " +
             "</script>")
-    List<ResponseChainAccount> getChainAccount(String userId, String name, String userAddress, Boolean isGasTransfer, Date startTime, Date endTime);
+    List<ResponseChainAccount> getChainAccount(String userId, String name, String userAddress, Boolean isGasTransfer, Boolean isCustody, Date startTime, Date endTime);
 
     // 根据用户id和链户id查询地址列表
     @Select("<script> " +

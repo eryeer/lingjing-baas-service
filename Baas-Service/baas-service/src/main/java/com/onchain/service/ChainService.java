@@ -169,14 +169,14 @@ public class ChainService {
         return gasApplyMapper.getApplyList(userId);
     }
 
-    public PageInfo<ResponseChainAccount> getChainAccount(Integer pageNumber, Integer pageSize, String userId, String name, String userAddress, Boolean isGasTransfer, Long startTime, Long endTime) {
+    public PageInfo<ResponseChainAccount> getChainAccount(Integer pageNumber, Integer pageSize, String userId, String name, String userAddress, Boolean isGasTransfer, Boolean isCustody, Long startTime, Long endTime) {
         PageHelper.startPage(pageNumber, pageSize);
         Date start = null, end = null;
         if (startTime != null && endTime != null) {
             start = new Date(startTime);
             end = new Date(endTime);
         }
-        List<ResponseChainAccount> users = chainAccountMapper.getChainAccount(userId, name, userAddress, isGasTransfer, start, end);
+        List<ResponseChainAccount> users = chainAccountMapper.getChainAccount(userId, name, userAddress, isGasTransfer, isCustody, start, end);
         return new PageInfo<>(users);
     }
 

@@ -67,14 +67,16 @@ public class ChainController {
     @OperLogAnnotation(description = "getChainAccount")
     public ResponseFormat<PageInfo<ResponseChainAccount>> getChainAccount(@RequestParam(name = "pageNumber") @Min(1) Integer pageNumber,
                                                                           @RequestParam(name = "pageSize") @Min(1) @Max(50) Integer pageSize,
+                                                                          @RequestParam String userId,
                                                                           @RequestParam(required = false) String name,
                                                                           @RequestParam(required = false) String userAddress,
                                                                           @RequestParam(required = false) Boolean isGasTransfer,
+                                                                          @RequestParam(required = false) Boolean isCustody,
                                                                           @RequestParam(required = false) Long startTime,
                                                                           @RequestParam(required = false) Long endTime,
                                                                           @RequestHeader(CommonConst.HEADER_ACCESS_TOKEN) String accessToken) {
         User user = jwtService.parseToken(accessToken);
-        PageInfo<ResponseChainAccount> result = chainService.getChainAccount(pageNumber, pageSize, user.getUserId(), name, userAddress, isGasTransfer, startTime, endTime);
+        PageInfo<ResponseChainAccount> result = chainService.getChainAccount(pageNumber, pageSize, user.getUserId(), name, userAddress, isGasTransfer, isCustody, startTime, endTime);
         return new ResponseFormat<>(result);
     }
 
