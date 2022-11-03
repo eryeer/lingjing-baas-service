@@ -59,8 +59,8 @@ public interface ChainAccountMapper {
     // 根据用户id和链户id查询地址列表
     @Select("<script> " +
             "select " + BASIC_COLS + " from tbl_chain_account where user_Id = #{userId} and status != 0 and id in " +
-            "<foreach collection='list' index='index' item='item' open='(' separator=',' close=')'> " +
-            "#{ids} " +
+            "<foreach collection='ids' index='index' item='item' open='(' separator=',' close=')'> " +
+            "#{item} " +
             "</foreach> " +
             "</script>")
     List<ChainAccount> getUserAccountListById(String userId, List<Long> ids);
@@ -69,8 +69,8 @@ public interface ChainAccountMapper {
     @Update("<script> " +
             "update tbl_chain_account set status = #{status}, is_gas_transfer = #{isGasTransfer} " +
             "where user_id = #{userId} and id in " +
-            "<foreach collection='list' index='index' item='item' open='(' separator=',' close=')'> " +
-            "#{ids} " +
+            "<foreach collection='ids' index='index' item='item' open='(' separator=',' close=')'> " +
+            "#{item} " +
             "</foreach> " +
             "</script>")
     List<String> updateAccountStatusById(String userId, List<Long> ids, String status, Boolean isGasTransfer);

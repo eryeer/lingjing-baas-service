@@ -25,6 +25,7 @@ import org.web3j.crypto.Credentials;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.DefaultBlockParameterName;
 import org.web3j.protocol.core.methods.response.EthGetTransactionCount;
+import org.web3j.tx.RawTransactionManager;
 import org.web3j.tx.gas.ContractGasProvider;
 import org.web3j.tx.gas.StaticGasProvider;
 
@@ -196,9 +197,11 @@ public class ChainService {
 
     @Transactional(rollbackFor = Exception.class)
     private void setGasUsers(List<String> addresses, Boolean isGasTransfer) throws Exception {
-        ContractGasProvider gasProvider = new StaticGasProvider(BigInteger.valueOf(100_000_000L), BigInteger.valueOf(30_000_000L));
         Credentials credentials = Credentials.create(paramsConfig.maasAdminAccount);
-        Maas maasConfig = Maas.load(paramsConfig.maasConfigAddress, web3j, credentials, gasProvider);
+        String netVersion = web3j.netVersion().send().getNetVersion();
+        ContractGasProvider gasProvider = new StaticGasProvider(BigInteger.valueOf(100_000_000L), BigInteger.valueOf(30_000_000L));
+        RawTransactionManager rawTransactionManager = Web3jUtil.getTransactionManager(web3j, credentials, netVersion);
+        Maas maasConfig = Maas.load(paramsConfig.maasConfigAddress, web3j, rawTransactionManager, gasProvider);
         maasConfig.setGasUsers(addresses, isGasTransfer).send();
     }
 

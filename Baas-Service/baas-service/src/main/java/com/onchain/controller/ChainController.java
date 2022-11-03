@@ -3,6 +3,7 @@ package com.onchain.controller;
 import com.github.pagehelper.PageInfo;
 import com.onchain.aop.operlog.OperLogAnnotation;
 import com.onchain.constants.CommonConst;
+import com.onchain.constants.ReturnCode;
 import com.onchain.constants.UrlConst;
 import com.onchain.entities.ResponseFormat;
 import com.onchain.entities.dao.User;
@@ -76,7 +77,10 @@ public class ChainController {
                                                                           @RequestParam(required = false) Long endTime,
                                                                           @RequestHeader(CommonConst.HEADER_ACCESS_TOKEN) String accessToken) {
         User user = jwtService.parseToken(accessToken);
-        PageInfo<ResponseChainAccount> result = chainService.getChainAccount(pageNumber, pageSize, user.getUserId(), name, userAddress, isGasTransfer, isCustody, startTime, endTime);
+        if (!user.getRole().equals(CommonConst.PM) && !user.getUserId().equals(userId)) {
+            return new ResponseFormat<>(ReturnCode.USER_ROLE_ERROR);
+        }
+        PageInfo<ResponseChainAccount> result = chainService.getChainAccount(pageNumber, pageSize, userId, name, userAddress, isGasTransfer, isCustody, startTime, endTime);
         return new ResponseFormat<>(result);
     }
 

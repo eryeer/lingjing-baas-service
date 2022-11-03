@@ -6,7 +6,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
 @Data
@@ -15,10 +16,10 @@ import java.util.List;
 @AllArgsConstructor
 public class RequestChangeGasTransfer {
     @ApiModelProperty(value = "链账户id列表")
-    @NotBlank
+    @NotEmpty
     private List<Long> ids;
 
     @ApiModelProperty(value = "是否可接收燃料")
-    @NotBlank
+    @NotNull
     private Boolean isGasTransfer;
 }

@@ -2,8 +2,6 @@ package com.onchain.entities.dao;
 
 import lombok.*;
 
-import java.util.Date;
-
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -14,5 +12,6 @@ public class ChainAccount extends Base {
     private String userAddress;
     private String name;
     private Boolean isGasTransfer;
+    private Boolean isCustody;
     private String encodeKey;
 }
