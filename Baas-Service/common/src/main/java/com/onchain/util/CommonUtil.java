@@ -23,6 +23,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import static javax.xml.bind.DatatypeConverter.printHexBinary;
 
@@ -330,5 +331,32 @@ public class CommonUtil {
             }
         }
         return false;
+    }
+
+    public static String getLineFromStringByLineNum(String text, int number){
+        StringReader stringReader = null;
+        BufferedReader bufferedReader = null;
+        String lineText = "";
+        try {
+            stringReader = new StringReader(text);
+            bufferedReader = new BufferedReader(stringReader);
+            List<String> collect = bufferedReader.lines().collect(Collectors.toList());
+            lineText = collect.get(number);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }finally {
+            try{
+                if (null != bufferedReader){
+                    bufferedReader.close();
+                }
+                if (null != stringReader){
+                    stringReader.close();
+                }
+            }catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            return lineText;
+        }
     }
 }
