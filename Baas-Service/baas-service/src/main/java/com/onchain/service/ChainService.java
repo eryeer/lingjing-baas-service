@@ -51,7 +51,7 @@ public class ChainService {
     private final CosService cosService;
     private final GasApplyMapper gasApplyMapper;
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public ResponseChainAccount accountCreate(String userId, RequestAccountCreate request) {
         String userAddress = request.getChainAddress();
         String chainUserName = request.getChainUserName();
@@ -103,7 +103,7 @@ public class ChainService {
         return chainAccountMapper.getChainAccountByAddress(userAddress);
     }
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void custodPrivateKey(Long chainAccountId, String privateKey) {
         ChainAccount account = chainAccountMapper.getChainAccountById(chainAccountId);
         if (account == null) {

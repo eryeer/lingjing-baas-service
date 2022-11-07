@@ -1,6 +1,5 @@
 package com.onchain.entities.response;
 
-import com.onchain.entities.dao.ChainAccount;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -24,6 +23,8 @@ public class ResponseChainAccount {
     private String userAddress;
     @ApiModelProperty(value = "链账户是否可以进行gas转账")
     private Boolean isGasTransfer;
+    @ApiModelProperty(value = "链账户是否托管")
+    private Boolean isCustody;
     @ApiModelProperty(value = "私钥")
     private String privateKey;
     @ApiModelProperty(value = "创建时间")
