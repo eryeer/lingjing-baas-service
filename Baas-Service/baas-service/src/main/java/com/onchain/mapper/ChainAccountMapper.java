@@ -52,7 +52,7 @@ public interface ChainAccountMapper {
             "<if test='isCustody != null'> AND is_custody = #{isCustody} </if> " +
             "<if test='startTime != null and endTime != null'> AND create_time between #{startTime} and #{endTime} </if> " +
             "</where>" +
-            " order by update_time desc " +
+            " order by create_time desc " +
             "</script>")
     List<ResponseChainAccount> getChainAccount(String userId, String name, String userAddress, Boolean isGasTransfer, Boolean isCustody, Date startTime, Date endTime);
 
