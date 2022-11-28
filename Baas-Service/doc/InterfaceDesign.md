@@ -170,7 +170,7 @@
 - 功能说明：创建燃料签约合同
 - url: /baas/gas/createGasContract
 - auth: 企业用户/个人用户
-- 行为：燃料表新增记录，上传合同PDF到CDS服务，生成流水号，保存合同文件、签约燃料数量等数据
+- 行为：燃料表新增记录，上传合同PDF到COS服务，生成流水号，保存合同文件、签约燃料数量等数据
 - 校验：accessToken校验，校验签名
 
 ### 2.3.2. getGasContractHistoryList
