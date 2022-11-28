@@ -163,9 +163,59 @@
 - 行为：链上调用批量开启/关闭燃料转账，同时结果同步数据库
 - 校验：accessToken校验，校验地址列表是否存在
 
-## 2.3. 公共接口
+## 2.3. 燃料管理
 
-### 2.3.1. sendVerifyCode
+### 2.3.1. createGasContract
+
+- 功能说明：创建燃料签约合同
+- url: /baas/gas/createGasContract
+- auth: 企业用户/个人用户
+- 行为：燃料表新增记录，上传合同PDF到CDS服务，生成流水号，保存合同文件、签约燃料数量等数据
+- 校验：accessToken校验，校验签名
+
+### 2.3.2. getGasContractHistoryList
+
+- 功能说明：获取燃料签约记录列表
+- url: /baas/gas/getGasContractList
+- auth: 企业用户/个人用户
+- 行为：获取其主体的燃料签约历史记录，支持分页查询，携带包含详情维度的信息量（燃料记录详情不再做单独接口）
+- 校验：accessToken校验，校验签名
+
+### 2.3.3. getGasSummary
+
+- 功能说明：获取燃料统计
+- url: /baas/gas/getGasSummary
+- auth: 企业用户/个人用户
+- 行为：返回已签约燃料总量、已申领燃料总量、剩余可申领燃料总量
+- 校验：accessToken校验，校验签名
+
+### 2.3.4. getAdminGasContractList
+
+- 功能说明：获取PM视角燃料签约记录列表
+- url: /baas/gas/getAdminGasContractList
+- auth: PM
+- 行为：可获取全部公司的燃料签约历史记录，支持分页查询，携带包含详情维度的信息量（燃料记录详情不再做单独接口）
+- 校验：accessToken校验，校验签名
+
+### 2.3.5. approveGasContract
+
+- 功能说明：PM审批燃料签约合同
+- url: /baas/gas/approveGasContract
+- auth: PM
+- 行为：审批燃料签约合同，支持修改燃料数额，以及填写核验反馈，核验反馈在驳回的时候为必填项
+- 校验：accessToken校验，校验签名
+
+### 2.3.6. getGasContactStatisticList
+
+- 功能说明：PM获取燃料信息库中签约信息统计列表
+- url: /baas/gas/getGasContactStatisticList
+- auth: PM
+- 行为：可获取全部公司的燃料签约统计信息列表，支持分页查询
+- 校验：accessToken校验，校验签名
+
+## 2.4. 公共接口
+
+### 2.4.1. sendVerifyCode
 
 - 功能说明：发送注册短信验证码
 - url: /baas/common/sendVerifyCode
@@ -173,7 +223,7 @@
 - 行为：通过参数指定发送的是注册、登录、修改手机号、忘记密码的短信验证码，返回发送成功或失败
 - 校验：手机号格式校验，注册条件校验
 
-### 2.3.2. uploadFile
+### 2.4.2. uploadFile
 
 - 功能说明：上传文件
 - url: /baas/common/uploadFile
@@ -181,7 +231,7 @@
 - 行为：上传文件到COS，返回文件uuid,原始文件名和临时url
 - 校验：文件大小校验（7M），格式校验（jpg, jpeg, bmp, png，pdf）,图片类型校验（jpg, jpeg, bmp, png）
 
-### 2.3.3. updateFile
+### 2.4.3. updateFile
 
 - 功能说明：更新上传文件
 - url: /baas/common/updateFile
