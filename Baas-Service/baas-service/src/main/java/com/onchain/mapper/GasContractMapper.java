@@ -1,0 +1,42 @@
+package com.onchain.mapper;
+
+import com.onchain.entities.dao.GasApply;
+import com.onchain.entities.dao.GasContract;
+import com.onchain.entities.response.ResponseGasContract;
+import org.apache.ibatis.annotations.Insert;
+import org.apache.ibatis.annotations.Select;
+
+import java.util.List;
+
+public interface GasContractMapper {
+
+    String INSERT_COLS = " user_id, contract_file_uuid, flow_id, upload_time, approved_time, agreement_amount, feedback ";
+    String BASIC_COLS = " id, create_time, update_time, status, " + INSERT_COLS;
+    String INSERT_VALS = " #{userId}, #{contractFileUUID}, #{flowId}, #{uploadTime},  #{approvedTime} ,  #{agreementAmount},  #{feedback}  ";
+
+    //创建gas合同
+    @Insert("insert into tbl_gas_contract (" + INSERT_COLS + ") " +
+            "values ( " + INSERT_VALS + " )")
+    void createGasContract(GasContract gasContract);
+
+    @Select("<script> " +
+            "select " + BASIC_COLS + " from tbl_gas_contract " +
+            "<where>  user_id = #{userId} " +
+            "<if test='status != null'>AND status = #{status} </if> " +
+            "<if test='flowId != null'> AND flow_id = #{flowId} </if> " +
+            "<if test='uploadStartTime != null and uploadEndTime != null'> AND upload_time between #{uploadStartTime} and #{uploadEndTime} </if> " +
+            "<if test='approvedStartTime != null and approvedEndTime != null'> AND approved_time between #{approvedStartTime} and #{approvedEndTime} </if> " +
+            "</where>" +
+            " order by upload_time, approved_time desc " +
+            "</script>")
+    List<ResponseGasContract> getGasContractList(String userId, Integer status,  String flowId, Long uploadStartTime, Long uploadEndTime, Long approvedStartTime, Long approvedEndTime);
+
+    //通过userid 查询审核通过的gas合同
+    @Select("select " + BASIC_COLS + " from tbl_gas_contract  where  user_id = #{userId} and status = 1 order by upload_time, approved_time desc ")
+    List<ResponseGasContract> getSuccessGasContractListByUserId(String userId);
+
+
+    //根据流水号查询gas签约的合同
+    @Select("select " + BASIC_COLS + " from tbl_gas_contract where flow_id= #{flowId} limit 1")
+    ResponseGasContract getGasContractByFlowId(String flowId);
+}
