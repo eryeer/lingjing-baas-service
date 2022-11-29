@@ -47,6 +47,10 @@ public class UrlConst {
     public static final String APPLY_GAS = "/baas/chain/applyGas";
     public static final String GET_APPLY_LIST = "/baas/chain/getApplyList";
 
+    public static final String  CREATE_GAS_CONTRACT =  "/baas/gas/createGasContract";
+    public static final String  GET_GAS_CONTRACT_LIST =  "/baas/gas/getGasContractList";
+    public static final String  GET_GAS_SUMMARY =  "/baas/gas/getGasSummary";
+
     public static final String UPLOAD_PDFS = "/baas/pdfs/uploadPdfs";
     public static final String GET_PDFS_LIST = "/baas/pdfs/getPdfsList";
     public static final String DOWNLOAD_PDFS = "/baas/pdfs/downloadPdfs";

@@ -163,3 +163,23 @@ CREATE TABLE `tbl_gas_apply` (
     PRIMARY KEY (`id`)
 ) COMMENT='燃料申领记录表';
 
+
+DROP TABLE IF EXISTS tbl_gas_contract;
+CREATE TABLE `tbl_gas_contract` (
+    `id` bigint NOT NULL AUTO_INCREMENT COMMENT '自增id, 非用户id',
+    `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间（默认字段）',
+    `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间（默认字段）',
+    `status` varchar(20) NOT NULL DEFAULT '0' COMMENT '签约状态（默认字段,2: 驳回 1：通过  0：审核中）',
+    `contract_file_uuid` varchar(32) NOT NULL DEFAULT '' COMMENT '合同文件的uuid',
+    `flow_id` varchar(20) NOT NULL DEFAULT '' COMMENT '流水号（LSH-HT-六位数字字符）',
+    `user_id` varchar(32) NOT NULL COMMENT '用户id',
+    `agreement_amount` varchar(30) NOT NULL COMMENT '签约的燃料数量',
+    `approved_time` bigint NOT NULL DEFAULT 0 COMMENT '审核完成的时间',
+    `upload_time` bigint NOT NULL  DEFAULT 0 COMMENT '合同上传时间',
+    `feedback` varchar(500) NOT NULL DEFAULT '' COMMENT '反馈意见',
+
+    KEY `idx_user_id`(`user_id`),
+    UNIQUE KEY `uk_flow_id`(`flow_id`),
+    PRIMARY KEY (`id`)
+) COMMENT='燃料签约记录表';
+

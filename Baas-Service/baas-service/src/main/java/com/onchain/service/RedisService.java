@@ -88,4 +88,9 @@ public class RedisService {
         return redisTemplate.execute(script, keys, args);
     }
 
+    public Long incrByKey(String key){
+        setValueIfAbsent(key, "0");
+        return redisTemplate.opsForValue().increment(key);
+    }
+
 }
