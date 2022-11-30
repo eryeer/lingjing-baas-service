@@ -45,7 +45,9 @@ public class GasService {
                 .userId(userId).build();
         gasContractMapper.createGasContract(gasContract);
         cosFileMapper.markFileUsed(Arrays.asList(requestGasCreate.getContractFileUUID()));
-        return gasContractMapper.getGasContractByFlowId(standardFlowId);
+        ResponseGasContract responseGasContract = gasContractMapper.getGasContractByFlowId(standardFlowId);
+        responseGasContract.setContractFile(cosService.getCosFile(responseGasContract.getContractFileUUID()));
+        return responseGasContract;
     }
 
     public PageInfo<ResponseGasContract> getGasContractList(Integer pageNumber, Integer pageSize, String userId, String flowId, Long uploadStartTime, Long uploadEndTime, Integer status, Long approvedStartTime, Long approvedEndTime) {

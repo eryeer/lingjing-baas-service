@@ -173,7 +173,7 @@ CREATE TABLE `tbl_gas_contract` (
     `contract_file_uuid` varchar(32) NOT NULL DEFAULT '' COMMENT '合同文件的uuid',
     `flow_id` varchar(20) NOT NULL DEFAULT '' COMMENT '流水号（LSH-HT-六位数字字符）',
     `user_id` varchar(32) NOT NULL COMMENT '用户id',
-    `agreement_amount` varchar(30) NOT NULL COMMENT '签约的燃料数量',
+    `agreement_amount` varchar(100) NOT NULL COMMENT '签约的燃料数量',
     `approved_time` bigint NOT NULL DEFAULT 0 COMMENT '审核完成的时间',
     `upload_time` bigint NOT NULL  DEFAULT 0 COMMENT '合同上传时间',
     `feedback` varchar(500) NOT NULL DEFAULT '' COMMENT '反馈意见',
