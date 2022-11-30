@@ -35,6 +35,10 @@ public class FileUtil {
         return StringUtils.equalsAnyIgnoreCase(fileSuffix, FILE_JPG, FILE_JPEG, FILE_PNG);
     }
 
+    public static boolean isPdf(String fileSuffix) {
+        return StringUtils.equalsAnyIgnoreCase(fileSuffix, FILE_PDF);
+    }
+
     /**
      * 判断OSS服务文件上传时文件的contentType
      *
@@ -76,8 +80,7 @@ public class FileUtil {
     }
 
     public static boolean isFileTypeSupport(String fileSuffix, String fileType) {
-        if (!StringUtils.equalsAny(fileType, CommonConst.FILE_IDA, CommonConst.FILE_IDB, CommonConst.FILE_BL, CommonConst.FILE_BLC,
-                CommonConst.FILE_SOL, CommonConst.FILE_WALLET)) {
+        if (!StringUtils.equalsAny(fileType, CommonConst.FILE_IDA, CommonConst.FILE_IDB, CommonConst.FILE_BL, CommonConst.FILE_GC)) {
             return false;
         }
 
@@ -87,13 +90,13 @@ public class FileUtil {
         }
 
         // 身份证，营业执照必须为图片类型(或PDF)
-        if (StringUtils.equalsAny(fileType, CommonConst.FILE_IDA, CommonConst.FILE_IDB, CommonConst.FILE_BL, CommonConst.FILE_BLC)) {
-            return isPicType(fileSuffix);
+        if (StringUtils.equalsAny(fileType, CommonConst.FILE_IDA, CommonConst.FILE_IDB, CommonConst.FILE_BL)) {
+            return isPicType(fileSuffix) || isPdf(fileSuffix);
         }
 
-        // SOL格式校验
-        if (StringUtils.equalsAny(fileType, CommonConst.FILE_SOL)) {
-            return StringUtils.equalsAnyIgnoreCase(fileSuffix, FILE_SOL);
+        // 合同格式校验
+        if (StringUtils.equalsAny(fileType, CommonConst.FILE_GC)) {
+            return StringUtils.equalsAnyIgnoreCase(fileSuffix, FILE_PDF);
         }
 
         return true;

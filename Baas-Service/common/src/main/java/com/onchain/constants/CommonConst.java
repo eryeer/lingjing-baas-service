@@ -130,15 +130,13 @@ public class CommonConst {
     public static final String FILE_IDA = "IDA"; // 身份证正面
     public static final String FILE_IDB = "IDB"; // 身份证反面
     public static final String FILE_BL = "BL"; // 营业执照正本
-    public static final String FILE_BLC = "BLC"; // 营业执照副本
-    public static final String FILE_SOL = "SOL"; // 智能合约文件
-    public static final String FILE_WALLET = "WAL"; // 钱包文件
+    public static final String FILE_GC = "GC"; // 燃料签约合同
 
     // 用户类型
     public static final String PC = "PC";  // 个人认证
     public static final String EC = "EC"; // 企业认证
     public static final String USER_TYPE_REGEX = "^(PC)|(EC)$";
-    
+
     // 用户认证状态
     public static final String PENDING = "Pending"; // 待审批
     public static final String APPROVED = "Approved"; // 审批通过
