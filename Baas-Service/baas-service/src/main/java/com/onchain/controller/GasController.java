@@ -3,23 +3,23 @@ package com.onchain.controller;
 import com.github.pagehelper.PageInfo;
 import com.onchain.aop.operlog.OperLogAnnotation;
 import com.onchain.constants.CommonConst;
+import com.onchain.constants.ReturnCode;
 import com.onchain.constants.UrlConst;
 import com.onchain.entities.ResponseFormat;
-import com.onchain.entities.dao.GasContract;
 import com.onchain.entities.dao.User;
-import com.onchain.entities.request.RequestAppCreate;
-import com.onchain.entities.request.RequestAppRemove;
+import com.onchain.entities.request.RequestApproveGasContract;
 import com.onchain.entities.request.RequestGasCreate;
+import com.onchain.entities.response.ResponseAdminGasContract;
 import com.onchain.entities.response.ResponseGasContract;
+import com.onchain.entities.response.ResponseGasContractStatistic;
 import com.onchain.entities.response.ResponseUserGasSummary;
-import com.onchain.service.ContractService;
 import com.onchain.service.GasService;
 import com.onchain.service.JwtService;
-import io.swagger.annotations.ApiModelProperty;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -70,8 +70,63 @@ public class GasController {
     @OperLogAnnotation(description = "getGasSummary")
     public ResponseFormat<ResponseUserGasSummary> getGasSummary(@RequestHeader(CommonConst.HEADER_ACCESS_TOKEN) String accessToken) {
         User user = jwtService.parseToken(accessToken);
-        ResponseUserGasSummary responseUserGasSummary = gasService.getGasContractSummary( user.getUserId());
+        ResponseUserGasSummary responseUserGasSummary = gasService.getGasContractSummary(user.getUserId());
         return new ResponseFormat<>(responseUserGasSummary);
     }
 
+    @GetMapping(value = UrlConst.GET_ADMIN_GAS_CONTRACT_LIST)
+    @ApiOperation(value = "获取PM视角燃料签约记录列表", notes = "获取PM视角燃料签约记录列表")
+    @OperLogAnnotation(description = "getAdminGasContractList")
+    public ResponseFormat<PageInfo<ResponseAdminGasContract>> getAdminGasContractList(
+            @RequestParam(name = "pageNumber") @Min(1) Integer pageNumber,
+            @RequestParam(name = "pageSize") @Min(1) @Max(50) Integer pageSize,
+            @ApiParam("用户手机号") @RequestParam(required = false) String phoneNumber,
+            @ApiParam("企业名称") @RequestParam(required = false) String userName,
+            @ApiParam("签约数量") @RequestParam(required = false) String agreementAmount,
+            @ApiParam("流水号") @RequestParam(required = false) String flowId,
+            @ApiParam("审核状态") @RequestParam(required = false) Integer status,
+            @ApiParam("上传日期的开始筛选时间") @RequestParam(required = false) Long uploadStartTime,
+            @ApiParam("文件上传时间的终止筛选时间") @RequestParam(required = false) Long uploadEndTime,
+            @ApiParam("审核完成的开始筛选时间") @RequestParam(required = false) Long approvedStartTime,
+            @ApiParam("审核完成的终止筛选时间") @RequestParam(required = false) Long approvedEndTime,
+            @RequestHeader(CommonConst.HEADER_ACCESS_TOKEN) String accessToken) {
+        User user = jwtService.parseToken(accessToken);
+        if (!StringUtils.equals(CommonConst.PM, user.getRole())) {
+            return new ResponseFormat<>(ReturnCode.USER_ROLE_ERROR);
+        }
+        PageInfo<ResponseAdminGasContract> gasContractList = gasService.getAdminGasContractList(pageNumber, pageSize, phoneNumber, userName, agreementAmount, flowId, uploadStartTime, uploadEndTime, status, approvedStartTime, approvedEndTime);
+        return new ResponseFormat<>(gasContractList);
+    }
+
+    @PostMapping(value = UrlConst.APPROVE_GAS_CONTRACT)
+    @ApiOperation(value = "PM审批燃料签约合同", notes = "PM审批燃料签约合同")
+    @OperLogAnnotation(description = "approveGasContract")
+    public ResponseFormat<?> approveGasContract(@Valid @RequestBody RequestApproveGasContract request,
+                                                @RequestHeader(CommonConst.HEADER_ACCESS_TOKEN) String accessToken) {
+        User user = jwtService.parseToken(accessToken);
+        if (!StringUtils.equals(CommonConst.PM, user.getRole())) {
+            return new ResponseFormat<>(ReturnCode.USER_ROLE_ERROR);
+        }
+        gasService.approveGasContract(request);
+        return new ResponseFormat<>();
+    }
+
+    @GetMapping(value = UrlConst.GET_GAS_CONTACT_STATISTIC_LIST)
+    @ApiOperation(value = "PM获取燃料信息库中签约信息统计列表", notes = "PM获取燃料信息库中签约信息统计列表")
+    @OperLogAnnotation(description = "getGasContactStatisticList")
+    public ResponseFormat<PageInfo<ResponseGasContractStatistic>> getGasContactStatisticList(
+            @RequestParam(name = "pageNumber") @Min(1) Integer pageNumber,
+            @RequestParam(name = "pageSize") @Min(1) @Max(50) Integer pageSize,
+            @ApiParam("用户手机号") @RequestParam(required = false) String phoneNumber,
+            @ApiParam("企业名称") @RequestParam(required = false) String userName,
+            @ApiParam("最近审批的开始筛选时间") @RequestParam(required = false) Long approvedStartTime,
+            @ApiParam("最近审批的终止筛选时间") @RequestParam(required = false) Long approvedEndTime,
+            @RequestHeader(CommonConst.HEADER_ACCESS_TOKEN) String accessToken) {
+        User user = jwtService.parseToken(accessToken);
+        if (!StringUtils.equals(CommonConst.PM, user.getRole())) {
+            return new ResponseFormat<>(ReturnCode.USER_ROLE_ERROR);
+        }
+        PageInfo<ResponseGasContractStatistic> gasContractList = gasService.getGasContactStatisticList(pageNumber, pageSize, phoneNumber, userName, approvedStartTime, approvedEndTime);
+        return new ResponseFormat<>(gasContractList);
+    }
 }

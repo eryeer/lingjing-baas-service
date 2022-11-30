@@ -3,12 +3,12 @@ package com.onchain.service;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.onchain.constants.GasContractStatus;
+import com.onchain.constants.ReturnCode;
 import com.onchain.entities.dao.GasContract;
+import com.onchain.entities.request.RequestApproveGasContract;
 import com.onchain.entities.request.RequestGasCreate;
-import com.onchain.entities.response.ResponseChainAccount;
-import com.onchain.entities.response.ResponseChainAccountGasSummary;
-import com.onchain.entities.response.ResponseGasContract;
-import com.onchain.entities.response.ResponseUserGasSummary;
+import com.onchain.entities.response.*;
+import com.onchain.exception.CommonException;
 import com.onchain.mapper.CosFileMapper;
 import com.onchain.mapper.GasContractMapper;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +19,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 
 @Service
@@ -33,7 +32,7 @@ public class GasService {
     private final CosService cosService;
 
     @Transactional(rollbackFor = Exception.class)
-    public ResponseGasContract createGasContract(String userId, RequestGasCreate requestGasCreate){
+    public ResponseGasContract createGasContract(String userId, RequestGasCreate requestGasCreate) {
         Long flowId = redisService.incrByKey("flow_id");
         String standardFlowId = "LSH-HT-" + String.format("%06d", flowId);
         GasContract gasContract = GasContract.builder()
@@ -41,7 +40,7 @@ public class GasService {
                 .contractFileUUID(requestGasCreate.getContractFileUUID())
                 .agreementAmount(requestGasCreate.getAgreementAmount())
                 .uploadTime(System.currentTimeMillis())
-                .approvedTime(0l)
+                .approvedTime(0L)
                 .feedback("")
                 .userId(userId).build();
         gasContractMapper.createGasContract(gasContract);
@@ -55,9 +54,6 @@ public class GasService {
         List<ResponseGasContract> gasContracts = gasContractMapper.getGasContractList(userId, status, flowId, uploadStartTime, uploadEndTime, approvedStartTime, approvedEndTime);
         for (ResponseGasContract gasContract : gasContracts) {
             gasContract.setContractFile(cosService.getCosFile(gasContract.getContractFileUUID()));
-            if (gasContract.getStatus() == GasContractStatus.Approving.ordinal()) {
-                gasContract.setApprovedTime(0l);
-            }
         }
         return new PageInfo<>(gasContracts);
     }
@@ -77,4 +73,40 @@ public class GasService {
         return responseUserGasSummary;
     }
 
+    public PageInfo<ResponseAdminGasContract> getAdminGasContractList(Integer pageNumber, Integer pageSize, String phoneNumber, String userName, String agreementAmount, String flowId, Long uploadStartTime, Long uploadEndTime, Integer status, Long approvedStartTime, Long approvedEndTime) {
+        PageHelper.startPage(pageNumber, pageSize);
+
+        List<ResponseAdminGasContract> gasContracts = gasContractMapper.getAdminGasContractList(phoneNumber, userName, agreementAmount, status, flowId, uploadStartTime, uploadEndTime, approvedStartTime, approvedEndTime);
+        for (ResponseAdminGasContract gasContract : gasContracts) {
+            gasContract.setContractFile(cosService.getCosFile(gasContract.getContractFileUUID()));
+        }
+        return new PageInfo<>(gasContracts);
+    }
+
+    public void approveGasContract(RequestApproveGasContract request) {
+        ResponseGasContract res = gasContractMapper.getGasContractByFlowId(request.getFlowId());
+        if (res == null) {
+            throw new CommonException(ReturnCode.GAS_CONTRACT_NOT_EXIST);
+        }
+        if (!(GasContractStatus.Approving.ordinal() == res.getStatus())) {
+            throw new CommonException(ReturnCode.GAS_CONTRACT_STATUS_ERROR);
+        }
+
+        GasContract gasContract = GasContract.builder()
+                .flowId(request.getFlowId())
+                .agreementAmount(request.getAgreementAmount())
+                .approvedTime(System.currentTimeMillis())
+                .feedback(request.getFeedback())
+                .build();
+        if (request.getIsPass()) {
+            gasContract.setStatus(String.valueOf(GasContractStatus.Success.ordinal()));
+        }
+        gasContractMapper.approveGasContract(gasContract);
+    }
+
+    public PageInfo<ResponseGasContractStatistic> getGasContactStatisticList(Integer pageNumber, Integer pageSize, String phoneNumber, String userName, Long approvedStartTime, Long approvedEndTime) {
+        PageHelper.startPage(pageNumber, pageSize);
+        List<ResponseGasContractStatistic> gasContracts = gasContractMapper.getGasContactStatisticList(phoneNumber, userName, approvedStartTime, approvedEndTime);
+        return new PageInfo<>(gasContracts);
+    }
 }

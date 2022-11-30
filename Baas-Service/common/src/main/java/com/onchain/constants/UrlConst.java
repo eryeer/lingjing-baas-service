@@ -47,9 +47,12 @@ public class UrlConst {
     public static final String APPLY_GAS = "/baas/chain/applyGas";
     public static final String GET_APPLY_LIST = "/baas/chain/getApplyList";
 
-    public static final String  CREATE_GAS_CONTRACT =  "/baas/gas/createGasContract";
-    public static final String  GET_GAS_CONTRACT_LIST =  "/baas/gas/getGasContractList";
-    public static final String  GET_GAS_SUMMARY =  "/baas/gas/getGasSummary";
+    public static final String CREATE_GAS_CONTRACT = "/baas/gas/createGasContract";
+    public static final String GET_GAS_CONTRACT_LIST = "/baas/gas/getGasContractList";
+    public static final String GET_GAS_SUMMARY = "/baas/gas/getGasSummary";
+    public static final String GET_ADMIN_GAS_CONTRACT_LIST = "/baas/gas/getAdminGasContractList";
+    public static final String APPROVE_GAS_CONTRACT = "/baas/gas/approveGasContract";
+    public static final String GET_GAS_CONTACT_STATISTIC_LIST = "/baas/gas/getGasContactStatisticList";
 
     public static final String UPLOAD_PDFS = "/baas/pdfs/uploadPdfs";
     public static final String GET_PDFS_LIST = "/baas/pdfs/getPdfsList";
@@ -92,9 +95,11 @@ public class UrlConst {
     // 普通用户 可以访问的接口
     public static final String[] CU_URLS = {APP_CREATE, APP_REMOVE, GET_APP_LIST, GET_APP, GET_CONTRACT_TEMPLATES, DEPLOY, UPDATE_FILE_LIST,
             ACCOUNT_CREATE, PRIVATE_KEY_CUSTODY, DOWNLOAD_PRIVATE_KEY, CHANGE_GAS_TRANSFER_STATUS, DELETE_CHAIN_ACCOUNT, APPLY_GAS, GET_APPLY_LIST, UPLOAD_PDFS, GET_PDFS_LIST, DOWNLOAD_PDFS, SHARE_PDFS,
-            SEND_CROSS_CHAIN, GET_CROSS_CHAIN, GET_CROSS_CHAIN_LIST, SET_CROSS_DST, GET_CROSS_TBD_LIST, SUBMIT_USER_KYC};
+            SEND_CROSS_CHAIN, GET_CROSS_CHAIN, GET_CROSS_CHAIN_LIST, SET_CROSS_DST, GET_CROSS_TBD_LIST, SUBMIT_USER_KYC,
+            CREATE_GAS_CONTRACT, GET_GAS_CONTRACT_LIST, GET_GAS_SUMMARY};
     // SM 可以访问的接口
-    public static final String[] PM_URLS = {APPROVE_USER_KYC, GET_USER_LIST, GET_USER_KYC_RECORD_LIST};
+    public static final String[] PM_URLS = {APPROVE_USER_KYC, GET_USER_LIST, GET_USER_KYC_RECORD_LIST,
+            GET_ADMIN_GAS_CONTRACT_LIST, APPROVE_GAS_CONTRACT, GET_GAS_CONTACT_STATISTIC_LIST};
 
     // 不能通过网关访问的接口
     public static final String[] INTERNAL_URLS = {};

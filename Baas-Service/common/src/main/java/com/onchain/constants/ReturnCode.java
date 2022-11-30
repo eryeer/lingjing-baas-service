@@ -100,6 +100,10 @@ public enum ReturnCode {
     CHAIN_ACCOUNT_SIGNATURE_ERROR(32009, "链户地址与签名信息有问题"),
     SIGNATURE_ORIGIN_TEXT_FORMAT_ERROR(32010, "签名原文格式有问题"),
 
+    // 燃料签约合同错误 [34xxx]
+    GAS_CONTRACT_NOT_EXIST(34001, "燃料签约合同不存在"),
+    GAS_CONTRACT_STATUS_ERROR(34002, "燃料签约合同审批状态错误"),
+
     // 跨链错误 [33xxx]
     SRC_CONTRACT_ADDRESS_ERROR(33001, "跨链源合约地址错误"),
 
