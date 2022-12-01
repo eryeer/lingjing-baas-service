@@ -9,6 +9,7 @@ import com.onchain.entities.request.RequestApproveGasContract;
 import com.onchain.entities.request.RequestGasCreate;
 import com.onchain.entities.response.*;
 import com.onchain.exception.CommonException;
+import com.onchain.mapper.ChainAccountMapper;
 import com.onchain.mapper.CosFileMapper;
 import com.onchain.mapper.GasContractMapper;
 import lombok.RequiredArgsConstructor;
@@ -30,6 +31,7 @@ public class GasService {
     private final RedisService redisService;
     private final CosFileMapper cosFileMapper;
     private final CosService cosService;
+    private final ChainAccountMapper chainAccountMapper;
 
     @Transactional(rollbackFor = Exception.class)
     public ResponseGasContract createGasContract(String userId, RequestGasCreate requestGasCreate) {
@@ -71,6 +73,16 @@ public class GasService {
         responseUserGasSummary.setUnApplyAmount(String.valueOf(totalAgreementAmount));
         responseUserGasSummary.setTotalAmount(String.valueOf(totalAgreementAmount));
         ArrayList<ResponseChainAccountGasSummary> responseChainAccountGasSummaries = new ArrayList<>();
+        List<ResponseChainAccount> chainAccounts = chainAccountMapper.getChainAccountByUserId(userId);
+        for (ResponseChainAccount chainAccount : chainAccounts) {
+            ResponseChainAccountGasSummary responseChainAccountGasSummary = ResponseChainAccountGasSummary.builder()
+                    .accountAddress(chainAccount.getUserAddress())
+                    .applyAmount("0").remain("0")
+                    .accountName(chainAccount.getName())
+                    .Id(chainAccount.getId())
+                    .build();
+            responseChainAccountGasSummaries.add(responseChainAccountGasSummary);
+        }
         responseUserGasSummary.setChainAccountGasDistribute(responseChainAccountGasSummaries);
         return responseUserGasSummary;
     }
