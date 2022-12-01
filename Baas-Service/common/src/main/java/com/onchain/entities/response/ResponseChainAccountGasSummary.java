@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class ResponseChainAccountGasSummary {
     @ApiModelProperty(value = "链用户id")
-    private String Id;
+    private Long Id;
     @ApiModelProperty(value = "链用户名称")
     private String accountName;
     @ApiModelProperty(value = "链用户地址")
