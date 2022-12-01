@@ -87,10 +87,10 @@ public class GasService {
         return responseUserGasSummary;
     }
 
-    public PageInfo<ResponseAdminGasContract> getAdminGasContractList(Integer pageNumber, Integer pageSize, String phoneNumber, String userName, String agreementAmount, String flowId, Long uploadStartTime, Long uploadEndTime, Integer status, Long approvedStartTime, Long approvedEndTime) {
+    public PageInfo<ResponseAdminGasContract> getAdminGasContractList(Integer pageNumber, Integer pageSize, String phoneNumber, String userName, String agreementAmount, String flowId, Long uploadStartTime, Long uploadEndTime, Integer status, Boolean isApproving, Long approvedStartTime, Long approvedEndTime) {
         PageHelper.startPage(pageNumber, pageSize);
 
-        List<ResponseAdminGasContract> gasContracts = gasContractMapper.getAdminGasContractList(phoneNumber, userName, agreementAmount, status, flowId, uploadStartTime, uploadEndTime, approvedStartTime, approvedEndTime);
+        List<ResponseAdminGasContract> gasContracts = gasContractMapper.getAdminGasContractList(phoneNumber, userName, agreementAmount, status, isApproving, flowId, uploadStartTime, uploadEndTime, approvedStartTime, approvedEndTime);
         for (ResponseAdminGasContract gasContract : gasContracts) {
             gasContract.setContractFile(cosService.getCosFile(gasContract.getContractFileUUID()));
         }

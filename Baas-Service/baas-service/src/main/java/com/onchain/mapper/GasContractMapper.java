@@ -52,18 +52,20 @@ public interface GasContractMapper {
             "<if test='userName != null'>AND u.user_Name = #{userName} </if> " +
             "<if test='agreementAmount != null'>AND c.agreement_Amount = #{agreementAmount} </if> " +
             "<if test='status != null'>AND c.status = #{status} </if> " +
+            "<if test='isApproving != null and isApproving'>AND c.status = 0 </if> " +
+            "<if test='isApproving != null and !isApproving'>AND c.status != 0 </if> " +
             "<if test='flowId != null'> AND c.flow_id = #{flowId} </if> " +
             "<if test='uploadStartTime != null and uploadEndTime != null'> AND c.upload_time between #{uploadStartTime} and #{uploadEndTime} </if> " +
             "<if test='approvedStartTime != null and approvedEndTime != null'> AND c.approved_time between #{approvedStartTime} and #{approvedEndTime} </if> " +
             "</where>" +
             " order by upload_time, approved_time desc " +
             "</script>")
-    List<ResponseAdminGasContract> getAdminGasContractList(String phoneNumber, String userName, String agreementAmount, Integer status, String flowId, Long uploadStartTime, Long uploadEndTime, Long approvedStartTime, Long approvedEndTime);
+    List<ResponseAdminGasContract> getAdminGasContractList(String phoneNumber, String userName, String agreementAmount, Integer status, Boolean isApproving, String flowId, Long uploadStartTime, Long uploadEndTime, Long approvedStartTime, Long approvedEndTime);
 
     @Select("<script> " +
             "select u.phone_number, u.user_name, u.user_id, sum(agreement_amount) as total_amount, max(approved_time) as last_approved_time  " +
             "from tbl_gas_contract c, tbl_user u " +
-            "<where> c.user_id = u.user_id " +
+            "<where> c.user_id = u.user_id and c.status = 1 " +
             "<if test='phoneNumber != null'>AND u.phone_number = #{phoneNumber} </if> " +
             "<if test='userName != null'>AND u.user_Name = #{userName} </if> " +
             "</where>" +

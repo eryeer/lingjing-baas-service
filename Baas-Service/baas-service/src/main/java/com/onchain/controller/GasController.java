@@ -85,6 +85,7 @@ public class GasController {
             @ApiParam("签约数量") @RequestParam(required = false) String agreementAmount,
             @ApiParam("流水号") @RequestParam(required = false) String flowId,
             @ApiParam("审核状态") @RequestParam(required = false) Integer status,
+            @ApiParam("是否审核中") @RequestParam(required = false) Boolean isApproving,
             @ApiParam("上传日期的开始筛选时间") @RequestParam(required = false) Long uploadStartTime,
             @ApiParam("文件上传时间的终止筛选时间") @RequestParam(required = false) Long uploadEndTime,
             @ApiParam("审核完成的开始筛选时间") @RequestParam(required = false) Long approvedStartTime,
@@ -94,7 +95,7 @@ public class GasController {
         if (!StringUtils.equals(CommonConst.PM, user.getRole())) {
             return new ResponseFormat<>(ReturnCode.USER_ROLE_ERROR);
         }
-        PageInfo<ResponseAdminGasContract> gasContractList = gasService.getAdminGasContractList(pageNumber, pageSize, phoneNumber, userName, agreementAmount, flowId, uploadStartTime, uploadEndTime, status, approvedStartTime, approvedEndTime);
+        PageInfo<ResponseAdminGasContract> gasContractList = gasService.getAdminGasContractList(pageNumber, pageSize, phoneNumber, userName, agreementAmount, flowId, uploadStartTime, uploadEndTime, status, isApproving, approvedStartTime, approvedEndTime);
         return new ResponseFormat<>(gasContractList);
     }
 
