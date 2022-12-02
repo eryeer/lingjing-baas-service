@@ -33,7 +33,7 @@ public interface GasContractMapper {
             "<if test='uploadStartTime != null and uploadEndTime != null'> AND upload_time between #{uploadStartTime} and #{uploadEndTime} </if> " +
             "<if test='approvedStartTime != null and approvedEndTime != null'> AND approved_time between #{approvedStartTime} and #{approvedEndTime} </if> " +
             "</where>" +
-            " order by upload_time, approved_time desc " +
+            " order by upload_time desc, approved_time desc " +
             "</script>")
     List<ResponseGasContract> getGasContractList(String userId, Integer status, String flowId, Long uploadStartTime, Long uploadEndTime, Long approvedStartTime, Long approvedEndTime);
 
@@ -58,7 +58,7 @@ public interface GasContractMapper {
             "<if test='uploadStartTime != null and uploadEndTime != null'> AND c.upload_time between #{uploadStartTime} and #{uploadEndTime} </if> " +
             "<if test='approvedStartTime != null and approvedEndTime != null'> AND c.approved_time between #{approvedStartTime} and #{approvedEndTime} </if> " +
             "</where>" +
-            " order by upload_time, approved_time desc " +
+            " order by upload_time desc, approved_time desc " +
             "</script>")
     List<ResponseAdminGasContract> getAdminGasContractList(String phoneNumber, String userName, String agreementAmount, Integer status, Boolean isApproving, String flowId, Long uploadStartTime, Long uploadEndTime, Long approvedStartTime, Long approvedEndTime);
 
