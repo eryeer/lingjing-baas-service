@@ -47,7 +47,7 @@ public interface GasContractMapper {
 
     @Select("<script> " +
             "select c.*, u.phone_number, u.user_name from tbl_gas_contract c, tbl_user u " +
-            "<where> c.user_id = u.user_id " +
+            "<where> c.user_id = u.user_id and u.status = 1 " +
             "<if test='phoneNumber != null'>AND u.phone_number = #{phoneNumber} </if> " +
             "<if test='userName != null'>AND u.user_Name = #{userName} </if> " +
             "<if test='agreementAmount != null'>AND c.agreement_Amount = #{agreementAmount} </if> " +
@@ -65,7 +65,7 @@ public interface GasContractMapper {
     @Select("<script> " +
             "select u.phone_number, u.user_name, u.user_id, sum(agreement_amount) as total_amount, max(approved_time) as last_approved_time  " +
             "from tbl_gas_contract c, tbl_user u " +
-            "<where> c.user_id = u.user_id and c.status = 1 " +
+            "<where> c.user_id = u.user_id and u.status = 1 and c.status = 1 " +
             "<if test='phoneNumber != null'>AND u.phone_number = #{phoneNumber} </if> " +
             "<if test='userName != null'>AND u.user_Name = #{userName} </if> " +
             "</where>" +

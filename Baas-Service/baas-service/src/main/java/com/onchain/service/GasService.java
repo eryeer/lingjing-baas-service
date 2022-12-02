@@ -114,6 +114,8 @@ public class GasService {
                 .build();
         if (request.getIsPass()) {
             gasContract.setStatus(String.valueOf(GasContractStatus.Success.ordinal()));
+        } else {
+            gasContract.setStatus(String.valueOf(GasContractStatus.Fail.ordinal()));
         }
         gasContractMapper.approveGasContract(gasContract);
     }
