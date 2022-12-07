@@ -12,10 +12,12 @@ import com.onchain.exception.CommonException;
 import com.onchain.mapper.ChainAccountMapper;
 import com.onchain.mapper.CosFileMapper;
 import com.onchain.mapper.GasContractMapper;
+import com.onchain.untils.Web3jUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.web3j.protocol.Web3j;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
