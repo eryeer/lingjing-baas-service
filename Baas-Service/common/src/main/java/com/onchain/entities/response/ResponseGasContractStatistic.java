@@ -20,7 +20,7 @@ public class ResponseGasContractStatistic {
     @ApiModelProperty(value = "企业名称")
     private String userName;
     @ApiModelProperty(value = "签约的燃料总量")
-    private BigInteger totalAmount;
+    private String totalAmount;
     @ApiModelProperty(value = "最近签约时间")
     private Long lastApprovedTime;
 }
