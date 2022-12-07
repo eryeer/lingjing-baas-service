@@ -24,7 +24,7 @@ public class ResponseAdminGasContract {
     @ApiModelProperty(value = "用户手机号")
     private String phoneNumber;
     @ApiModelProperty(value = "企业名称")
-    private String userName;
+    private String companyName;
     @ApiModelProperty(value = "流水id")
     private String flowId;
     @ApiModelProperty(value = "审核状态")
