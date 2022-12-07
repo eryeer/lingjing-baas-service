@@ -12,12 +12,10 @@ import com.onchain.exception.CommonException;
 import com.onchain.mapper.ChainAccountMapper;
 import com.onchain.mapper.CosFileMapper;
 import com.onchain.mapper.GasContractMapper;
-import com.onchain.untils.Web3jUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.web3j.protocol.Web3j;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -89,10 +87,10 @@ public class GasService {
         return responseUserGasSummary;
     }
 
-    public PageInfo<ResponseAdminGasContract> getAdminGasContractList(Integer pageNumber, Integer pageSize, String phoneNumber, String userName, String agreementAmount, String flowId, Long uploadStartTime, Long uploadEndTime, Integer status, Boolean isApproving, Long approvedStartTime, Long approvedEndTime) {
+    public PageInfo<ResponseAdminGasContract> getAdminGasContractList(Integer pageNumber, Integer pageSize, String phoneNumber, String companyName, String agreementAmount, String flowId, Long uploadStartTime, Long uploadEndTime, Integer status, Boolean isApproving, Long approvedStartTime, Long approvedEndTime) {
         PageHelper.startPage(pageNumber, pageSize);
 
-        List<ResponseAdminGasContract> gasContracts = gasContractMapper.getAdminGasContractList(phoneNumber, userName, agreementAmount, status, isApproving, flowId, uploadStartTime, uploadEndTime, approvedStartTime, approvedEndTime);
+        List<ResponseAdminGasContract> gasContracts = gasContractMapper.getAdminGasContractList(phoneNumber, companyName, agreementAmount, status, isApproving, flowId, uploadStartTime, uploadEndTime, approvedStartTime, approvedEndTime);
         for (ResponseAdminGasContract gasContract : gasContracts) {
             gasContract.setContractFile(cosService.getCosFile(gasContract.getContractFileUUID()));
         }
@@ -122,9 +120,9 @@ public class GasService {
         gasContractMapper.approveGasContract(gasContract);
     }
 
-    public PageInfo<ResponseGasContractStatistic> getGasContactStatisticList(Integer pageNumber, Integer pageSize, String phoneNumber, String userName, Long approvedStartTime, Long approvedEndTime) {
+    public PageInfo<ResponseGasContractStatistic> getGasContactStatisticList(Integer pageNumber, Integer pageSize, String phoneNumber, String companyName, Long approvedStartTime, Long approvedEndTime) {
         PageHelper.startPage(pageNumber, pageSize);
-        List<ResponseGasContractStatistic> gasContracts = gasContractMapper.getGasContactStatisticList(phoneNumber, userName, approvedStartTime, approvedEndTime);
+        List<ResponseGasContractStatistic> gasContracts = gasContractMapper.getGasContactStatisticList(phoneNumber, companyName, approvedStartTime, approvedEndTime);
         return new PageInfo<>(gasContracts);
     }
 }

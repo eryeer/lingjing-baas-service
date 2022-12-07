@@ -6,8 +6,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.math.BigInteger;
-
 @Data
 @Builder
 @NoArgsConstructor
@@ -18,7 +16,7 @@ public class ResponseGasContractStatistic {
     @ApiModelProperty(value = "用户手机号")
     private String phoneNumber;
     @ApiModelProperty(value = "企业名称")
-    private String userName;
+    private String companyName;
     @ApiModelProperty(value = "签约的燃料总量")
     private String totalAmount;
     @ApiModelProperty(value = "最近签约时间")

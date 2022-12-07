@@ -81,7 +81,7 @@ public class GasController {
             @RequestParam(name = "pageNumber") @Min(1) Integer pageNumber,
             @RequestParam(name = "pageSize") @Min(1) @Max(50) Integer pageSize,
             @ApiParam("用户手机号") @RequestParam(required = false) String phoneNumber,
-            @ApiParam("企业名称") @RequestParam(required = false) String userName,
+            @ApiParam("企业名称") @RequestParam(required = false) String companyName,
             @ApiParam("签约数量") @RequestParam(required = false) String agreementAmount,
             @ApiParam("流水号") @RequestParam(required = false) String flowId,
             @ApiParam("审核状态") @RequestParam(required = false) Integer status,
@@ -95,7 +95,7 @@ public class GasController {
         if (!StringUtils.equals(CommonConst.PM, user.getRole())) {
             return new ResponseFormat<>(ReturnCode.USER_ROLE_ERROR);
         }
-        PageInfo<ResponseAdminGasContract> gasContractList = gasService.getAdminGasContractList(pageNumber, pageSize, phoneNumber, userName, agreementAmount, flowId, uploadStartTime, uploadEndTime, status, isApproving, approvedStartTime, approvedEndTime);
+        PageInfo<ResponseAdminGasContract> gasContractList = gasService.getAdminGasContractList(pageNumber, pageSize, phoneNumber, companyName, agreementAmount, flowId, uploadStartTime, uploadEndTime, status, isApproving, approvedStartTime, approvedEndTime);
         return new ResponseFormat<>(gasContractList);
     }
 
@@ -119,7 +119,7 @@ public class GasController {
             @RequestParam(name = "pageNumber") @Min(1) Integer pageNumber,
             @RequestParam(name = "pageSize") @Min(1) @Max(50) Integer pageSize,
             @ApiParam("用户手机号") @RequestParam(required = false) String phoneNumber,
-            @ApiParam("企业名称") @RequestParam(required = false) String userName,
+            @ApiParam("企业名称") @RequestParam(required = false) String companyName,
             @ApiParam("最近审批的开始筛选时间") @RequestParam(required = false) Long approvedStartTime,
             @ApiParam("最近审批的终止筛选时间") @RequestParam(required = false) Long approvedEndTime,
             @RequestHeader(CommonConst.HEADER_ACCESS_TOKEN) String accessToken) {
@@ -127,7 +127,7 @@ public class GasController {
         if (!StringUtils.equals(CommonConst.PM, user.getRole())) {
             return new ResponseFormat<>(ReturnCode.USER_ROLE_ERROR);
         }
-        PageInfo<ResponseGasContractStatistic> gasContractList = gasService.getGasContactStatisticList(pageNumber, pageSize, phoneNumber, userName, approvedStartTime, approvedEndTime);
+        PageInfo<ResponseGasContractStatistic> gasContractList = gasService.getGasContactStatisticList(pageNumber, pageSize, phoneNumber, companyName, approvedStartTime, approvedEndTime);
         return new ResponseFormat<>(gasContractList);
     }
 }
