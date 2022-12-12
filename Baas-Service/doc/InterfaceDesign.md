@@ -186,7 +186,7 @@
 - 功能说明：获取燃料统计
 - url: /baas/gas/getGasSummary
 - auth: 企业用户/个人用户
-- 行为：返回已签约燃料总量、已申领燃料总量、剩余可申领燃料总量
+- 行为：返回已签约燃料总量、已申领燃料总量、剩余可申领燃料总量，根据用户id获取链账户信息列表，限展示10个地址，按已申领燃料数量倒排
 - 校验：accessToken校验，校验签名
 
 ### 2.3.4. getAdminGasContractList
@@ -221,15 +221,7 @@
 - 行为：可根据用户id获取链账户信息列表，支持分页查询
 - 校验：accessToken校验，校验签名
 
-### 2.3.8. getChainAccountListForGasDashbord
-
-- 功能说明：获取燃料申领页的链账户列表
-- url: /baas/gas/getChainAccountListForGasManagement
-- auth: 企业用户/个人用户
-- 行为：可根据用户id获取链账户信息列表，限展示10个地址，按已申领燃料数量倒排
-- 校验：accessToken校验，校验签名
-
-### 2.3.9. claimGas
+### 2.3.8. claimGas
 
 - 功能说明：申领燃料
 - url: /baas/gas/accquireGas
@@ -237,7 +229,7 @@
 - 行为：申领燃料，燃料申领数量不低于可申领下限，且不高于可申领燃料额度，触发合约燃料转账
 - 校验：accessToken校验，校验签名
 
-### 2.3.10. getGasClaimHistory
+### 2.3.9. getGasClaimHistory
 
 - 功能说明：获取申领燃料记录
 - url: /baas/gas/getGasClaimHistory
