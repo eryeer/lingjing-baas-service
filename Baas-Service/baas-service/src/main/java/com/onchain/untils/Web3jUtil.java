@@ -3,11 +3,16 @@ package com.onchain.untils;
 import org.web3j.abi.datatypes.Type;
 import org.web3j.crypto.*;
 import org.web3j.protocol.Web3j;
+import org.web3j.protocol.core.DefaultBlockParameter;
+import org.web3j.protocol.core.DefaultBlockParameterName;
+import org.web3j.protocol.core.methods.response.EthGetTransactionCount;
+import org.web3j.protocol.core.methods.response.EthSendTransaction;
 import org.web3j.protocol.core.methods.response.TransactionReceipt;
 import org.web3j.protocol.exceptions.TransactionException;
 import org.web3j.protocol.http.HttpService;
 import org.web3j.tx.RawTransactionManager;
 import org.web3j.tx.response.PollingTransactionReceiptProcessor;
+import org.web3j.utils.Convert;
 import org.web3j.utils.Numeric;
 
 import java.io.IOException;
@@ -15,6 +20,7 @@ import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Locale;
+import java.util.concurrent.ExecutionException;
 
 public class Web3jUtil {
 
@@ -115,6 +121,30 @@ public class Web3jUtil {
 
         return Hash.sha3(result);
     }
+
+    public static BigInteger getBalanceByAddress(Web3j web3j, String address) throws IOException {
+        return web3j.ethGetBalance(address, DefaultBlockParameter.valueOf("latest")).send().getBalance();
+    }
+
+    public static String transfer(Web3j web3j, String privateKey, String toAddress, String amount) throws InterruptedException, ExecutionException {
+        Credentials credentials = Credentials.create(privateKey);
+        String fromAddress = Web3jUtil.getAddressFromETHPrivateKey(privateKey);
+        EthGetTransactionCount ethGetTransactionCount = web3j.ethGetTransactionCount(fromAddress, DefaultBlockParameterName.LATEST).sendAsync().get();
+        BigInteger nonce = ethGetTransactionCount.getTransactionCount();
+        RawTransaction etherTransaction = RawTransaction.createEtherTransaction(
+                nonce,
+                Convert.toWei("0.05", Convert.Unit.GWEI).toBigInteger(),
+                BigInteger.valueOf(21000L),
+                toAddress,
+                new BigInteger(amount)
+        );
+        byte[] signedMessage = TransactionEncoder.signMessage(etherTransaction, credentials);
+        String hexString= Numeric.toHexString(signedMessage);
+        EthSendTransaction ethSendTransaction = web3j.ethSendRawTransaction(hexString).sendAsync().get();
+        String transactionHash = ethSendTransaction.getTransactionHash();
+        return transactionHash;
+    }
+
 
 
 }

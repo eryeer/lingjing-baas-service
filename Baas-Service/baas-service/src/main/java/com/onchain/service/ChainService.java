@@ -63,7 +63,7 @@ public class ChainService {
         }
         String addressFromSignedMessage = getLineFromStringByLineNum(originMessage, 7);
         if (StringUtils.isEmpty(addressFromSignedMessage)){
-            throw new CommonException(ReturnCode.SIGNATURE_ORIGIN_TEXT_FORMAT_ERROR);
+            throw new  CommonException(ReturnCode.SIGNATURE_ORIGIN_TEXT_FORMAT_ERROR);
         }
         if (!addressFromSignedMessage.toLowerCase(Locale.ROOT).equals(request.getChainAddress().toLowerCase(Locale.ROOT))){
             throw new CommonException(ReturnCode.SIGNATURE_ORIGIN_TEXT_FORMAT_ERROR);
@@ -185,10 +185,6 @@ public class ChainService {
 //            chainAccountMapper.updateChainAccount(account);
 //        }
 //    }
-
-    public List<GasApply> getApplyList(String userId) {
-        return gasApplyMapper.getApplyList(userId);
-    }
 
     public PageInfo<ResponseChainAccount> getChainAccount(Integer pageNumber, Integer pageSize, String userId, String name, String userAddress, Boolean isGasTransfer, Boolean isCustody, Long startTime, Long endTime) {
         PageHelper.startPage(pageNumber, pageSize);
