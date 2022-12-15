@@ -112,6 +112,7 @@ public enum ReturnCode {
     TRANSFER_ERROR(35002, "转账交易未执行成功"),
     TX_HASH_MISMATCH_ERROR(35002, "本地交易hash与远程交易hash不一致"),
     REMAIN_NOT_ENOUGH_ERROR(35003, "签约的余额不足"),
+    UN_MATCH_MIN_TRANSFR_AMOUNT_ERROR(35003, "不满足最小转账金额"),
 
     //最大错误码
     MAX_RETURN_CODE(99999, "最大错误码");
