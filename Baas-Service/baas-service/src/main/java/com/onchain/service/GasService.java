@@ -94,7 +94,7 @@ public class GasService {
             responseUserGasSummary.setChainAccountGasDistribute(responseChainAccountGasSummaries);
 
             responseUserGasSummary.setApplyAmount(gasSummary.getApplyAmount());
-            BigInteger unApplyAmount = new BigInteger(gasSummary.getAgreementAmount()).min(new BigInteger(gasSummary.getApplyAmount()));
+            BigInteger unApplyAmount = new BigInteger(gasSummary.getAgreementAmount()).subtract(new BigInteger(gasSummary.getApplyAmount()));
             responseUserGasSummary.setUnApplyAmount(unApplyAmount.toString());
             responseUserGasSummary.setTotalAmount(gasSummary.getAgreementAmount());
             return responseUserGasSummary;
