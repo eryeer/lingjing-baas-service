@@ -147,6 +147,23 @@ CREATE TABLE `tbl_chain_account` (
     PRIMARY KEY (`id`)
 ) COMMENT='用户链账户表';
 
+DROP TABLE IF EXISTS tbl_gas_summary;
+CREATE TABLE `tbl_gas_summary` (
+    `id` bigint NOT NULL AUTO_INCREMENT COMMENT '自增id, 非用户id',
+    `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间（默认字段）',
+    `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间（默认字段）',
+    `status` varchar(20) NOT NULL DEFAULT '1' COMMENT '状态（默认字段,1：有效  0：无效）',
+
+    `user_id` varchar(32) NOT NULL COMMENT '用户id',
+    `apply_amount` varchar(100) NOT NULL COMMENT '申领总数量',
+    `agreement_amount` varchar(100) NOT NULL COMMENT '签约总数量',
+    `apply_time` bigint NOT NULL  DEFAULT 0 COMMENT '燃料最近申领时间',
+    `agreement_time` bigint NOT NULL  DEFAULT 0 COMMENT '燃料最近签约时间',
+
+    unique `uk_user_id`(`user_id`),
+    PRIMARY KEY (`id`)
+) COMMENT='燃料汇总表 包括申领 签约信息';
+
 DROP TABLE IF EXISTS tbl_gas_apply;
 CREATE TABLE `tbl_gas_apply` (
     `id` bigint NOT NULL AUTO_INCREMENT COMMENT '自增id, 非用户id',
@@ -156,10 +173,12 @@ CREATE TABLE `tbl_gas_apply` (
 
     `user_id` varchar(32) NOT NULL COMMENT '用户id',
     `user_address` varchar(42) NOT NULL COMMENT '链账户地址',
-    `apply_amount` varchar(30) NOT NULL COMMENT '燃料申领数量',
-    `apply_time` datetime NULL COMMENT '燃料申领时间',
+    `apply_amount` varchar(100) NOT NULL COMMENT '燃料申领数量',
+    `apply_time` bigint NOT NULL  DEFAULT 0 COMMENT '燃料申领时间',
+    `tx_hash` VARCHAR(66)  NOT NULL DEFAULT '' COMMENT '交易hash',
 
     KEY `idx_user_id`(`user_id`),
+    KEY `idx_user_address`(`user_address`),
     PRIMARY KEY (`id`)
 ) COMMENT='燃料申领记录表';
 

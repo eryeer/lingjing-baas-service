@@ -172,4 +172,6 @@ public class CommonConst {
     public static final String ADDRESS_HEADER = "Wallet address:";
     public static final String NONCE_HEADER = "Nonce:";
 
+    public static final String ZERO_STR = "0";
+
 }

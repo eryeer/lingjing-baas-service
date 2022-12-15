@@ -7,12 +7,10 @@ import com.onchain.constants.ReturnCode;
 import com.onchain.constants.UrlConst;
 import com.onchain.entities.ResponseFormat;
 import com.onchain.entities.dao.User;
+import com.onchain.entities.request.RequestAcRequireGas;
 import com.onchain.entities.request.RequestApproveGasContract;
 import com.onchain.entities.request.RequestGasCreate;
-import com.onchain.entities.response.ResponseAdminGasContract;
-import com.onchain.entities.response.ResponseGasContract;
-import com.onchain.entities.response.ResponseGasContractStatistic;
-import com.onchain.entities.response.ResponseUserGasSummary;
+import com.onchain.entities.response.*;
 import com.onchain.service.GasService;
 import com.onchain.service.JwtService;
 import io.swagger.annotations.ApiOperation;
@@ -22,10 +20,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.web3j.protocol.exceptions.TransactionException;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
+import java.io.IOException;
+import java.util.concurrent.ExecutionException;
 
 
 @RestController
@@ -129,5 +130,32 @@ public class GasController {
         }
         PageInfo<ResponseGasContractStatistic> gasContractList = gasService.getGasContactStatisticList(pageNumber, pageSize, phoneNumber, companyName, approvedStartTime, approvedEndTime);
         return new ResponseFormat<>(gasContractList);
+    }
+
+    @PostMapping(value = UrlConst.ACQUIRE_GAS)
+    @ApiOperation(value = "燃料申请", notes = "燃料申请")
+    @OperLogAnnotation(description = "accquireGas")
+    public ResponseFormat<?> acquireGas(
+            @Valid @RequestBody RequestAcRequireGas requestAccGasRequire,
+            @RequestHeader(CommonConst.HEADER_ACCESS_TOKEN) String accessToken) throws InterruptedException, ExecutionException, TransactionException, IOException {
+        User user = jwtService.parseToken(accessToken);
+        gasService.acquireGas(user.getUserId(), requestAccGasRequire);
+        return new ResponseFormat<>();
+    }
+
+    @GetMapping(value = UrlConst.GET_CHAIN_ACCOUNT_LIST_FOR_GAS_MANAGEMENT)
+    @ApiOperation(value = "获取燃料申领页的链账户列表", notes = "获取燃料申领页的链账户列表")
+    @OperLogAnnotation(description = "getChainAccountListForGasManagement")
+    public ResponseFormat<PageInfo<ReponseChainAccountGasApplySummary>> getChainAccountListForGasManagement(
+            @RequestParam(name = "pageNumber") @Min(1) Integer pageNumber,
+            @RequestParam(name = "pageSize") @Min(1) @Max(50) Integer pageSize,
+            @ApiParam("链账号地址") @RequestParam(required = false) String userAddress,
+            @ApiParam("链账号名称") @RequestParam(required = false) String name,
+            @ApiParam("最近审批的开始筛选时间") @RequestParam(required = false) Long applyStartTime,
+            @ApiParam("最近审批的终止筛选时间") @RequestParam(required = false) Long applyEndTime,
+            @RequestHeader(CommonConst.HEADER_ACCESS_TOKEN) String accessToken) throws IOException {
+        User user = jwtService.parseToken(accessToken);
+        PageInfo<ReponseChainAccountGasApplySummary> chainAccountListForGasManagement = gasService.getChainAccountListForGasManagement(pageNumber, pageSize, user.getUserId(), userAddress, name, applyStartTime, applyEndTime);
+        return new ResponseFormat<>(chainAccountListForGasManagement);
     }
 }

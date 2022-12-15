@@ -13,5 +13,6 @@ public class GasApply extends Base {
     private String userId;
     private String userAddress;
     private String applyAmount;
-    private Date applyTime;
+    private Long applyTime;
+    private String txHash;
 }
