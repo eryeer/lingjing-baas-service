@@ -7,7 +7,7 @@ import com.onchain.constants.ReturnCode;
 import com.onchain.constants.UrlConst;
 import com.onchain.entities.ResponseFormat;
 import com.onchain.entities.dao.User;
-import com.onchain.entities.request.RequestAccRequireGas;
+import com.onchain.entities.request.RequestAcRequireGas;
 import com.onchain.entities.request.RequestApproveGasContract;
 import com.onchain.entities.request.RequestGasCreate;
 import com.onchain.entities.response.*;
@@ -132,14 +132,14 @@ public class GasController {
         return new ResponseFormat<>(gasContractList);
     }
 
-    @PostMapping(value = UrlConst.ACCQUIRE_GAS)
+    @PostMapping(value = UrlConst.ACQUIRE_GAS)
     @ApiOperation(value = "燃料申请", notes = "燃料申请")
     @OperLogAnnotation(description = "accquireGas")
-    public ResponseFormat<?> accquireGas(
-            @Valid @RequestBody RequestAccRequireGas requestAccGasRequire,
+    public ResponseFormat<?> acquireGas(
+            @Valid @RequestBody RequestAcRequireGas requestAccGasRequire,
             @RequestHeader(CommonConst.HEADER_ACCESS_TOKEN) String accessToken) throws InterruptedException, ExecutionException, TransactionException, IOException {
         User user = jwtService.parseToken(accessToken);
-        gasService.accquireGas(user.getUserId(), requestAccGasRequire);
+        gasService.acquireGas(user.getUserId(), requestAccGasRequire);
         return new ResponseFormat<>();
     }
 

@@ -9,7 +9,7 @@ import com.onchain.constants.ReturnCode;
 import com.onchain.entities.dao.GasApply;
 import com.onchain.entities.dao.GasContract;
 import com.onchain.entities.dao.GasSummary;
-import com.onchain.entities.request.RequestAccRequireGas;
+import com.onchain.entities.request.RequestAcRequireGas;
 import com.onchain.entities.request.RequestApproveGasContract;
 import com.onchain.entities.request.RequestGasCreate;
 import com.onchain.entities.response.*;
@@ -34,8 +34,6 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 @Service
 @Slf4j
@@ -172,7 +170,7 @@ public class GasService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public void accquireGas(String userId, RequestAccRequireGas requestAccGasRequire) throws InterruptedException, ExecutionException, IOException, TransactionException {
+    public void acquireGas(String userId, RequestAcRequireGas requestAccGasRequire) throws InterruptedException, ExecutionException, IOException, TransactionException {
         String remainAmountByStr = gasApplyMapper.getRemainAmountByUserId(userId);
         BigInteger remainAmount= StringUtils.isEmpty(remainAmountByStr)? new BigInteger(CommonConst.ZERO_STR):new BigInteger(remainAmountByStr);
         if (remainAmount.compareTo(new BigInteger(requestAccGasRequire.getApplyAmount())) < 0) {
