@@ -177,6 +177,8 @@ CREATE TABLE `tbl_gas_apply` (
     `apply_time` bigint NOT NULL  DEFAULT 0 COMMENT '燃料申领时间',
     `tx_hash` VARCHAR(66)  NOT NULL DEFAULT '' COMMENT '交易hash',
 
+    KEY `idx_user_id`(`user_id`),
+    KEY `idx_user_address`(`user_address`),
     PRIMARY KEY (`id`)
 ) COMMENT='燃料申领记录表';
 
