@@ -3,6 +3,7 @@ package com.onchain.service;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.onchain.config.ParamsConfig;
+import com.onchain.constants.CommonConst;
 import com.onchain.constants.GasContractStatus;
 import com.onchain.constants.ReturnCode;
 import com.onchain.entities.dao.GasApply;
@@ -209,6 +210,7 @@ public class GasService {
                     .agreementAmount(agreementAmount.toString())
                     .userId(userId).build();
             gasApplyMapper.updateGasSummaryInfo(gasSummary);
+            // 进行转账操作
             String transactionHash = Web3jUtil.transfer(web3j, signedRawTransaction);
             if(StringUtils.isEmpty(transactionHash)) {
                 throw new CommonException(ReturnCode.TRANSFER_ERROR);
@@ -243,10 +245,10 @@ public class GasService {
                 BigInteger balance = Web3jUtil.getBalanceByAddress(web3j, chainAccountGasApplyInfo.getAccountAddress());
                 chainAccountGasApplyInfo.setRemainGas(balance.toString());
                 if(StringUtils.isEmpty(chainAccountGasApplyInfo.getAppliedGas())){
-                    chainAccountGasApplyInfo.setAppliedGas("0");
+                    chainAccountGasApplyInfo.setAppliedGas(CommonConst.ZERO_STR);
                 }
                 if(StringUtils.isEmpty(chainAccountGasApplyInfo.getRemainGas())){
-                    chainAccountGasApplyInfo.setRemainGas("0");
+                    chainAccountGasApplyInfo.setRemainGas(CommonConst.ZERO_STR);
                 }
             }
         }catch (Exception e){
