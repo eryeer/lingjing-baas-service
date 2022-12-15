@@ -95,7 +95,11 @@ public class GasService {
             for (ResponseChainAccountGasSummary responseChainAccountGasSummary : responseChainAccountGasSummaries) {
                 BigInteger remain = Web3jUtil.getBalanceByAddress(web3j, responseChainAccountGasSummary.getAccountAddress());
                 responseChainAccountGasSummary.setRemain(remain.toString());
+                if (StringUtils.isEmpty(responseChainAccountGasSummary.getApplyAmount())){
+                    responseChainAccountGasSummary.setApplyAmount("0");
+                }
             }
+
             responseUserGasSummary.setChainAccountGasDistribute(responseChainAccountGasSummaries);
             return responseUserGasSummary;
         }catch (Exception e){
