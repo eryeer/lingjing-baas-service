@@ -45,7 +45,7 @@ public interface GasApplyMapper {
             "select tga.user_address,  sum(cast(tga.apply_amount as decimal(60))) as applied_gas, max(tga.apply_time) as recently_apply_time\n" +
             "from tbl_gas_apply tga\n" +
             "right join tbl_chain_account tca on tga.user_address = tca.user_address\n" +
-            "group by tga.user_address ) as info\n" +
+            "group by tga.user_address where tca.status = 1) as info\n" +
             "right join tbl_chain_account tca on tca.user_address = info.user_address" +
             "<where> tca.user_id = #{userId} and tca.status = 1 " +
             "<if test='name != null'>AND tca.name = #{name} </if> " +
