@@ -174,7 +174,8 @@ public class GasService {
     @Transactional(rollbackFor = Exception.class)
     public void accquireGas(String userId, RequestAccGasRequire requestAccGasRequire) {
         try {
-            BigInteger remainAmount= new BigInteger(gasApplyMapper.getRemainAmountByUserId(userId));
+            String remainAmountByStr = gasApplyMapper.getRemainAmountByUserId(userId);
+            BigInteger remainAmount= StringUtils.isEmpty(remainAmountByStr)? new BigInteger(CommonConst.ZERO_STR):new BigInteger(remainAmountByStr);
             if (remainAmount.compareTo(new BigInteger(requestAccGasRequire.getApplyAmount())) < 0) {
                 throw new CommonException(ReturnCode.REMAIN_NOT_ENOUGH_ERROR);
             }

@@ -20,12 +20,4 @@ public class RequestAccGasRequire {
     @ApiModelProperty(value = "申领地址")
     @NotBlank
     private String applyAccountAddress;
-
-//    @ApiModelProperty(value = "原文")
-//    @NotNull
-//    private String message;
-//
-//    @ApiModelProperty(value = "签名")
-//    @NotNull
-//    private String signedMessage;
 }
