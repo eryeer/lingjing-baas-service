@@ -81,14 +81,6 @@ public class GasService {
     public ResponseUserGasSummary getGasContractSummary(String userId) {
         try {
             ResponseUserGasSummary responseUserGasSummary = ResponseUserGasSummary.builder().userId(userId).build();
-            BigInteger totalAgreementAmount = new BigInteger(CommonConst.ZERO_STR);
-            List<ResponseGasContract> gasContracts = gasContractMapper.getSuccessGasContractListByUserId(userId);
-            for (ResponseGasContract gasContract : gasContracts) {
-                totalAgreementAmount = totalAgreementAmount.add(new BigInteger(gasContract.getAgreementAmount()));
-            }
-            responseUserGasSummary.setApplyAmount(CommonConst.ZERO_STR);
-            responseUserGasSummary.setUnApplyAmount(String.valueOf(totalAgreementAmount));
-            responseUserGasSummary.setTotalAmount(String.valueOf(totalAgreementAmount));
             List<ResponseChainAccountGasSummary> responseChainAccountGasSummaries = gasApplyMapper.getChainAccountApplySummary(userId);
             for (ResponseChainAccountGasSummary responseChainAccountGasSummary : responseChainAccountGasSummaries) {
                 BigInteger remain = Web3jUtil.getBalanceByAddress(web3j, responseChainAccountGasSummary.getAccountAddress());
@@ -97,8 +89,14 @@ public class GasService {
                     responseChainAccountGasSummary.setApplyAmount("0");
                 }
             }
+            GasSummary gasSummary = gasApplyMapper.getGasSummaryInfoByUserId(userId);
 
             responseUserGasSummary.setChainAccountGasDistribute(responseChainAccountGasSummaries);
+
+            responseUserGasSummary.setApplyAmount(gasSummary.getApplyAmount());
+            BigInteger unApplyAmount = new BigInteger(gasSummary.getAgreementAmount()).min(new BigInteger(gasSummary.getApplyAmount()));
+            responseUserGasSummary.setUnApplyAmount(unApplyAmount.toString());
+            responseUserGasSummary.setTotalAmount(gasSummary.getAgreementAmount());
             return responseUserGasSummary;
         }catch (Exception e){
             log.error("getGasContractSummary error: ", e.getMessage());
