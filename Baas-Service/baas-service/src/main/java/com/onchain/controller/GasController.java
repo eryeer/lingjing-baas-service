@@ -7,7 +7,7 @@ import com.onchain.constants.ReturnCode;
 import com.onchain.constants.UrlConst;
 import com.onchain.entities.ResponseFormat;
 import com.onchain.entities.dao.User;
-import com.onchain.entities.request.RequestAccGasRequire;
+import com.onchain.entities.request.RequestAccRequireGas;
 import com.onchain.entities.request.RequestApproveGasContract;
 import com.onchain.entities.request.RequestGasCreate;
 import com.onchain.entities.response.*;
@@ -133,7 +133,7 @@ public class GasController {
     @ApiOperation(value = "燃料申请", notes = "燃料申请")
     @OperLogAnnotation(description = "accquireGas")
     public ResponseFormat<?> accquireGas(
-            @Valid @RequestBody RequestAccGasRequire requestAccGasRequire,
+            @Valid @RequestBody RequestAccRequireGas requestAccGasRequire,
             @RequestHeader(CommonConst.HEADER_ACCESS_TOKEN) String accessToken) {
         User user = jwtService.parseToken(accessToken);
         gasService.accquireGas(user.getUserId(), requestAccGasRequire);

@@ -12,7 +12,7 @@ import javax.validation.constraints.NotBlank;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class RequestAccGasRequire {
+public class RequestAccRequireGas {
     @ApiModelProperty(value = "申领的燃料数量")
     @NotBlank
     private String applyAmount;

@@ -9,7 +9,7 @@ import com.onchain.constants.ReturnCode;
 import com.onchain.entities.dao.GasApply;
 import com.onchain.entities.dao.GasContract;
 import com.onchain.entities.dao.GasSummary;
-import com.onchain.entities.request.RequestAccGasRequire;
+import com.onchain.entities.request.RequestAccRequireGas;
 import com.onchain.entities.request.RequestApproveGasContract;
 import com.onchain.entities.request.RequestGasCreate;
 import com.onchain.entities.response.*;
@@ -172,7 +172,7 @@ public class GasService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public void accquireGas(String userId, RequestAccGasRequire requestAccGasRequire) {
+    public void accquireGas(String userId, RequestAccRequireGas requestAccGasRequire) {
         try {
             String remainAmountByStr = gasApplyMapper.getRemainAmountByUserId(userId);
             BigInteger remainAmount= StringUtils.isEmpty(remainAmountByStr)? new BigInteger(CommonConst.ZERO_STR):new BigInteger(remainAmountByStr);
