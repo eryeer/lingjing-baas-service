@@ -23,11 +23,21 @@ public interface GasApplyMapper {
             "values ( " + INSERT_VALS + " )")
     void insertGasApply(GasApply gasApply);
 
-    @Select("select tca.name, tca.user_address, tga.apply_time, tga.apply_amount, tga.tx_hash\n" +
+    @Select("select tca.name as account_name, tca.user_address as account_address, tga.apply_time, tga.apply_amount, tga.tx_hash\n" +
             "from tbl_gas_apply tga\n" +
             "right join tbl_chain_account tca on tga.user_id = tca.user_id and tga.user_address = tca.user_address\n" +
             "where tca.user_id = #{userId} and tca.status = 1")
     List<ResponseChainAccountGasSummary> getChainAccountApplyList(String userId);
+
+    @Select("select tca.name as account_name, tca.user_address as account_address, tga.apply_amount\n" +
+            "from (\n" +
+            "select user_address, sum(cast(apply_amount as decimal(60) )) as apply_amount\n" +
+            "from tbl_gas_apply\n" +
+            "where user_id = #{userId}  \n" +
+            "group by user_address ) tga\n" +
+            "right join tbl_chain_account tca on tga.user_address = tca.user_address " +
+            "where tca.status = 1 and tca.user_id = #{userId}")
+    List<ResponseChainAccountGasSummary> getChainAccountApplySummary(String userId);
 
     @Select("<script>" +
             "select tca.user_address as account_address, tca.name, info.applied_gas, info.recently_apply_time\n" +

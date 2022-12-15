@@ -83,32 +83,23 @@ public class GasService {
     public ResponseUserGasSummary getGasContractSummary(String userId) {
         try {
             ResponseUserGasSummary responseUserGasSummary = ResponseUserGasSummary.builder().userId(userId).build();
-            BigInteger totalAgreementAmount = new BigInteger("0");
+            BigInteger totalAgreementAmount = new BigInteger(CommonConst.ZERO_STR);
             List<ResponseGasContract> gasContracts = gasContractMapper.getSuccessGasContractListByUserId(userId);
             for (ResponseGasContract gasContract : gasContracts) {
                 totalAgreementAmount = totalAgreementAmount.add(new BigInteger(gasContract.getAgreementAmount()));
             }
-            responseUserGasSummary.setApplyAmount("0");
+            responseUserGasSummary.setApplyAmount(CommonConst.ZERO_STR);
             responseUserGasSummary.setUnApplyAmount(String.valueOf(totalAgreementAmount));
             responseUserGasSummary.setTotalAmount(String.valueOf(totalAgreementAmount));
-            List<ResponseChainAccount> chainAccounts = chainAccountMapper.getChainAccountByUserId(userId);
-            List<ResponseChainAccountGasSummary> responseChainAccountGasSummaries = gasApplyMapper.getChainAccountApplyList(userId);
+            List<ResponseChainAccountGasSummary> responseChainAccountGasSummaries = gasApplyMapper.getChainAccountApplySummary(userId);
             for (ResponseChainAccountGasSummary responseChainAccountGasSummary : responseChainAccountGasSummaries) {
                 BigInteger remain = Web3jUtil.getBalanceByAddress(web3j, responseChainAccountGasSummary.getAccountAddress());
                 responseChainAccountGasSummary.setRemain(remain.toString());
             }
-            for (ResponseChainAccount chainAccount : chainAccounts) {
-                ResponseChainAccountGasSummary responseChainAccountGasSummary = ResponseChainAccountGasSummary.builder()
-                        .accountAddress(chainAccount.getUserAddress())
-                        .applyAmount("0").remain("0")
-                        .accountName(chainAccount.getName())
-                        .Id(chainAccount.getId())
-                        .build();
-                responseChainAccountGasSummaries.add(responseChainAccountGasSummary);
-            }
             responseUserGasSummary.setChainAccountGasDistribute(responseChainAccountGasSummaries);
             return responseUserGasSummary;
         }catch (Exception e){
+            log.error(e.getMessage());
             throw new CommonException(ReturnCode.GET_BALANCE_ERROR);
         }
     }
