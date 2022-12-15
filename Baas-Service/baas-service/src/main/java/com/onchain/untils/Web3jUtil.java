@@ -145,7 +145,7 @@ public class Web3jUtil {
         RawTransactionManager rawTransactionManager = Web3jUtil.getTransactionManager(web3j, credentials, netVersion);
         RawTransaction etherTransaction = RawTransaction.createEtherTransaction(
                 nonce,
-                Convert.toWei("12", Convert.Unit.GWEI).toBigInteger(),
+                Convert.toWei("1", Convert.Unit.GWEI).toBigInteger(),
                 BigInteger.valueOf(21000L),
                 toAddress,
                 new BigInteger(amount)

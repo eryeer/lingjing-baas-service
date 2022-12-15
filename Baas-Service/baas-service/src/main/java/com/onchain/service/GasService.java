@@ -29,6 +29,7 @@ import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.methods.response.*;
 import org.web3j.protocol.exceptions.TransactionException;
 import org.web3j.tx.response.PollingTransactionReceiptProcessor;
+import org.web3j.utils.Convert;
 
 import java.io.IOException;
 import java.math.BigInteger;
@@ -81,14 +82,6 @@ public class GasService {
     public ResponseUserGasSummary getGasContractSummary(String userId) {
         try {
             ResponseUserGasSummary responseUserGasSummary = ResponseUserGasSummary.builder().userId(userId).build();
-            BigInteger totalAgreementAmount = new BigInteger(CommonConst.ZERO_STR);
-            List<ResponseGasContract> gasContracts = gasContractMapper.getSuccessGasContractListByUserId(userId);
-            for (ResponseGasContract gasContract : gasContracts) {
-                totalAgreementAmount = totalAgreementAmount.add(new BigInteger(gasContract.getAgreementAmount()));
-            }
-            responseUserGasSummary.setApplyAmount(CommonConst.ZERO_STR);
-            responseUserGasSummary.setUnApplyAmount(String.valueOf(totalAgreementAmount));
-            responseUserGasSummary.setTotalAmount(String.valueOf(totalAgreementAmount));
             List<ResponseChainAccountGasSummary> responseChainAccountGasSummaries = gasApplyMapper.getChainAccountApplySummary(userId);
             for (ResponseChainAccountGasSummary responseChainAccountGasSummary : responseChainAccountGasSummaries) {
                 BigInteger remain = Web3jUtil.getBalanceByAddress(web3j, responseChainAccountGasSummary.getAccountAddress());
@@ -97,8 +90,14 @@ public class GasService {
                     responseChainAccountGasSummary.setApplyAmount("0");
                 }
             }
+            GasSummary gasSummary = gasApplyMapper.getGasSummaryInfoByUserId(userId);
 
             responseUserGasSummary.setChainAccountGasDistribute(responseChainAccountGasSummaries);
+
+            responseUserGasSummary.setApplyAmount(gasSummary.getApplyAmount());
+            BigInteger unApplyAmount = new BigInteger(gasSummary.getAgreementAmount()).subtract(new BigInteger(gasSummary.getApplyAmount()));
+            responseUserGasSummary.setUnApplyAmount(unApplyAmount.toString());
+            responseUserGasSummary.setTotalAmount(gasSummary.getAgreementAmount());
             return responseUserGasSummary;
         }catch (Exception e){
             log.error("getGasContractSummary error: ", e.getMessage());
@@ -172,8 +171,14 @@ public class GasService {
     @Transactional(rollbackFor = Exception.class)
     public void acquireGas(String userId, RequestAcRequireGas requestAccGasRequire) throws InterruptedException, ExecutionException, IOException, TransactionException {
         String remainAmountByStr = gasApplyMapper.getRemainAmountByUserId(userId);
+        BigInteger acquireAmount = new BigInteger(requestAccGasRequire.getApplyAmount());
+        BigInteger minTransferAmount = Convert.toWei("10000", Convert.Unit.GWEI).toBigInteger();
+        if (acquireAmount.compareTo(minTransferAmount) < 0) {
+            throw new CommonException(ReturnCode.UN_MATCH_MIN_TRANSFR_AMOUNT_ERROR);
+        }
         BigInteger remainAmount= StringUtils.isEmpty(remainAmountByStr)? new BigInteger(CommonConst.ZERO_STR):new BigInteger(remainAmountByStr);
-        if (remainAmount.compareTo(new BigInteger(requestAccGasRequire.getApplyAmount())) < 0) {
+
+        if (remainAmount.compareTo(acquireAmount) < 0) {
             throw new CommonException(ReturnCode.REMAIN_NOT_ENOUGH_ERROR);
         }
         String signedRawTransaction = Web3jUtil.getSignedRawTransaction(web3j, paramsConfig.maasAdminAccount,  requestAccGasRequire.getApplyAccountAddress(), requestAccGasRequire.getApplyAmount());
