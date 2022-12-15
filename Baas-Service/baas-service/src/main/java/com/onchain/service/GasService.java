@@ -103,7 +103,7 @@ public class GasService {
             responseUserGasSummary.setChainAccountGasDistribute(responseChainAccountGasSummaries);
             return responseUserGasSummary;
         }catch (Exception e){
-            log.error(e.getMessage());
+            log.error("getGasContractSummary error: ", e.getMessage());
             throw new CommonException(ReturnCode.GET_BALANCE_ERROR);
         }
     }
@@ -172,84 +172,65 @@ public class GasService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public void accquireGas(String userId, RequestAccRequireGas requestAccGasRequire) {
-        try {
-            String remainAmountByStr = gasApplyMapper.getRemainAmountByUserId(userId);
-            BigInteger remainAmount= StringUtils.isEmpty(remainAmountByStr)? new BigInteger(CommonConst.ZERO_STR):new BigInteger(remainAmountByStr);
-            if (remainAmount.compareTo(new BigInteger(requestAccGasRequire.getApplyAmount())) < 0) {
-                throw new CommonException(ReturnCode.REMAIN_NOT_ENOUGH_ERROR);
-            }
-            String signedRawTransaction = Web3jUtil.getSignedRawTransaction(web3j, paramsConfig.maasAdminAccount,  requestAccGasRequire.getApplyAccountAddress(), requestAccGasRequire.getApplyAmount());
-            String txHash = Hash.sha3(signedRawTransaction);
-            // 先进行数据库事务
-            GasApply gasApply = GasApply.builder().applyTime(System.currentTimeMillis())
-                    .applyAmount(requestAccGasRequire.getApplyAmount())
-                    .txHash(txHash)
-                    .userAddress(requestAccGasRequire.getApplyAccountAddress())
-                    .userId(userId).build();
-            gasApplyMapper.insertGasApply(gasApply);
-            List<ResponseGasContract> successGasContract = gasContractMapper.getSuccessGasContractListByUserId(userId);
-            Long agreementTime = successGasContract.get(0).getApprovedTime();
-            BigInteger agreementAmount = new BigInteger("0");
-            for (ResponseGasContract responseGasContract : successGasContract) {
-                agreementAmount = agreementAmount.add(new BigInteger(responseGasContract.getAgreementAmount()));
-            }
-            List<ResponseChainAccountGasSummary> chainAccountApplyList = gasApplyMapper.getChainAccountApplyList(userId);
-            BigInteger applyAmount = new BigInteger("0");
-            for (ResponseChainAccountGasSummary accountGasApply : chainAccountApplyList) {
-                String applyAmountStr = StringUtils.isEmpty(accountGasApply.getApplyAmount())?"0":accountGasApply.getApplyAmount();
-                applyAmount = applyAmount.add(new BigInteger(applyAmountStr));
-            }
-            GasSummary gasSummary = GasSummary.builder().agreementTime(agreementTime)
-                    .applyTime(gasApply.getApplyTime())
-                    .applyAmount(applyAmount.toString())
-                    .agreementAmount(agreementAmount.toString())
-                    .userId(userId).build();
-            gasApplyMapper.updateGasSummaryInfo(gasSummary);
-            // 进行转账操作
-            String transactionHash = Web3jUtil.transfer(web3j, signedRawTransaction);
-            if(StringUtils.isEmpty(transactionHash)) {
-                throw new CommonException(ReturnCode.TRANSFER_ERROR);
-            }
-            if (!txHash.equals(transactionHash)){
-                throw new CommonException(ReturnCode.TRANSFER_ERROR);
-            }
-            PollingTransactionReceiptProcessor pollingTransactionReceiptProcessor = new PollingTransactionReceiptProcessor(web3j, 5000L, 10);
-            TransactionReceipt transactionReceipt = pollingTransactionReceiptProcessor.waitForTransactionReceipt(transactionHash);
-            if (!transactionReceipt.getStatus().equals("0x1")){
-                throw new CommonException(ReturnCode.TRANSFER_ERROR);
-            }
-        }catch (ExecutionException var1){
-            throw new CommonException(ReturnCode.TRANSFER_ERROR);
+    public void accquireGas(String userId, RequestAccRequireGas requestAccGasRequire) throws InterruptedException, ExecutionException, IOException, TransactionException {
+        String remainAmountByStr = gasApplyMapper.getRemainAmountByUserId(userId);
+        BigInteger remainAmount= StringUtils.isEmpty(remainAmountByStr)? new BigInteger(CommonConst.ZERO_STR):new BigInteger(remainAmountByStr);
+        if (remainAmount.compareTo(new BigInteger(requestAccGasRequire.getApplyAmount())) < 0) {
+            throw new CommonException(ReturnCode.REMAIN_NOT_ENOUGH_ERROR);
         }
-        catch(InterruptedException var2){
-            throw new CommonException(ReturnCode.TRANSFER_ERROR);
-        }catch (IOException var3){
-            throw new CommonException(ReturnCode.TRANSFER_ERROR);
-        } catch (TransactionException var4) {
+        String signedRawTransaction = Web3jUtil.getSignedRawTransaction(web3j, paramsConfig.maasAdminAccount,  requestAccGasRequire.getApplyAccountAddress(), requestAccGasRequire.getApplyAmount());
+        String txHash = Hash.sha3(signedRawTransaction);
+        // 先进行数据库事务
+        GasApply gasApply = GasApply.builder().applyTime(System.currentTimeMillis())
+                .applyAmount(requestAccGasRequire.getApplyAmount())
+                .txHash(txHash)
+                .userAddress(requestAccGasRequire.getApplyAccountAddress())
+                .userId(userId).build();
+        gasApplyMapper.insertGasApply(gasApply);
+        List<ResponseGasContract> successGasContract = gasContractMapper.getSuccessGasContractListByUserId(userId);
+        Long agreementTime = successGasContract.get(0).getApprovedTime();
+        BigInteger agreementAmount = new BigInteger("0");
+        for (ResponseGasContract responseGasContract : successGasContract) {
+            agreementAmount = agreementAmount.add(new BigInteger(responseGasContract.getAgreementAmount()));
+        }
+        List<ResponseChainAccountGasSummary> chainAccountApplyList = gasApplyMapper.getChainAccountApplyList(userId);
+        BigInteger applyAmount = new BigInteger("0");
+        for (ResponseChainAccountGasSummary accountGasApply : chainAccountApplyList) {
+            String applyAmountStr = StringUtils.isEmpty(accountGasApply.getApplyAmount())?"0":accountGasApply.getApplyAmount();
+            applyAmount = applyAmount.add(new BigInteger(applyAmountStr));
+        }
+        GasSummary gasSummary = GasSummary.builder().agreementTime(agreementTime)
+                .applyTime(gasApply.getApplyTime())
+                .applyAmount(applyAmount.toString())
+                .agreementAmount(agreementAmount.toString())
+                .userId(userId).build();
+        gasApplyMapper.updateGasSummaryInfo(gasSummary);
+        // 进行转账操作
+        String transactionHash = Web3jUtil.transfer(web3j, signedRawTransaction);
+        if (!txHash.equals(transactionHash)){
+            throw new CommonException(ReturnCode.TX_HASH_MISMATCH_ERROR);
+        }
+        PollingTransactionReceiptProcessor pollingTransactionReceiptProcessor = new PollingTransactionReceiptProcessor(web3j, 5000L, 10);
+        TransactionReceipt transactionReceipt = pollingTransactionReceiptProcessor.waitForTransactionReceipt(transactionHash);
+        if (!transactionReceipt.getStatus().equals("0x1")){
             throw new CommonException(ReturnCode.TRANSFER_ERROR);
         }
     }
 
 
 
-    public PageInfo<ReponseChainAccountGasApplySummary> getChainAccountListForGasManagement(Integer pageNumber, Integer pageSize,String userId, String userAddress, String name, Long applyStartTime, Long applyEndTime){
+    public PageInfo<ReponseChainAccountGasApplySummary> getChainAccountListForGasManagement(Integer pageNumber, Integer pageSize,String userId, String userAddress, String name, Long applyStartTime, Long applyEndTime) throws IOException {
         PageHelper.startPage(pageNumber, pageSize);
         List<ReponseChainAccountGasApplySummary> chainAccountGasInfoList = gasApplyMapper.getChainAccountGasInfoList(userId, userAddress, applyStartTime, applyEndTime, name);
-        try {
-            for (ReponseChainAccountGasApplySummary chainAccountGasApplyInfo : chainAccountGasInfoList) {
-                BigInteger balance = Web3jUtil.getBalanceByAddress(web3j, chainAccountGasApplyInfo.getAccountAddress());
-                chainAccountGasApplyInfo.setRemainGas(balance.toString());
-                if(StringUtils.isEmpty(chainAccountGasApplyInfo.getAppliedGas())){
-                    chainAccountGasApplyInfo.setAppliedGas(CommonConst.ZERO_STR);
-                }
-                if(StringUtils.isEmpty(chainAccountGasApplyInfo.getRemainGas())){
-                    chainAccountGasApplyInfo.setRemainGas(CommonConst.ZERO_STR);
-                }
+        for (ReponseChainAccountGasApplySummary chainAccountGasApplyInfo : chainAccountGasInfoList) {
+            BigInteger balance = Web3jUtil.getBalanceByAddress(web3j, chainAccountGasApplyInfo.getAccountAddress());
+            chainAccountGasApplyInfo.setRemainGas(balance.toString());
+            if(StringUtils.isEmpty(chainAccountGasApplyInfo.getAppliedGas())){
+                chainAccountGasApplyInfo.setAppliedGas(CommonConst.ZERO_STR);
             }
-        }catch (Exception e){
-            log.error(e.toString());
-            throw  new CommonException(ReturnCode.GET_BALANCE_ERROR);
+            if(StringUtils.isEmpty(chainAccountGasApplyInfo.getRemainGas())){
+                chainAccountGasApplyInfo.setRemainGas(CommonConst.ZERO_STR);
+            }
         }
         return new PageInfo<>(chainAccountGasInfoList);
     }

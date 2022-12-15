@@ -20,10 +20,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.web3j.protocol.exceptions.TransactionException;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
+import java.io.IOException;
+import java.util.concurrent.ExecutionException;
 
 
 @RestController
@@ -134,7 +137,7 @@ public class GasController {
     @OperLogAnnotation(description = "accquireGas")
     public ResponseFormat<?> accquireGas(
             @Valid @RequestBody RequestAccRequireGas requestAccGasRequire,
-            @RequestHeader(CommonConst.HEADER_ACCESS_TOKEN) String accessToken) {
+            @RequestHeader(CommonConst.HEADER_ACCESS_TOKEN) String accessToken) throws InterruptedException, ExecutionException, TransactionException, IOException {
         User user = jwtService.parseToken(accessToken);
         gasService.accquireGas(user.getUserId(), requestAccGasRequire);
         return new ResponseFormat<>();
@@ -150,7 +153,7 @@ public class GasController {
             @ApiParam("链账号名称") @RequestParam(required = false) String name,
             @ApiParam("最近审批的开始筛选时间") @RequestParam(required = false) Long applyStartTime,
             @ApiParam("最近审批的终止筛选时间") @RequestParam(required = false) Long applyEndTime,
-            @RequestHeader(CommonConst.HEADER_ACCESS_TOKEN) String accessToken) {
+            @RequestHeader(CommonConst.HEADER_ACCESS_TOKEN) String accessToken) throws IOException {
         User user = jwtService.parseToken(accessToken);
         PageInfo<ReponseChainAccountGasApplySummary> chainAccountListForGasManagement = gasService.getChainAccountListForGasManagement(pageNumber, pageSize, user.getUserId(), userAddress, name, applyStartTime, applyEndTime);
         return new ResponseFormat<>(chainAccountListForGasManagement);
