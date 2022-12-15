@@ -178,7 +178,7 @@ public class GasService {
         }
         BigInteger remainAmount= StringUtils.isEmpty(remainAmountByStr)? new BigInteger(CommonConst.ZERO_STR):new BigInteger(remainAmountByStr);
 
-        if (remainAmount.compareTo(remainAmount) < 0) {
+        if (remainAmount.compareTo(acquireAmount) < 0) {
             throw new CommonException(ReturnCode.REMAIN_NOT_ENOUGH_ERROR);
         }
         String signedRawTransaction = Web3jUtil.getSignedRawTransaction(web3j, paramsConfig.maasAdminAccount,  requestAccGasRequire.getApplyAccountAddress(), requestAccGasRequire.getApplyAmount());
