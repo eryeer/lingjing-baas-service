@@ -130,7 +130,7 @@ public class GasController {
     }
 
     @PostMapping(value = UrlConst.ACCQUIRE_GAS)
-    @ApiOperation(value = "燃料", notes = "燃料")
+    @ApiOperation(value = "燃料申请", notes = "燃料申请")
     @OperLogAnnotation(description = "accquireGas")
     public ResponseFormat<?> accquireGas(
             @Valid @RequestBody RequestAccGasRequire requestAccGasRequire,
