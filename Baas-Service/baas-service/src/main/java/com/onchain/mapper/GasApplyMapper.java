@@ -58,7 +58,7 @@ public interface GasApplyMapper {
 
     //获取userid剩余可申请的gas
     @Select("select cast(agreement_amount as decimal(60)) - cast(apply_amount as decimal(60))\n" +
-            "from tbl_gas_summary where user_id = #{userId};")
+            "from tbl_gas_summary where user_id = #{userId} for update;")
     String getRemainAmountByUserId(String userId);
 
     @Select("select cast(agreement_amount as decimal(60) )\n" +
