@@ -177,7 +177,7 @@ public class GasController {
         if (!user.getRole().equals(CommonConst.PM) && !user.getUserId().equals(userId)) {
             return new ResponseFormat<>(ReturnCode.USER_ROLE_ERROR);
         }
-        PageInfo<ResponseGasClaimHistory> list = gasService.getGasClaimHistory(pageNumber, pageSize, user.getUserId(), userAddress, name, phoneNumber, companyName, applyStartTime, applyEndTime);
+        PageInfo<ResponseGasClaimHistory> list = gasService.getGasClaimHistory(pageNumber, pageSize, userId, userAddress, name, phoneNumber, companyName, applyStartTime, applyEndTime);
         return new ResponseFormat<>(list);
     }
 
@@ -193,6 +193,9 @@ public class GasController {
             @ApiParam("最近申领的终止筛选时间") @RequestParam(required = false) Long applyEndTime,
             @RequestHeader(CommonConst.HEADER_ACCESS_TOKEN) String accessToken) throws IOException {
         User user = jwtService.parseToken(accessToken);
+        if (!StringUtils.equals(CommonConst.PM, user.getRole())) {
+            return new ResponseFormat<>(ReturnCode.USER_ROLE_ERROR);
+        }
         PageInfo<ResponseUserGasClaimSummary> list = gasService.getUserGasClaimSummary(pageNumber, pageSize, phoneNumber, companyName, applyStartTime, applyEndTime);
         return new ResponseFormat<>(list);
     }

@@ -14,7 +14,7 @@ public class ResponseGasClaimHistory {
     @ApiModelProperty(value = "账户名称")
     private String name;
     @ApiModelProperty(value = "账户地址")
-    private String accountAddress;
+    private String userAddress;
     @ApiModelProperty(value = "申领数量")
     private String applyAmount;
     @ApiModelProperty(value = "申领时间")
