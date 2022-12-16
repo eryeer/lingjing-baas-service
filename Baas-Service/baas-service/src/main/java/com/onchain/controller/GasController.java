@@ -133,8 +133,8 @@ public class GasController {
     }
 
     @PostMapping(value = UrlConst.ACQUIRE_GAS)
-    @ApiOperation(value = "燃料申请", notes = "燃料申请")
-    @OperLogAnnotation(description = "accquireGas")
+    @ApiOperation(value = "燃料申领", notes = "燃料申领")
+    @OperLogAnnotation(description = "acquireGas")
     public ResponseFormat<?> acquireGas(
             @Valid @RequestBody RequestAcRequireGas requestAccGasRequire,
             @RequestHeader(CommonConst.HEADER_ACCESS_TOKEN) String accessToken) throws InterruptedException, ExecutionException, TransactionException, IOException {
@@ -146,7 +146,7 @@ public class GasController {
     @GetMapping(value = UrlConst.GET_CHAIN_ACCOUNT_LIST_FOR_GAS_MANAGEMENT)
     @ApiOperation(value = "获取燃料申领页的链账户列表", notes = "获取燃料申领页的链账户列表")
     @OperLogAnnotation(description = "getChainAccountListForGasManagement")
-    public ResponseFormat<PageInfo<ReponseChainAccountGasApplySummary>> getChainAccountListForGasManagement(
+    public ResponseFormat<PageInfo<ResponseChainAccountGasClaimSummary>> getChainAccountListForGasManagement(
             @RequestParam(name = "pageNumber") @Min(1) Integer pageNumber,
             @RequestParam(name = "pageSize") @Min(1) @Max(50) Integer pageSize,
             @ApiParam("链账号地址") @RequestParam(required = false) String userAddress,
@@ -155,7 +155,46 @@ public class GasController {
             @ApiParam("最近审批的终止筛选时间") @RequestParam(required = false) Long applyEndTime,
             @RequestHeader(CommonConst.HEADER_ACCESS_TOKEN) String accessToken) throws IOException {
         User user = jwtService.parseToken(accessToken);
-        PageInfo<ReponseChainAccountGasApplySummary> chainAccountListForGasManagement = gasService.getChainAccountListForGasManagement(pageNumber, pageSize, user.getUserId(), userAddress, name, applyStartTime, applyEndTime);
+        PageInfo<ResponseChainAccountGasClaimSummary> chainAccountListForGasManagement = gasService.getChainAccountListForGasManagement(pageNumber, pageSize, user.getUserId(), userAddress, name, applyStartTime, applyEndTime);
         return new ResponseFormat<>(chainAccountListForGasManagement);
     }
+
+    @GetMapping(value = UrlConst.GET_GAS_CLAIM_HISTORY)
+    @ApiOperation(value = "获取申领燃料记录", notes = "获取申领燃料记录")
+    @OperLogAnnotation(description = "getGasClaimHistory")
+    public ResponseFormat<PageInfo<ResponseGasClaimHistory>> getGasClaimHistory(
+            @RequestParam(name = "pageNumber") @Min(1) Integer pageNumber,
+            @RequestParam(name = "pageSize") @Min(1) @Max(50) Integer pageSize,
+            @ApiParam("链账号地址") @RequestParam(required = false) String userAddress,
+            @ApiParam("链账号名称") @RequestParam(required = false) String name,
+            @ApiParam("用户id") @RequestParam(required = false) String userId,
+            @ApiParam("用户手机号") @RequestParam(required = false) String phoneNumber,
+            @ApiParam("企业名称") @RequestParam(required = false) String companyName,
+            @ApiParam("申领的开始筛选时间") @RequestParam(required = false) Long applyStartTime,
+            @ApiParam("申领的终止筛选时间") @RequestParam(required = false) Long applyEndTime,
+            @RequestHeader(CommonConst.HEADER_ACCESS_TOKEN) String accessToken) throws IOException {
+        User user = jwtService.parseToken(accessToken);
+        if (!user.getRole().equals(CommonConst.PM) && !user.getUserId().equals(userId)) {
+            return new ResponseFormat<>(ReturnCode.USER_ROLE_ERROR);
+        }
+        PageInfo<ResponseGasClaimHistory> list = gasService.getGasClaimHistory(pageNumber, pageSize, user.getUserId(), userAddress, name, phoneNumber, companyName, applyStartTime, applyEndTime);
+        return new ResponseFormat<>(list);
+    }
+
+    @GetMapping(value = UrlConst.GET_GAS_CLAIM_SUMMARY)
+    @ApiOperation(value = "获取申领燃料统计列表", notes = "获取申领燃料统计列表")
+    @OperLogAnnotation(description = "getGasClaimSummary")
+    public ResponseFormat<PageInfo<ResponseUserGasClaimSummary>> getGasClaimSummary(
+            @RequestParam(name = "pageNumber") @Min(1) Integer pageNumber,
+            @RequestParam(name = "pageSize") @Min(1) @Max(50) Integer pageSize,
+            @ApiParam("用户手机号") @RequestParam(required = false) String phoneNumber,
+            @ApiParam("企业名称") @RequestParam(required = false) String companyName,
+            @ApiParam("最近申领的开始筛选时间") @RequestParam(required = false) Long applyStartTime,
+            @ApiParam("最近申领的终止筛选时间") @RequestParam(required = false) Long applyEndTime,
+            @RequestHeader(CommonConst.HEADER_ACCESS_TOKEN) String accessToken) throws IOException {
+        User user = jwtService.parseToken(accessToken);
+        PageInfo<ResponseUserGasClaimSummary> list = gasService.getUserGasClaimSummary(pageNumber, pageSize, phoneNumber, companyName, applyStartTime, applyEndTime);
+        return new ResponseFormat<>(list);
+    }
+
 }

@@ -171,7 +171,7 @@
 - url: /baas/gas/createGasContract
 - auth: 企业用户/个人用户
 - 行为：燃料表新增记录，上传合同PDF到COS服务，生成流水号，保存合同文件、签约燃料数量等数据
-- 校验：accessToken校验，校验签名
+- 校验：accessToken校验
 
 ### 2.3.2. getGasContractHistoryList
 
@@ -179,7 +179,7 @@
 - url: /baas/gas/getGasContractList
 - auth: 企业用户/个人用户
 - 行为：获取其主体的燃料签约历史记录，支持分页查询，携带包含详情维度的信息量（燃料记录详情不再做单独接口）
-- 校验：accessToken校验，校验签名
+- 校验：accessToken校验
 
 ### 2.3.3. getGasSummary
 
@@ -187,7 +187,7 @@
 - url: /baas/gas/getGasSummary
 - auth: 企业用户/个人用户
 - 行为：返回已签约燃料总量、已申领燃料总量、剩余可申领燃料总量，根据用户id获取链账户信息列表，限展示10个地址，按已申领燃料数量倒排
-- 校验：accessToken校验，校验签名
+- 校验：accessToken校验
 
 ### 2.3.4. getAdminGasContractList
 
@@ -195,7 +195,7 @@
 - url: /baas/gas/getAdminGasContractList
 - auth: PM
 - 行为：可获取全部公司的燃料签约历史记录，支持分页查询，携带包含详情维度的信息量（燃料记录详情不再做单独接口）
-- 校验：accessToken校验，校验签名
+- 校验：accessToken校验
 
 ### 2.3.5. approveGasContract
 
@@ -203,7 +203,7 @@
 - url: /baas/gas/approveGasContract
 - auth: PM
 - 行为：审批燃料签约合同，支持修改燃料数额，以及填写核验反馈，核验反馈在驳回的时候为必填项
-- 校验：accessToken校验，校验签名
+- 校验：accessToken校验
 
 ### 2.3.6. getGasContactStatisticList
 
@@ -211,7 +211,7 @@
 - url: /baas/gas/getGasContactStatisticList
 - auth: PM
 - 行为：可获取全部公司的燃料签约统计信息列表，支持分页查询
-- 校验：accessToken校验，校验签名
+- 校验：accessToken校验
 
 ### 2.3.7. getChainAccountListForGasManagement
 
@@ -219,15 +219,15 @@
 - url: /baas/gas/getChainAccountListForGasManagement
 - auth: 企业用户/个人用户
 - 行为：可根据用户id获取链账户信息列表，支持分页查询
-- 校验：accessToken校验，校验签名
+- 校验：accessToken校验
 
-### 2.3.8. claimGas
+### 2.3.8. acquireGas
 
 - 功能说明：申领燃料
-- url: /baas/gas/accquireGas
+- url: /baas/gas/acquireGas
 - auth: 企业用户/个人用户
 - 行为：申领燃料，燃料申领数量不低于可申领下限，且不高于可申领燃料额度，触发合约燃料转账
-- 校验：accessToken校验，校验签名
+- 校验：accessToken校验
 
 ### 2.3.9. getGasClaimHistory
 
@@ -235,7 +235,15 @@
 - url: /baas/gas/getGasClaimHistory
 - auth: 所有
 - 行为：用户查询自己的链账户申领记录，PM可查询所有的链账户申领记录，支持分页查询
-- 校验：accessToken校验，校验签名
+- 校验：accessToken校验
+
+### 2.3.10. getGasClaimSummary
+
+- 功能说明：获取申领燃料统计列表
+- url: /baas/gas/getGasClaimSummary
+- auth: PM
+- 行为：PM可获取全部公司的链账户申领记录列表，支持分页查询
+- 校验：accessToken校验
 
 ## 2.4. 公共接口
 

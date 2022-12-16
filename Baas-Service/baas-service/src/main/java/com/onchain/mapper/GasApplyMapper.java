@@ -3,12 +3,12 @@ package com.onchain.mapper;
 
 import com.onchain.entities.dao.GasApply;
 import com.onchain.entities.dao.GasSummary;
-import com.onchain.entities.response.ReponseChainAccountGasApplySummary;
+import com.onchain.entities.response.ResponseChainAccountGasClaimSummary;
 import com.onchain.entities.response.ResponseChainAccountGasSummary;
+import com.onchain.entities.response.ResponseGasClaimHistory;
+import com.onchain.entities.response.ResponseUserGasClaimSummary;
 import org.apache.ibatis.annotations.Insert;
-import org.apache.ibatis.annotations.Options;
 import org.apache.ibatis.annotations.Select;
-import org.apache.ibatis.annotations.Update;
 
 import java.util.List;
 
@@ -54,7 +54,7 @@ public interface GasApplyMapper {
             "</where>" +
             "order by info.recently_apply_time desc" +
             "</script>")
-    List<ReponseChainAccountGasApplySummary> getChainAccountGasInfoList(String userId, String userAddress, Long applyStartTime, Long applyEndTime, String name);
+    List<ResponseChainAccountGasClaimSummary> getChainAccountGasInfoList(String userId, String userAddress, Long applyStartTime, Long applyEndTime, String name);
 
     //获取userid剩余可申请的gas
     @Select("select cast(agreement_amount as decimal(60)) - cast(apply_amount as decimal(60))\n" +
@@ -79,4 +79,31 @@ public interface GasApplyMapper {
 
     @Select("select user_id, apply_amount, agreement_amount, apply_time, agreement_time from tbl_gas_summary where user_id = #{userId} ")
     GasSummary getGasSummaryInfoByUserId(String userId);
+
+    @Select("<script> " +
+            "select a.*, ac.name, u.phone_number, u.company_name  " +
+            "FROM tbl_gas_apply a, tbl_chain_account ac, tbl_user u " +
+            "<where> a.user_id = u.user_id and a. user_id = ac.user_id and a.user_address = ac.user_address " +
+            "<if test='userId != null'>AND a.user_id = #{userId} </if> " +
+            "<if test='userAddress != null'>AND a.user_Address = #{userAddress} </if> " +
+            "<if test='name != null'>AND ac.name = #{name} </if> " +
+            "<if test='phoneNumber != null'> AND u.phone_Number = #{phoneNumber} </if> " +
+            "<if test='companyName != null'> AND u.company_Name = #{companyName} </if> " +
+            "<if test='applyStartTime != null and applyEndTime != null'> AND a.apply_time between #{applyStartTime} and #{applyEndTime} </if> " +
+            "</where>" +
+            " order by apply_time desc " +
+            "</script>")
+    List<ResponseGasClaimHistory> getGasClaimHistory(String userId, String userAddress, String name, String phoneNumber, String companyName, Long applyStartTime, Long applyEndTime);
+
+    @Select("<script> " +
+            "select s.*, u.phone_number, u.company_name  " +
+            "FROM tbl_gas_summary s, tbl_user u " +
+            "<where> s.user_id = u.user_id " +
+            "<if test='phoneNumber != null'> AND u.phone_Number = #{phoneNumber} </if> " +
+            "<if test='companyName != null'> AND u.company_Name = #{companyName} </if> " +
+            "<if test='applyStartTime != null and applyEndTime != null'> AND s.apply_time between #{applyStartTime} and #{applyEndTime} </if> " +
+            "</where>" +
+            " order by apply_time desc " +
+            "</script>")
+    List<ResponseUserGasClaimSummary> getUserGasClaimSummary(String phoneNumber, String companyName, Long applyStartTime, Long applyEndTime);
 }

@@ -26,14 +26,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.web3j.crypto.Hash;
 import org.web3j.protocol.Web3j;
-import org.web3j.protocol.core.methods.response.*;
+import org.web3j.protocol.core.methods.response.TransactionReceipt;
 import org.web3j.protocol.exceptions.TransactionException;
 import org.web3j.tx.response.PollingTransactionReceiptProcessor;
 import org.web3j.utils.Convert;
 
 import java.io.IOException;
 import java.math.BigInteger;
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 @Service
@@ -86,7 +87,7 @@ public class GasService {
             for (ResponseChainAccountGasSummary responseChainAccountGasSummary : responseChainAccountGasSummaries) {
                 BigInteger remain = Web3jUtil.getBalanceByAddress(web3j, responseChainAccountGasSummary.getAccountAddress());
                 responseChainAccountGasSummary.setRemain(remain.toString());
-                if (StringUtils.isEmpty(responseChainAccountGasSummary.getApplyAmount())){
+                if (StringUtils.isEmpty(responseChainAccountGasSummary.getApplyAmount())) {
                     responseChainAccountGasSummary.setApplyAmount("0");
                 }
             }
@@ -99,7 +100,7 @@ public class GasService {
             responseUserGasSummary.setUnApplyAmount(unApplyAmount.toString());
             responseUserGasSummary.setTotalAmount(gasSummary.getAgreementAmount());
             return responseUserGasSummary;
-        }catch (Exception e){
+        } catch (Exception e) {
             log.error("getGasContractSummary error: ", e.getMessage());
             throw new CommonException(ReturnCode.GET_BALANCE_ERROR);
         }
@@ -142,7 +143,7 @@ public class GasService {
         String userId = gasContractByFlowId.getUserId();
         String approvedAmount = gasApplyMapper.getApprovedAmountByUserID(userId);
         BigInteger latestApprovedAmount = new BigInteger("0");
-        if (!StringUtils.isEmpty(approvedAmount)){
+        if (!StringUtils.isEmpty(approvedAmount)) {
             latestApprovedAmount = new BigInteger(approvedAmount);
         }
         latestApprovedAmount = latestApprovedAmount.add(new BigInteger(request.getAgreementAmount()));
@@ -153,9 +154,9 @@ public class GasService {
                 .userId(userId).build();
         String applyAmount = "0";
         Long applyTime = 0l;
-        if (oldSummaryInfo != null){
-           applyAmount = StringUtils.isEmpty(oldSummaryInfo.getApplyAmount())?applyAmount:oldSummaryInfo.getApplyAmount();
-           applyTime = oldSummaryInfo.getApplyTime();
+        if (oldSummaryInfo != null) {
+            applyAmount = StringUtils.isEmpty(oldSummaryInfo.getApplyAmount()) ? applyAmount : oldSummaryInfo.getApplyAmount();
+            applyTime = oldSummaryInfo.getApplyTime();
         }
         gasSummary.setApplyAmount(applyAmount);
         gasSummary.setApplyTime(applyTime);
@@ -176,12 +177,12 @@ public class GasService {
         if (acquireAmount.compareTo(minTransferAmount) < 0) {
             throw new CommonException(ReturnCode.UN_MATCH_MIN_TRANSFR_AMOUNT_ERROR);
         }
-        BigInteger remainAmount= StringUtils.isEmpty(remainAmountByStr)? new BigInteger(CommonConst.ZERO_STR):new BigInteger(remainAmountByStr);
+        BigInteger remainAmount = StringUtils.isEmpty(remainAmountByStr) ? new BigInteger(CommonConst.ZERO_STR) : new BigInteger(remainAmountByStr);
 
         if (remainAmount.compareTo(acquireAmount) < 0) {
             throw new CommonException(ReturnCode.REMAIN_NOT_ENOUGH_ERROR);
         }
-        String signedRawTransaction = Web3jUtil.getSignedRawTransaction(web3j, paramsConfig.maasAdminAccount,  requestAccGasRequire.getApplyAccountAddress(), requestAccGasRequire.getApplyAmount());
+        String signedRawTransaction = Web3jUtil.getSignedRawTransaction(web3j, paramsConfig.maasAdminAccount, requestAccGasRequire.getApplyAccountAddress(), requestAccGasRequire.getApplyAmount());
         String txHash = Hash.sha3(signedRawTransaction);
         // 先进行数据库事务
         GasApply gasApply = GasApply.builder().applyTime(System.currentTimeMillis())
@@ -199,7 +200,7 @@ public class GasService {
         List<ResponseChainAccountGasSummary> chainAccountApplyList = gasApplyMapper.getChainAccountApplyList(userId);
         BigInteger applyAmount = new BigInteger("0");
         for (ResponseChainAccountGasSummary accountGasApply : chainAccountApplyList) {
-            String applyAmountStr = StringUtils.isEmpty(accountGasApply.getApplyAmount())?"0":accountGasApply.getApplyAmount();
+            String applyAmountStr = StringUtils.isEmpty(accountGasApply.getApplyAmount()) ? "0" : accountGasApply.getApplyAmount();
             applyAmount = applyAmount.add(new BigInteger(applyAmountStr));
         }
         GasSummary gasSummary = GasSummary.builder().agreementTime(agreementTime)
@@ -210,31 +211,41 @@ public class GasService {
         gasApplyMapper.updateGasSummaryInfo(gasSummary);
         // 进行转账操作
         String transactionHash = Web3jUtil.transfer(web3j, signedRawTransaction);
-        if (!txHash.equals(transactionHash)){
+        if (!txHash.equals(transactionHash)) {
             throw new CommonException(ReturnCode.TX_HASH_MISMATCH_ERROR);
         }
         PollingTransactionReceiptProcessor pollingTransactionReceiptProcessor = new PollingTransactionReceiptProcessor(web3j, 5000L, 10);
         TransactionReceipt transactionReceipt = pollingTransactionReceiptProcessor.waitForTransactionReceipt(transactionHash);
-        if (!transactionReceipt.getStatus().equals("0x1")){
+        if (!transactionReceipt.getStatus().equals("0x1")) {
             throw new CommonException(ReturnCode.TRANSFER_ERROR);
         }
     }
 
-
-
-    public PageInfo<ReponseChainAccountGasApplySummary> getChainAccountListForGasManagement(Integer pageNumber, Integer pageSize,String userId, String userAddress, String name, Long applyStartTime, Long applyEndTime) throws IOException {
+    public PageInfo<ResponseChainAccountGasClaimSummary> getChainAccountListForGasManagement(Integer pageNumber, Integer pageSize, String userId, String userAddress, String name, Long applyStartTime, Long applyEndTime) throws IOException {
         PageHelper.startPage(pageNumber, pageSize);
-        List<ReponseChainAccountGasApplySummary> chainAccountGasInfoList = gasApplyMapper.getChainAccountGasInfoList(userId, userAddress, applyStartTime, applyEndTime, name);
-        for (ReponseChainAccountGasApplySummary chainAccountGasApplyInfo : chainAccountGasInfoList) {
+        List<ResponseChainAccountGasClaimSummary> chainAccountGasInfoList = gasApplyMapper.getChainAccountGasInfoList(userId, userAddress, applyStartTime, applyEndTime, name);
+        for (ResponseChainAccountGasClaimSummary chainAccountGasApplyInfo : chainAccountGasInfoList) {
             BigInteger balance = Web3jUtil.getBalanceByAddress(web3j, chainAccountGasApplyInfo.getAccountAddress());
             chainAccountGasApplyInfo.setRemainGas(balance.toString());
-            if(StringUtils.isEmpty(chainAccountGasApplyInfo.getAppliedGas())){
+            if (StringUtils.isEmpty(chainAccountGasApplyInfo.getAppliedGas())) {
                 chainAccountGasApplyInfo.setAppliedGas(CommonConst.ZERO_STR);
             }
-            if(StringUtils.isEmpty(chainAccountGasApplyInfo.getRemainGas())){
+            if (StringUtils.isEmpty(chainAccountGasApplyInfo.getRemainGas())) {
                 chainAccountGasApplyInfo.setRemainGas(CommonConst.ZERO_STR);
             }
         }
         return new PageInfo<>(chainAccountGasInfoList);
+    }
+
+    public PageInfo<ResponseGasClaimHistory> getGasClaimHistory(Integer pageNumber, Integer pageSize, String userId, String userAddress, String name, String phoneNumber, String companyName, Long applyStartTime, Long applyEndTime) {
+        PageHelper.startPage(pageNumber, pageSize);
+        List<ResponseGasClaimHistory> list = gasApplyMapper.getGasClaimHistory(userId, userAddress, name, phoneNumber, companyName, applyStartTime, applyEndTime);
+        return new PageInfo<>(list);
+    }
+
+    public PageInfo<ResponseUserGasClaimSummary> getUserGasClaimSummary(Integer pageNumber, Integer pageSize, String phoneNumber, String companyName, Long applyStartTime, Long applyEndTime) {
+        PageHelper.startPage(pageNumber, pageSize);
+        List<ResponseUserGasClaimSummary> list = gasApplyMapper.getUserGasClaimSummary(phoneNumber, companyName, applyStartTime, applyEndTime);
+        return new PageInfo<>(list);
     }
 }

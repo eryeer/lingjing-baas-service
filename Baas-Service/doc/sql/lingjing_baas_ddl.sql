@@ -137,7 +137,7 @@ CREATE TABLE `tbl_chain_account` (
     `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间（默认字段）',
     `status` varchar(32) NOT NULL DEFAULT '1' COMMENT '状态（默认字段,1:已启用 0:已删除 2:已停用）',
     `user_id` varchar(32) NOT NULL COMMENT '用户id',
-    `name` varchar(32) NOT NULL COMMENT '链用户名称',
+    `name` varchar(32) NOT NULL COMMENT '链账户名称',
     `is_gas_transfer` tinyint NOT NULL COMMENT '链用户是否可以gas 转账  1:允许 0:不允许',
     `is_custody` tinyint NOT NULL COMMENT '链用户私钥是否托管 1:托管 0:不托管',
     `user_address` varchar(42) NOT NULL COMMENT '链账户地址',
