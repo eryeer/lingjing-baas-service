@@ -52,7 +52,7 @@ public interface GasApplyMapper {
             "<if test='userAddress != null'>AND tca.user_address = #{userAddress} </if> " +
             "<if test='applyStartTime != null and applyEndTime != null'> AND info.recently_apply_time between #{applyStartTime} and #{applyEndTime} </if> " +
             "</where>" +
-            "order by info.recently_apply_time, tca.create_time desc" +
+            "order by info.recently_apply_time desc, tca.create_time desc" +
             "</script>")
     List<ResponseChainAccountGasClaimSummary> getChainAccountGasInfoList(String userId, String userAddress, Long applyStartTime, Long applyEndTime, String name);
 
