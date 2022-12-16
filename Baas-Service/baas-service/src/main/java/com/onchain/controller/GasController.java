@@ -149,13 +149,14 @@ public class GasController {
     public ResponseFormat<PageInfo<ResponseChainAccountGasClaimSummary>> getChainAccountListForGasManagement(
             @RequestParam(name = "pageNumber") @Min(1) Integer pageNumber,
             @RequestParam(name = "pageSize") @Min(1) @Max(50) Integer pageSize,
+            @ApiParam("用户id") @RequestParam(name = "userId") String userId,
             @ApiParam("链账号地址") @RequestParam(required = false) String userAddress,
             @ApiParam("链账号名称") @RequestParam(required = false) String name,
             @ApiParam("最近审批的开始筛选时间") @RequestParam(required = false) Long applyStartTime,
             @ApiParam("最近审批的终止筛选时间") @RequestParam(required = false) Long applyEndTime,
             @RequestHeader(CommonConst.HEADER_ACCESS_TOKEN) String accessToken) throws IOException {
         User user = jwtService.parseToken(accessToken);
-        PageInfo<ResponseChainAccountGasClaimSummary> chainAccountListForGasManagement = gasService.getChainAccountListForGasManagement(pageNumber, pageSize, user.getUserId(), userAddress, name, applyStartTime, applyEndTime);
+        PageInfo<ResponseChainAccountGasClaimSummary> chainAccountListForGasManagement = gasService.getChainAccountListForGasManagement(pageNumber, pageSize, userId, userAddress, name, applyStartTime, applyEndTime);
         return new ResponseFormat<>(chainAccountListForGasManagement);
     }
 
