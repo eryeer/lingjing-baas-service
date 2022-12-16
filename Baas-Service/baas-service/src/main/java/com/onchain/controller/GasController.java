@@ -156,6 +156,9 @@ public class GasController {
             @ApiParam("最近审批的终止筛选时间") @RequestParam(required = false) Long applyEndTime,
             @RequestHeader(CommonConst.HEADER_ACCESS_TOKEN) String accessToken) throws IOException {
         User user = jwtService.parseToken(accessToken);
+        if (!user.getUserId().equals(userId) && !user.getRole().equals(CommonConst.PM)){
+            return new ResponseFormat<>(ReturnCode.USER_ROLE_ERROR);
+        }
         PageInfo<ResponseChainAccountGasClaimSummary> chainAccountListForGasManagement = gasService.getChainAccountListForGasManagement(pageNumber, pageSize, userId, userAddress, name, applyStartTime, applyEndTime);
         return new ResponseFormat<>(chainAccountListForGasManagement);
     }
