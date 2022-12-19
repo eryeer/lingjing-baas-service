@@ -2,8 +2,6 @@ package com.onchain.entities.dao;
 
 import lombok.*;
 
-import java.util.Date;
-
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -12,6 +10,7 @@ import java.util.Date;
 public class GasApply extends Base {
     private String userId;
     private String userAddress;
+    private String name;
     private String applyAmount;
     private Long applyTime;
     private String txHash;

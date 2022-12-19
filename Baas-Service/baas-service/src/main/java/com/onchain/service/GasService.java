@@ -171,6 +171,11 @@ public class GasService {
 
     @Transactional(rollbackFor = Exception.class)
     public void acquireGas(String userId, RequestAcRequireGas requestAccGasRequire) throws InterruptedException, ExecutionException, IOException, TransactionException {
+        ResponseChainAccount account = chainAccountMapper.getChainAccountByAddress(requestAccGasRequire.getApplyAccountAddress());
+        if(account == null){
+            throw new CommonException(ReturnCode.CHAIN_ACCOUNT_NOT_EXIST);
+        }
+
         String remainAmountByStr = gasApplyMapper.getRemainAmountByUserId(userId);
         BigInteger acquireAmount = new BigInteger(requestAccGasRequire.getApplyAmount());
         BigInteger minTransferAmount = Convert.toWei("10000", Convert.Unit.GWEI).toBigInteger();
@@ -189,6 +194,7 @@ public class GasService {
                 .applyAmount(requestAccGasRequire.getApplyAmount())
                 .txHash(txHash)
                 .userAddress(requestAccGasRequire.getApplyAccountAddress())
+                .name(account.getName())
                 .userId(userId).build();
         gasApplyMapper.insertGasApply(gasApply);
         List<ResponseGasContract> successGasContract = gasContractMapper.getSuccessGasContractListByUserId(userId);

@@ -155,8 +155,8 @@ CREATE TABLE `tbl_gas_summary` (
     `status` varchar(20) NOT NULL DEFAULT '1' COMMENT '状态（默认字段,1：有效  0：无效）',
 
     `user_id` varchar(32) NOT NULL COMMENT '用户id',
-    `apply_amount` varchar(100) NOT NULL COMMENT '申领总数量',
-    `agreement_amount` varchar(100) NOT NULL COMMENT '签约总数量',
+    `apply_amount` varchar(100) NOT NULL DEFAULT '0' COMMENT '申领总数量',
+    `agreement_amount` varchar(100) NOT NULL DEFAULT '0' COMMENT '签约总数量',
     `apply_time` bigint NOT NULL  DEFAULT 0 COMMENT '燃料最近申领时间',
     `agreement_time` bigint NOT NULL  DEFAULT 0 COMMENT '燃料最近签约时间',
 
@@ -173,6 +173,7 @@ CREATE TABLE `tbl_gas_apply` (
 
     `user_id` varchar(32) NOT NULL COMMENT '用户id',
     `user_address` varchar(42) NOT NULL COMMENT '链账户地址',
+    `name` varchar(32) NOT NULL COMMENT '链账户名称',
     `apply_amount` varchar(100) NOT NULL COMMENT '燃料申领数量',
     `apply_time` bigint NOT NULL  DEFAULT 0 COMMENT '燃料申领时间',
     `tx_hash` VARCHAR(66)  NOT NULL DEFAULT '' COMMENT '交易hash',

@@ -10,13 +10,14 @@ import com.onchain.entities.response.ResponseUserGasClaimSummary;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Select;
 
+import java.math.BigInteger;
 import java.util.List;
 
 public interface GasApplyMapper {
 
-    String INSERT_COLS = " user_id, user_address, apply_amount, apply_time, tx_hash ";
+    String INSERT_COLS = " user_id, user_address, name, apply_amount, apply_time, tx_hash ";
     String BASIC_COLS = " id, create_time, update_time, status, " + INSERT_COLS;
-    String INSERT_VALS = " #{userId}, #{userAddress}, #{applyAmount}, #{applyTime}, #{txHash} ";
+    String INSERT_VALS = " #{userId}, #{userAddress}, #{name}, #{applyAmount}, #{applyTime}, #{txHash} ";
 
     //添加申领记录并获取主键
     @Insert("insert into tbl_gas_apply (" + INSERT_COLS + ") " +
@@ -69,7 +70,6 @@ public interface GasApplyMapper {
             "insert into tbl_gas_summary (user_id, apply_amount, agreement_amount, apply_time, agreement_time) \n" +
             "values (#{userId}, #{applyAmount}, #{agreementAmount}, #{applyTime}, #{agreementTime})\n" +
             "on duplicate key update " +
-            "user_id = VALUES(user_id)" +
             "<if test='applyAmount != null'>, apply_amount = VALUES(apply_amount)</if>" +
             "<if test='agreementAmount != null'> , agreement_amount = VALUES(agreement_amount)</if>" +
             "<if test='applyTime != null'> , apply_time = VALUES(apply_time)</if>" +
@@ -81,12 +81,12 @@ public interface GasApplyMapper {
     GasSummary getGasSummaryInfoByUserId(String userId);
 
     @Select("<script> " +
-            "select a.*, ac.name, u.phone_number, u.company_name  " +
-            "FROM tbl_gas_apply a, tbl_chain_account ac, tbl_user u " +
-            "<where> a.user_id = u.user_id and a. user_id = ac.user_id and a.user_address = ac.user_address " +
+            "select a.*, u.phone_number, u.company_name  " +
+            "FROM tbl_gas_apply a, tbl_user u " +
+            "<where> a.user_id = u.user_id and a.user_address = ac.user_address " +
             "<if test='userId != null'>AND a.user_id = #{userId} </if> " +
             "<if test='userAddress != null'>AND a.user_Address = #{userAddress} </if> " +
-            "<if test='name != null'>AND ac.name = #{name} </if> " +
+            "<if test='name != null'>AND a.name = #{name} </if> " +
             "<if test='phoneNumber != null'> AND u.phone_Number = #{phoneNumber} </if> " +
             "<if test='companyName != null'> AND u.company_Name = #{companyName} </if> " +
             "<if test='applyStartTime != null and applyEndTime != null'> AND a.apply_time between #{applyStartTime} and #{applyEndTime} </if> " +
