@@ -14,10 +14,7 @@ import com.onchain.entities.request.RequestApproveGasContract;
 import com.onchain.entities.request.RequestGasCreate;
 import com.onchain.entities.response.*;
 import com.onchain.exception.CommonException;
-import com.onchain.mapper.ChainAccountMapper;
-import com.onchain.mapper.CosFileMapper;
-import com.onchain.mapper.GasApplyMapper;
-import com.onchain.mapper.GasContractMapper;
+import com.onchain.mapper.*;
 import com.onchain.untils.Web3jUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -50,6 +47,7 @@ public class GasService {
     private final GasApplyMapper gasApplyMapper;
     private final ParamsConfig paramsConfig;
     private final Web3j web3j;
+    private final GasSummaryMapper gasSummaryMapper;
 
     @Transactional(rollbackFor = Exception.class)
     public ResponseGasContract createGasContract(String userId, RequestGasCreate requestGasCreate) {
@@ -92,7 +90,7 @@ public class GasService {
         }
         responseUserGasSummary.setChainAccountGasDistribute(responseChainAccountGasSummaries);
 
-        GasSummary gasSummary = gasApplyMapper.getGasSummaryInfoByUserId(userId);
+        GasSummary gasSummary = gasSummaryMapper.getGasSummaryInfoByUserId(userId);
         if (gasSummary == null) {
             responseUserGasSummary.setApplyAmount("0");
             responseUserGasSummary.setUnApplyAmount("0");
@@ -139,28 +137,7 @@ public class GasService {
         }
         gasContractMapper.approveGasContract(gasContract);
         //审批完成 更新 tbl_gas_summary
-        ResponseGasContract gasContractByFlowId = gasContractMapper.getGasContractByFlowId(gasContract.getFlowId());
-        String userId = gasContractByFlowId.getUserId();
-        String approvedAmount = gasApplyMapper.getApprovedAmountByUserID(userId);
-        BigInteger latestApprovedAmount = new BigInteger("0");
-        if (!StringUtils.isEmpty(approvedAmount)) {
-            latestApprovedAmount = new BigInteger(approvedAmount);
-        }
-        latestApprovedAmount = latestApprovedAmount.add(new BigInteger(request.getAgreementAmount()));
-        GasSummary oldSummaryInfo = gasApplyMapper.getGasSummaryInfoByUserId(userId);
-        GasSummary gasSummary = GasSummary.builder()
-                .agreementAmount(latestApprovedAmount.toString())
-                .agreementTime(gasContract.getApprovedTime())
-                .userId(userId).build();
-        String applyAmount = "0";
-        Long applyTime = 0l;
-        if (oldSummaryInfo != null) {
-            applyAmount = StringUtils.isEmpty(oldSummaryInfo.getApplyAmount()) ? applyAmount : oldSummaryInfo.getApplyAmount();
-            applyTime = oldSummaryInfo.getApplyTime();
-        }
-        gasSummary.setApplyAmount(applyAmount);
-        gasSummary.setApplyTime(applyTime);
-        gasApplyMapper.updateGasSummaryInfo(gasSummary);
+        gasSummaryMapper.updateGasContractSummary(res.getUserId());
     }
 
     public PageInfo<ResponseGasContractStatistic> getGasContactStatisticList(Integer pageNumber, Integer pageSize, String phoneNumber, String companyName, Long approvedStartTime, Long approvedEndTime) {
@@ -176,7 +153,7 @@ public class GasService {
             throw new CommonException(ReturnCode.CHAIN_ACCOUNT_NOT_EXIST);
         }
 
-        String remainAmountByStr = gasApplyMapper.getRemainAmountByUserId(userId);
+        String remainAmountByStr = gasSummaryMapper.getRemainAmountByUserId(userId);
         BigInteger acquireAmount = new BigInteger(requestAccGasRequire.getApplyAmount());
         BigInteger minTransferAmount = Convert.toWei("10000", Convert.Unit.GWEI).toBigInteger();
         if (acquireAmount.compareTo(minTransferAmount) < 0) {
@@ -197,24 +174,7 @@ public class GasService {
                 .name(account.getName())
                 .userId(userId).build();
         gasApplyMapper.insertGasApply(gasApply);
-        List<ResponseGasContract> successGasContract = gasContractMapper.getSuccessGasContractListByUserId(userId);
-        Long agreementTime = successGasContract.get(0).getApprovedTime();
-        BigInteger agreementAmount = new BigInteger("0");
-        for (ResponseGasContract responseGasContract : successGasContract) {
-            agreementAmount = agreementAmount.add(new BigInteger(responseGasContract.getAgreementAmount()));
-        }
-        List<ResponseChainAccountGasSummary> chainAccountApplyList = gasApplyMapper.getChainAccountApplyList(userId);
-        BigInteger applyAmount = new BigInteger("0");
-        for (ResponseChainAccountGasSummary accountGasApply : chainAccountApplyList) {
-            String applyAmountStr = StringUtils.isEmpty(accountGasApply.getApplyAmount()) ? "0" : accountGasApply.getApplyAmount();
-            applyAmount = applyAmount.add(new BigInteger(applyAmountStr));
-        }
-        GasSummary gasSummary = GasSummary.builder().agreementTime(agreementTime)
-                .applyTime(gasApply.getApplyTime())
-                .applyAmount(applyAmount.toString())
-                .agreementAmount(agreementAmount.toString())
-                .userId(userId).build();
-        gasApplyMapper.updateGasSummaryInfo(gasSummary);
+        gasSummaryMapper.updateGasApplySummary(userId);
         // 进行转账操作
         String transactionHash = Web3jUtil.transfer(web3j, signedRawTransaction);
         if (!txHash.equals(transactionHash)) {
@@ -251,7 +211,7 @@ public class GasService {
 
     public PageInfo<ResponseUserGasClaimSummary> getUserGasClaimSummary(Integer pageNumber, Integer pageSize, String phoneNumber, String companyName, Long applyStartTime, Long applyEndTime) {
         PageHelper.startPage(pageNumber, pageSize);
-        List<ResponseUserGasClaimSummary> list = gasApplyMapper.getUserGasClaimSummary(phoneNumber, companyName, applyStartTime, applyEndTime);
+        List<ResponseUserGasClaimSummary> list = gasSummaryMapper.getUserGasClaimSummary(phoneNumber, companyName, applyStartTime, applyEndTime);
         return new PageInfo<>(list);
     }
 }

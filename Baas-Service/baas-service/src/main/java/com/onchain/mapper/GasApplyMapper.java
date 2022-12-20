@@ -2,15 +2,12 @@ package com.onchain.mapper;
 
 
 import com.onchain.entities.dao.GasApply;
-import com.onchain.entities.dao.GasSummary;
 import com.onchain.entities.response.ResponseChainAccountGasClaimSummary;
 import com.onchain.entities.response.ResponseChainAccountGasSummary;
 import com.onchain.entities.response.ResponseGasClaimHistory;
-import com.onchain.entities.response.ResponseUserGasClaimSummary;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Select;
 
-import java.math.BigInteger;
 import java.util.List;
 
 public interface GasApplyMapper {
@@ -23,12 +20,6 @@ public interface GasApplyMapper {
     @Insert("insert into tbl_gas_apply (" + INSERT_COLS + ") " +
             "values ( " + INSERT_VALS + " )")
     void insertGasApply(GasApply gasApply);
-
-    @Select("select tca.name as account_name, tca.user_address as account_address, tga.apply_time, tga.apply_amount, tga.tx_hash\n" +
-            "from tbl_gas_apply tga\n" +
-            "right join tbl_chain_account tca on tga.user_id = tca.user_id and tga.user_address = tca.user_address\n" +
-            "where tca.user_id = #{userId} and tca.status = 1")
-    List<ResponseChainAccountGasSummary> getChainAccountApplyList(String userId);
 
     @Select("select tca.name as account_name, tca.user_address as account_address, tga.apply_amount\n" +
             "from (\n" +
@@ -57,29 +48,6 @@ public interface GasApplyMapper {
             "</script>")
     List<ResponseChainAccountGasClaimSummary> getChainAccountGasInfoList(String userId, String userAddress, Long applyStartTime, Long applyEndTime, String name);
 
-    //获取userid剩余可申请的gas
-    @Select("select cast(agreement_amount as decimal(60)) - cast(apply_amount as decimal(60))\n" +
-            "from tbl_gas_summary where user_id = #{userId} for update;")
-    String getRemainAmountByUserId(String userId);
-
-    @Select("select cast(agreement_amount as decimal(60) )\n" +
-            "from tbl_gas_summary where user_id = #{userId}")
-    String getApprovedAmountByUserID(String userId);
-
-    @Insert("<script>" +
-            "insert into tbl_gas_summary (user_id, apply_amount, agreement_amount, apply_time, agreement_time) \n" +
-            "values (#{userId}, #{applyAmount}, #{agreementAmount}, #{applyTime}, #{agreementTime})\n" +
-            "on duplicate key update " +
-            "<if test='applyAmount != null'>, apply_amount = VALUES(apply_amount)</if>" +
-            "<if test='agreementAmount != null'> , agreement_amount = VALUES(agreement_amount)</if>" +
-            "<if test='applyTime != null'> , apply_time = VALUES(apply_time)</if>" +
-            "<if test='agreementTime != null'> , agreement_time = VALUES(agreement_time)</if>" +
-            "</script>")
-    void updateGasSummaryInfo(GasSummary gasSummary);
-
-    @Select("select user_id, apply_amount, agreement_amount, apply_time, agreement_time from tbl_gas_summary where user_id = #{userId} ")
-    GasSummary getGasSummaryInfoByUserId(String userId);
-
     @Select("<script> " +
             "select a.*, u.phone_number, u.company_name  " +
             "FROM tbl_gas_apply a, tbl_user u " +
@@ -94,16 +62,4 @@ public interface GasApplyMapper {
             " order by apply_time desc " +
             "</script>")
     List<ResponseGasClaimHistory> getGasClaimHistory(String userId, String userAddress, String name, String phoneNumber, String companyName, Long applyStartTime, Long applyEndTime);
-
-    @Select("<script> " +
-            "select s.*, u.phone_number, u.company_name  " +
-            "FROM tbl_gas_summary s, tbl_user u " +
-            "<where> s.user_id = u.user_id " +
-            "<if test='phoneNumber != null'> AND u.phone_Number = #{phoneNumber} </if> " +
-            "<if test='companyName != null'> AND u.company_Name = #{companyName} </if> " +
-            "<if test='applyStartTime != null and applyEndTime != null'> AND s.apply_time between #{applyStartTime} and #{applyEndTime} </if> " +
-            "</where>" +
-            " order by apply_time desc " +
-            "</script>")
-    List<ResponseUserGasClaimSummary> getUserGasClaimSummary(String phoneNumber, String companyName, Long applyStartTime, Long applyEndTime);
 }
