@@ -1,31 +1,30 @@
 package com.onchain.untils;
 
+import com.onchain.constants.ReturnCode;
+import com.onchain.exception.CommonException;
+import lombok.extern.slf4j.Slf4j;
 import org.web3j.abi.datatypes.Type;
 import org.web3j.crypto.*;
 import org.web3j.protocol.Web3j;
-import org.web3j.protocol.core.DefaultBlockParameter;
 import org.web3j.protocol.core.DefaultBlockParameterName;
-import org.web3j.protocol.core.DefaultBlockParameterNumber;
-import org.web3j.protocol.core.methods.response.EthGetBalance;
 import org.web3j.protocol.core.methods.response.EthGetTransactionCount;
 import org.web3j.protocol.core.methods.response.EthSendTransaction;
 import org.web3j.protocol.core.methods.response.TransactionReceipt;
 import org.web3j.protocol.exceptions.TransactionException;
 import org.web3j.protocol.http.HttpService;
 import org.web3j.tx.RawTransactionManager;
-import org.web3j.tx.Transfer;
 import org.web3j.tx.response.PollingTransactionReceiptProcessor;
 import org.web3j.utils.Convert;
 import org.web3j.utils.Numeric;
 
 import java.io.IOException;
-import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Locale;
 import java.util.concurrent.ExecutionException;
 
+@Slf4j
 public class Web3jUtil {
 
     public static Credentials getCredentials(String privateKey) {
@@ -126,8 +125,13 @@ public class Web3jUtil {
         return Hash.sha3(result);
     }
 
-    public static BigInteger getBalanceByAddress(Web3j web3j, String address) throws IOException {
-        return web3j.ethGetBalance(address, DefaultBlockParameterName.LATEST).send().getBalance();
+    public static BigInteger getBalanceByAddress(Web3j web3j, String address) {
+        try {
+            return web3j.ethGetBalance(address, DefaultBlockParameterName.LATEST).send().getBalance();
+        } catch (Exception e) {
+            log.error("getBalanceByAddress error: ", e);
+            throw new CommonException(ReturnCode.GET_BALANCE_ERROR);
+        }
     }
 
     public static String transfer(Web3j web3j, String signedRawTransaction) throws InterruptedException, ExecutionException, IOException {

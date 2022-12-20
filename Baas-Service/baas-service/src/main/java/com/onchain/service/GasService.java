@@ -81,29 +81,29 @@ public class GasService {
     }
 
     public ResponseUserGasSummary getGasContractSummary(String userId) {
-        try {
-            ResponseUserGasSummary responseUserGasSummary = ResponseUserGasSummary.builder().userId(userId).build();
-            List<ResponseChainAccountGasSummary> responseChainAccountGasSummaries = gasApplyMapper.getChainAccountApplySummary(userId);
-            for (ResponseChainAccountGasSummary responseChainAccountGasSummary : responseChainAccountGasSummaries) {
-                BigInteger remain = Web3jUtil.getBalanceByAddress(web3j, responseChainAccountGasSummary.getAccountAddress());
-                responseChainAccountGasSummary.setRemain(remain.toString());
-                if (StringUtils.isEmpty(responseChainAccountGasSummary.getApplyAmount())) {
-                    responseChainAccountGasSummary.setApplyAmount("0");
-                }
+        ResponseUserGasSummary responseUserGasSummary = ResponseUserGasSummary.builder().userId(userId).build();
+        List<ResponseChainAccountGasSummary> responseChainAccountGasSummaries = gasApplyMapper.getChainAccountApplySummary(userId);
+        for (ResponseChainAccountGasSummary responseChainAccountGasSummary : responseChainAccountGasSummaries) {
+            BigInteger remain = Web3jUtil.getBalanceByAddress(web3j, responseChainAccountGasSummary.getAccountAddress());
+            responseChainAccountGasSummary.setRemain(remain.toString());
+            if (StringUtils.isEmpty(responseChainAccountGasSummary.getApplyAmount())) {
+                responseChainAccountGasSummary.setApplyAmount("0");
             }
-            GasSummary gasSummary = gasApplyMapper.getGasSummaryInfoByUserId(userId);
-
-            responseUserGasSummary.setChainAccountGasDistribute(responseChainAccountGasSummaries);
-
-            responseUserGasSummary.setApplyAmount(gasSummary.getApplyAmount());
-            BigInteger unApplyAmount = new BigInteger(gasSummary.getAgreementAmount()).subtract(new BigInteger(gasSummary.getApplyAmount()));
-            responseUserGasSummary.setUnApplyAmount(unApplyAmount.toString());
-            responseUserGasSummary.setTotalAmount(gasSummary.getAgreementAmount());
-            return responseUserGasSummary;
-        } catch (Exception e) {
-            log.error("getGasContractSummary error: ", e.getMessage());
-            throw new CommonException(ReturnCode.GET_BALANCE_ERROR);
         }
+        responseUserGasSummary.setChainAccountGasDistribute(responseChainAccountGasSummaries);
+
+        GasSummary gasSummary = gasApplyMapper.getGasSummaryInfoByUserId(userId);
+        if (gasSummary == null) {
+            responseUserGasSummary.setApplyAmount("0");
+            responseUserGasSummary.setUnApplyAmount("0");
+            responseUserGasSummary.setTotalAmount("0");
+            return responseUserGasSummary;
+        }
+        responseUserGasSummary.setApplyAmount(gasSummary.getApplyAmount());
+        BigInteger unApplyAmount = new BigInteger(gasSummary.getAgreementAmount()).subtract(new BigInteger(gasSummary.getApplyAmount()));
+        responseUserGasSummary.setUnApplyAmount(unApplyAmount.toString());
+        responseUserGasSummary.setTotalAmount(gasSummary.getAgreementAmount());
+        return responseUserGasSummary;
     }
 
     public PageInfo<ResponseAdminGasContract> getAdminGasContractList(Integer pageNumber, Integer pageSize, String phoneNumber, String companyName, String agreementAmount, String flowId, Long uploadStartTime, Long uploadEndTime, Integer status, Boolean isApproving, Long approvedStartTime, Long approvedEndTime) {
@@ -172,7 +172,7 @@ public class GasService {
     @Transactional(rollbackFor = Exception.class)
     public void acquireGas(String userId, RequestAcRequireGas requestAccGasRequire) throws InterruptedException, ExecutionException, IOException, TransactionException {
         ResponseChainAccount account = chainAccountMapper.getChainAccountByAddress(requestAccGasRequire.getApplyAccountAddress());
-        if(account == null){
+        if (account == null) {
             throw new CommonException(ReturnCode.CHAIN_ACCOUNT_NOT_EXIST);
         }
 
