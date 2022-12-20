@@ -51,7 +51,7 @@ public interface GasApplyMapper {
     @Select("<script> " +
             "select a.*, u.phone_number, u.company_name  " +
             "FROM tbl_gas_apply a, tbl_user u " +
-            "<where> a.user_id = u.user_id and a.user_address = ac.user_address " +
+            "<where> a.user_id = u.user_id " +
             "<if test='userId != null'>AND a.user_id = #{userId} </if> " +
             "<if test='userAddress != null'>AND a.user_Address = #{userAddress} </if> " +
             "<if test='name != null'>AND a.name = #{name} </if> " +
