@@ -21,6 +21,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotEmpty;
+import java.util.List;
 
 @RestController
 @Slf4j
@@ -60,7 +62,8 @@ public class SjController {
     @PostMapping(value = UrlConst.ASSET_REGISTER)
     @ApiOperation(value = "数交所资产注册", notes = "数交所资产注册")
     @OperLogAnnotation(description = "assetRegister")
-    public ResponseFormat<?> assetRegister(@Valid @RequestBody RequestAssetRegister request, @RequestHeader(CommonConst.HEADER_ACCESS_TOKEN) String accessToken) {
+    public ResponseFormat<?> assetRegister(@Valid @RequestBody @NotEmpty List<RequestAssetRegister> request,
+                                           @RequestHeader(CommonConst.HEADER_ACCESS_TOKEN) String accessToken) {
         HttpHeaders headers = new HttpHeaders();
         headers.set("appid", paramsConfig.sjAppId);
         headers.set("access-token", accessToken);
