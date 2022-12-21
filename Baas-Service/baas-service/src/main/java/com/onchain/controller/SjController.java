@@ -38,7 +38,7 @@ public class SjController {
         String timestamp = "" + System.currentTimeMillis();
         String sigSrc = String.format("appId%sappSecret%stimestamp%s", paramsConfig.sjAppId, paramsConfig.sjAppSecret, timestamp);
         String sig = SM3Util.sm3(sigSrc);
-        String getUrl = paramsConfig.sjGetTokenUrl + "?appId=" + paramsConfig.sjAppId + "&timestamp=" + timestamp + "&sig=" + sig;
+        String getUrl = paramsConfig.sjGetTokenUrl + "?appId=" + paramsConfig.sjAppId + "&timestamp=" + timestamp + "&sign=" + sig;
         log.info(getUrl);
         SjResponse<TokenResponse> result = restTemplate.getForObject(getUrl, SjResponse.class);
         return new ResponseFormat<>(result);
@@ -51,7 +51,7 @@ public class SjController {
         String timestamp = "" + System.currentTimeMillis();
         String sigSrc = String.format("appId%sappSecret%srefreshToken%stimestamp%s", paramsConfig.sjAppId, paramsConfig.sjAppSecret, refreshToken, timestamp);
         String sig = SM3Util.sm3(sigSrc);
-        String getUrl = paramsConfig.sjRefreshTokenUrl + "?appId=" + paramsConfig.sjAppId + "&timestamp=" + timestamp + "&refreshToken=" + refreshToken + "&sig=" + sig;
+        String getUrl = paramsConfig.sjRefreshTokenUrl + "?appId=" + paramsConfig.sjAppId + "&timestamp=" + timestamp + "&refreshToken=" + refreshToken + "&sign=" + sig;
         log.info(getUrl);
         SjResponse<TokenResponse> result = restTemplate.getForObject(getUrl, SjResponse.class);
         return new ResponseFormat<>(result);
