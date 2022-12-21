@@ -1,7 +1,6 @@
 package com.onchain.controller;
 
 import com.alibaba.fastjson.JSON;
-import com.google.gson.JsonObject;
 import com.onchain.aop.operlog.OperLogAnnotation;
 import com.onchain.config.ParamsConfig;
 import com.onchain.constants.CommonConst;
@@ -16,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
@@ -67,10 +67,10 @@ public class SjController {
         HttpHeaders headers = new HttpHeaders();
         headers.set("appid", paramsConfig.sjAppId);
         headers.set("access-token", accessToken);
-        headers.set("Content-Type", "application/json");
-        HttpEntity<JsonObject> headerEntity = new HttpEntity<>(headers);
+        headers.setContentType(MediaType.APPLICATION_JSON);
         log.info(JSON.toJSONString(headers));
-        SjResponse result = restTemplate.postForObject(paramsConfig.sjAssetRegisterUrl, request, SjResponse.class, headerEntity);
+        HttpEntity entity = new HttpEntity<>(request, headers);
+        SjResponse result = restTemplate.postForObject(paramsConfig.sjAssetRegisterUrl, entity, SjResponse.class);
         return new ResponseFormat<>(result);
     }
 
