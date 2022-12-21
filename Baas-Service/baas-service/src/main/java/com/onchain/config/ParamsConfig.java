@@ -62,4 +62,23 @@ public class ParamsConfig {
     @Value("${privatekey.encode.offset}")
     public String privateEncodeOffset;
 
+
+    @Value("${sj.appId}")
+    public String sjAppId;
+
+    @Value("${sj.appSecret}")
+    public String sjAppSecret;
+
+    @Value("${sj.chainId}")
+    public String sjChainId;
+
+    @Value("${sj.getTokenUrl}")
+    public String sjGetTokenUrl;
+
+    @Value("${sj.refreshTokenUrl}")
+    public String sjRefreshTokenUrl;
+
+    @Value("${sj.assetRegisterUrl}")
+    public String sjAssetRegisterUrl;
+
 }

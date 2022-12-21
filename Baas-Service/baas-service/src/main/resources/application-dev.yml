@@ -50,3 +50,13 @@ privatekey:
   encode:
     key: ${ENCODE_KEY:aGVsbG9vbmNoYWluYnJvdA==}
     offset: ${ENCODE_OFFSET:1234567890123456}
+
+
+sj:
+  appId: APLAW7zZwGnsd1YsTQ2fa2TLQeinkPgjG7
+  appSecret: ASGW85yC3dFE9vx32uX5rDs8Zy9jM7u5IK
+  chainId: Metanu91c2bkedqs
+  assetRegisterUrl: https://chainbridge.chinadep.com/api/v1/assets/register
+  getTokenUrl: https://chainbridge.chinadep.com/platform/api/platform/token
+  refreshTokenUrl: https://chainbridge.chinadep.com/platform/api/platform/refreshToken
+

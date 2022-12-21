@@ -90,6 +90,11 @@ public class UrlConst {
     public static final String REST_MARK_FILES = "/rest/userManage/markFiles";
 
 
+    // 数交所联调
+    public static final String GET_SJ_TOKEN = "/baas/sj/getToken";
+    public static final String REFRESH_SJ_TOKEN = "/baas/sj/refreshToken";
+    public static final String ASSET_REGISTER = "/baas/sj/assetRegister";
+
     // 不需要登录的接口
     public static final String[] NOT_LOGIN_URLS = {REGISTER_USER, CHECK_USER_REGISTER, LOGIN, REFRESH_TOKEN, SEND_VERIFY_CODE, GET_SERVER_TIME, GET_RETURN_CODES, UPLOAD_FILE, RESET_PASSWORD};
     // 所有角色都可以访问的接口
