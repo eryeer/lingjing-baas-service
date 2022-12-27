@@ -134,15 +134,27 @@ public class Web3jUtil {
         }
     }
 
-    public static String transfer(Web3j web3j, String signedRawTransaction) throws InterruptedException, ExecutionException, IOException {
-        EthSendTransaction ethSendTransaction = web3j.ethSendRawTransaction(signedRawTransaction).send();
-        String transactionHash = ethSendTransaction.getTransactionHash();
-        return transactionHash;
+    public static String sendTransaction(Web3j web3j, String signedRawTransaction) throws InterruptedException, ExecutionException, IOException {
+        EthSendTransaction ethSendTransaction;
+        try {
+            ethSendTransaction = web3j.ethSendRawTransaction(signedRawTransaction).send();
+        } catch (Exception e) {
+            log.error("sendTransaction error: ", e);
+            throw new CommonException(ReturnCode.TRANSACTION_ERROR);
+        }
+        if (ethSendTransaction == null) {
+            log.error("sendTransaction error: ethSendTransaction null");
+            throw new CommonException(ReturnCode.TRANSACTION_ERROR);
+        }
+        if (ethSendTransaction.hasError()) {
+            log.error("sendTransaction error: " + ethSendTransaction.getError().getMessage());
+            throw new CommonException(ReturnCode.TRANSACTION_ERROR);
+        }
+        return ethSendTransaction.getTransactionHash();
     }
 
     public static String getSignedRawTransaction(Web3j web3j, String privateKey, String toAddress, String amount) throws InterruptedException, ExecutionException, IOException {
         Credentials credentials = Credentials.create(privateKey);
-        String fromAddress = Web3jUtil.getAddressFromETHPrivateKey(privateKey);
         EthGetTransactionCount ethGetTransactionCount = web3j.ethGetTransactionCount(credentials.getAddress(), DefaultBlockParameterName.PENDING).send();
         BigInteger nonce = ethGetTransactionCount.getTransactionCount();
         String netVersion = web3j.netVersion().send().getNetVersion();
@@ -154,8 +166,7 @@ public class Web3jUtil {
                 toAddress,
                 new BigInteger(amount)
         );
-        String signedMessage = rawTransactionManager.sign(etherTransaction);
-        return signedMessage;
+        return rawTransactionManager.sign(etherTransaction);
     }
 
 }

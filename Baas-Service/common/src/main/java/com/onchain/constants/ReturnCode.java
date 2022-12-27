@@ -109,7 +109,7 @@ public enum ReturnCode {
 
     // 链操作错误 [35xxx]
     GET_BALANCE_ERROR(35001, "web3j获取余额报错"),
-    TRANSFER_ERROR(35002, "转账交易未执行成功"),
+    TRANSACTION_ERROR(35002, "交易未执行成功"),
     TX_HASH_MISMATCH_ERROR(35003, "本地交易hash与远程交易hash不一致"),
     REMAIN_NOT_ENOUGH_ERROR(35004, "签约的余额不足"),
     UN_MATCH_MIN_TRANSFR_AMOUNT_ERROR(35005, "不满足最小转账金额"),

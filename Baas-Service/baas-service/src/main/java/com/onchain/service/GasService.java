@@ -176,14 +176,14 @@ public class GasService {
         gasApplyMapper.insertGasApply(gasApply);
         gasSummaryMapper.updateGasApplySummary(userId);
         // 进行转账操作
-        String transactionHash = Web3jUtil.transfer(web3j, signedRawTransaction);
+        String transactionHash = Web3jUtil.sendTransaction(web3j, signedRawTransaction);
         if (!txHash.equals(transactionHash)) {
             throw new CommonException(ReturnCode.TX_HASH_MISMATCH_ERROR);
         }
         PollingTransactionReceiptProcessor pollingTransactionReceiptProcessor = new PollingTransactionReceiptProcessor(web3j, 5000L, 10);
         TransactionReceipt transactionReceipt = pollingTransactionReceiptProcessor.waitForTransactionReceipt(transactionHash);
         if (!transactionReceipt.getStatus().equals("0x1")) {
-            throw new CommonException(ReturnCode.TRANSFER_ERROR);
+            throw new CommonException(ReturnCode.TRANSACTION_ERROR);
         }
     }
 
