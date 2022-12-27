@@ -53,6 +53,9 @@ public class CommonController {
         }
         String code = smsService.sendCode(phoneNumber, codeType, CommonConst.TEN_MINUTES);
         log.info("sendLoginCode: " + phoneNumber + ", " + code);
+        if (!paramsConfig.smsTest) {
+            code = "";
+        }
         return new ResponseFormat<>(code);
     }
 
