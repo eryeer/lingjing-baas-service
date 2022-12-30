@@ -60,3 +60,10 @@ sj:
   getTokenUrl: https://chainbridge.chinadep.com/platform/api/platform/token
   refreshTokenUrl: https://chainbridge.chinadep.com/platform/api/platform/refreshToken
 
+sj2:
+  appId: AP7sNFmQCDb8ZKbR7tDbpUf2MnLFcKBjwV
+  appKey: ASLvmAQAdxt8xizoQfvRoDUvfHgC4d7KX2
+  assetUpdateUrl: https://uat-dat.chinadep.com/api/market/out/v1/assets
+  assetCustomerUrl: https://uat-dat.chinadep.com/api/market/out/v1/customerAssets
+  assetRightsUrl: https://uat-dat.chinadep.com/api/market/out/v1/assetsRight
+

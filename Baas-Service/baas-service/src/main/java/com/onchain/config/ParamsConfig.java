@@ -81,4 +81,19 @@ public class ParamsConfig {
     @Value("${sj.assetRegisterUrl}")
     public String sjAssetRegisterUrl;
 
+    @Value("${sj2.appId}")
+    public String sj2AppId;
+
+    @Value("${sj2.appKey}")
+    public String sj2AppKey;
+
+    @Value("${sj2.assetUpdateUrl}")
+    public String sj2AssetUpdateUrl;
+
+    @Value("${sj2.assetCustomerUrl}")
+    public String sj2AssetCustomerUrl;
+
+    @Value("${sj2.assetRightsUrl}")
+    public String sj2AssetRightsUrl;
+
 }
