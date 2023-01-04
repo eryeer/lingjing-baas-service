@@ -245,9 +245,19 @@
 - 行为：PM可获取全部公司的链账户申领记录列表，支持分页查询
 - 校验：accessToken校验
 
-## 2.4. 公共接口
+## 2.4. Dashboard总览
 
-### 2.4.1. sendVerifyCode
+### 2.4.1. getDashboardSummary
+
+- 功能说明：获取Dashboard总览数据
+- url: /baas/dashboard/getDashboardSummary
+- auth: 企业用户/个人用户
+- 行为：通过查询baas数据库和区块链浏览器数据接口，获取总览的公共统计数据和个人账户统计数据
+- 校验：accessToken校验
+
+## 2.5. 公共接口
+
+### 2.5.1. sendVerifyCode
 
 - 功能说明：发送注册短信验证码
 - url: /baas/common/sendVerifyCode
@@ -255,7 +265,7 @@
 - 行为：通过参数指定发送的是注册、登录、修改手机号、忘记密码的短信验证码，返回发送成功或失败
 - 校验：手机号格式校验，注册条件校验
 
-### 2.4.2. uploadFile
+### 2.5.2. uploadFile
 
 - 功能说明：上传文件
 - url: /baas/common/uploadFile
@@ -263,7 +273,7 @@
 - 行为：上传文件到COS，返回文件uuid,原始文件名和临时url
 - 校验：文件大小校验（7M），格式校验（jpg, jpeg, bmp, png，pdf）,图片类型校验（jpg, jpeg, bmp, png）
 
-### 2.4.3. updateFile
+### 2.5.3. updateFile
 
 - 功能说明：更新上传文件
 - url: /baas/common/updateFile
