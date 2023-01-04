@@ -22,7 +22,7 @@ public interface GasSummaryMapper {
     @Insert("insert into tbl_gas_summary(user_id, apply_amount, apply_time, agreement_amount, agreement_time)\n" +
             "select user_id, sum(cast(apply_amount as decimal(60))), max(apply_time),0,0\n" +
             "from tbl_gas_apply\n" +
-            "where status =1 and user_id = #{userId}\n" +
+            "where status != 0 and user_id = #{userId}\n" +
             "on duplicate key update \n" +
             "apply_amount = VALUES(apply_amount),\n" +
             "apply_time = VALUES(apply_time) ")

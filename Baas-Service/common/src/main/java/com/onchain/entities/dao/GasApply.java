@@ -14,4 +14,5 @@ public class GasApply extends Base {
     private String applyAmount;
     private Long applyTime;
     private String txHash;
+    private Integer retries;
 }

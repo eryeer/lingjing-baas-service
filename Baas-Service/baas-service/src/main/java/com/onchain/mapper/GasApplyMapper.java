@@ -7,13 +7,15 @@ import com.onchain.entities.response.ResponseChainAccountGasSummary;
 import com.onchain.entities.response.ResponseGasClaimHistory;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
+import org.bouncycastle.asn1.cmc.BodyPartID;
 
 import java.util.List;
 
 public interface GasApplyMapper {
 
     String INSERT_COLS = " user_id, user_address, name, apply_amount, apply_time, tx_hash ";
-    String BASIC_COLS = " id, create_time, update_time, status, " + INSERT_COLS;
+    String BASIC_COLS = " id, create_time, update_time, status, retries, " + INSERT_COLS;
     String INSERT_VALS = " #{userId}, #{userAddress}, #{name}, #{applyAmount}, #{applyTime}, #{txHash} ";
 
     //添加申领记录并获取主键
@@ -25,7 +27,7 @@ public interface GasApplyMapper {
             "from (\n" +
             "select user_address, sum(cast(apply_amount as decimal(60) )) as apply_amount\n" +
             "from tbl_gas_apply\n" +
-            "where user_id = #{userId}  \n" +
+            "where user_id = #{userId} and status != 0  \n" +
             "group by user_address ) tga\n" +
             "right join tbl_chain_account tca on tga.user_address = tca.user_address " +
             "where tca.status = 1 and tca.user_id = #{userId}")
@@ -37,7 +39,7 @@ public interface GasApplyMapper {
             "select tga.user_address,  sum(cast(tga.apply_amount as decimal(60))) as applied_gas, max(tga.apply_time) as recently_apply_time\n" +
             "from tbl_gas_apply tga\n" +
             "right join tbl_chain_account tca on tga.user_address = tca.user_address\n" +
-            "where tca.status = 1 group by tga.user_address ) as info\n" +
+            "where tca.status = 1 and tga.status != 0 group by tga.user_address ) as info\n" +
             "right join tbl_chain_account tca on tca.user_address = info.user_address" +
             "<where> tca.user_id = #{userId} and tca.status = 1 " +
             "<if test='name != null'>AND tca.name = #{name} </if> " +
@@ -51,7 +53,7 @@ public interface GasApplyMapper {
     @Select("<script> " +
             "select a.*, u.phone_number, u.company_name  " +
             "FROM tbl_gas_apply a, tbl_user u " +
-            "<where> a.user_id = u.user_id " +
+            "<where> a.user_id = u.user_id and a.status != 0 " +
             "<if test='userId != null'>AND a.user_id = #{userId} </if> " +
             "<if test='userAddress != null'>AND a.user_Address = #{userAddress} </if> " +
             "<if test='name != null'>AND a.name = #{name} </if> " +
@@ -62,4 +64,18 @@ public interface GasApplyMapper {
             " order by apply_time desc " +
             "</script>")
     List<ResponseGasClaimHistory> getGasClaimHistory(String userId, String userAddress, String name, String phoneNumber, String companyName, Long applyStartTime, Long applyEndTime);
+
+    @Select("select   " + BASIC_COLS + " " +
+            "FROM tbl_gas_apply" +
+            " where status = 1" )
+    List<GasApply> getGasClaimHistoryInApplying();
+
+    @Update("update tbl_gas_apply set retries = #{retries} where tx_hash = #{txHash}")
+    void updateRetriesByTXHash(String txHash, Integer retries);
+
+    @Update("update tbl_gas_apply set status = 0 where tx_hash = #{txHash}")
+    void deleteByTXHash(String txHash);
+
+    @Update("update tbl_gas_apply set status = 2 where tx_hash = #{txHash}")
+    void ensureSuccessByTXHash(String txHash);
 }

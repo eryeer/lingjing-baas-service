@@ -11,6 +11,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ResponseGasClaimHistory {
+    @ApiModelProperty(value = "申领状态")
+    private Integer status;
     @ApiModelProperty(value = "账户名称")
     private String name;
     @ApiModelProperty(value = "账户地址")

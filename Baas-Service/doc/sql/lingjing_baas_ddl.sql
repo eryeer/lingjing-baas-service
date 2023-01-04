@@ -169,7 +169,7 @@ CREATE TABLE `tbl_gas_apply` (
     `id` bigint NOT NULL AUTO_INCREMENT COMMENT '自增id, 非用户id',
     `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间（默认字段）',
     `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间（默认字段）',
-    `status` varchar(20) NOT NULL DEFAULT '1' COMMENT '状态（默认字段,1：有效  0：无效）',
+    `status` varchar(20) NOT NULL DEFAULT '1' COMMENT '状态（默认字段,1：上链中 2:成功  0：失败）',
 
     `user_id` varchar(32) NOT NULL COMMENT '用户id',
     `user_address` varchar(42) NOT NULL COMMENT '链账户地址',
@@ -177,6 +177,7 @@ CREATE TABLE `tbl_gas_apply` (
     `apply_amount` varchar(100) NOT NULL COMMENT '燃料申领数量',
     `apply_time` bigint NOT NULL  DEFAULT 0 COMMENT '燃料申领时间',
     `tx_hash` VARCHAR(66)  NOT NULL DEFAULT '' COMMENT '交易hash',
+    `retries` tinyint  NOT NULL DEFAULT 0 COMMENT '重试次数',
 
     KEY `idx_user_id`(`user_id`),
     KEY `idx_user_address`(`user_address`),

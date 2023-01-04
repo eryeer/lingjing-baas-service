@@ -23,6 +23,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.web3j.crypto.Hash;
 import org.web3j.protocol.Web3j;
+import org.web3j.protocol.core.methods.response.EthGetTransactionReceipt;
 import org.web3j.protocol.core.methods.response.TransactionReceipt;
 import org.web3j.protocol.exceptions.TransactionException;
 import org.web3j.tx.response.PollingTransactionReceiptProcessor;
@@ -30,9 +31,13 @@ import org.web3j.utils.Convert;
 
 import java.io.IOException;
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.ExecutionException;
+import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -180,11 +185,6 @@ public class GasService {
         if (!txHash.equals(transactionHash)) {
             throw new CommonException(ReturnCode.TX_HASH_MISMATCH_ERROR);
         }
-        PollingTransactionReceiptProcessor pollingTransactionReceiptProcessor = new PollingTransactionReceiptProcessor(web3j, 5000L, 10);
-        TransactionReceipt transactionReceipt = pollingTransactionReceiptProcessor.waitForTransactionReceipt(transactionHash);
-        if (!transactionReceipt.getStatus().equals("0x1")) {
-            throw new CommonException(ReturnCode.TRANSACTION_ERROR);
-        }
     }
 
     public PageInfo<ResponseChainAccountGasClaimSummary> getChainAccountListForGasManagement(Integer pageNumber, Integer pageSize, String userId, String userAddress, String name, Long applyStartTime, Long applyEndTime) throws IOException {
@@ -214,4 +214,50 @@ public class GasService {
         List<ResponseUserGasClaimSummary> list = gasSummaryMapper.getUserGasClaimSummary(phoneNumber, companyName, applyStartTime, applyEndTime);
         return new PageInfo<>(list);
     }
+
+    @Transactional(rollbackFor = Exception.class)
+    public void syncGasApplyStatusAndUpdateSummary(){
+        List<GasApply> gasClaimHistoryInApplying = gasApplyMapper.getGasClaimHistoryInApplying();
+        List<String> userIds = new ArrayList<>();
+        for (GasApply responseGasClaimHistory : gasClaimHistoryInApplying) {
+            String transactionHash = responseGasClaimHistory.getTxHash();
+            Integer retries = responseGasClaimHistory.getRetries();
+            String userId = responseGasClaimHistory.getUserId();
+            userIds.add(userId);
+            //重试次数不能大于5次
+            if (retries > 5){
+                gasApplyMapper.deleteByTXHash(transactionHash);
+                continue;
+            }
+            try {
+                //轮询报错 添加重试次数
+                EthGetTransactionReceipt transactionReceipt = web3j.ethGetTransactionReceipt(transactionHash).send();
+                if (transactionReceipt.hasError()) {
+                    log.error("service:syncGasApplyStatusAndUpdateSummary has error: " + transactionReceipt.getError());
+                    gasApplyMapper.updateRetriesByTXHash(transactionHash, retries + 1);
+                    continue;
+                }
+
+                Optional<? extends TransactionReceipt> receiptOptional = transactionReceipt.getTransactionReceipt();
+                if (!receiptOptional.isPresent()) {
+                    gasApplyMapper.updateRetriesByTXHash(transactionHash, retries + 1);
+                    continue;
+                }
+                if (receiptOptional.get().getStatus().equals("0x1")){
+                    gasApplyMapper.ensureSuccessByTXHash(transactionHash);
+                }else{
+                    gasApplyMapper.deleteByTXHash(transactionHash);
+                }
+            } catch (IOException e) {
+                log.error("task syncGasApplyStatusAndUpdateSummary, error: " + e.getMessage());
+                gasApplyMapper.updateRetriesByTXHash(transactionHash, retries + 1);
+            }
+        }
+        //遍历 userId 更新summary
+        userIds = userIds.stream().distinct().collect(Collectors.toList());
+        for (String userId : userIds) {
+            gasSummaryMapper.updateGasApplySummary(userId);
+        }
+    }
+
 }

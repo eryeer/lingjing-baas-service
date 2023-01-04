@@ -69,7 +69,7 @@ public class GasController {
     @GetMapping(value = UrlConst.GET_GAS_SUMMARY)
     @ApiOperation(value = "获取燃料统计", notes = "获取燃料统计")
     @OperLogAnnotation(description = "getGasSummary")
-    public ResponseFormat<ResponseUserGasSummary> getGasSummary(@RequestHeader(CommonConst.HEADER_ACCESS_TOKEN) String accessToken) {
+    public ResponseFormat<ResponseUserGasSummary> getGasSummary(@RequestHeader(CommonConst.HEADER_ACCESS_TOKEN) String accessToken) throws IOException {
         User user = jwtService.parseToken(accessToken);
         ResponseUserGasSummary responseUserGasSummary = gasService.getGasContractSummary(user.getUserId());
         return new ResponseFormat<>(responseUserGasSummary);
