@@ -21,7 +21,6 @@ public class SyncGasApplyInfo {
             gasService.syncGasApplyStatusAndUpdateSummary();
         } catch (Exception e) {
             log.error("sync gas apply status task error: ", e);
-            throw e;
         }
         log.info("sync gas apply status task end");
     }

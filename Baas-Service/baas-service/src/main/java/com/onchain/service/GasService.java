@@ -1,5 +1,6 @@
 package com.onchain.service;
 
+import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.onchain.config.ParamsConfig;
@@ -24,20 +25,15 @@ import org.springframework.transaction.annotation.Transactional;
 import org.web3j.crypto.Hash;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.methods.response.EthGetTransactionReceipt;
-import org.web3j.protocol.core.methods.response.TransactionReceipt;
 import org.web3j.protocol.exceptions.TransactionException;
-import org.web3j.tx.response.PollingTransactionReceiptProcessor;
 import org.web3j.utils.Convert;
 
 import java.io.IOException;
 import java.math.BigInteger;
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.ExecutionException;
-import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -216,36 +212,31 @@ public class GasService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public void syncGasApplyStatusAndUpdateSummary(){
+    public void syncGasApplyStatusAndUpdateSummary() {
         List<GasApply> gasClaimHistoryInApplying = gasApplyMapper.getGasClaimHistoryInApplying();
-        List<String> userIds = new ArrayList<>();
+        HashMap<String, Boolean> userIds = new HashMap<>();
         for (GasApply responseGasClaimHistory : gasClaimHistoryInApplying) {
             String transactionHash = responseGasClaimHistory.getTxHash();
             Integer retries = responseGasClaimHistory.getRetries();
             String userId = responseGasClaimHistory.getUserId();
-            userIds.add(userId);
             //重试次数不能大于5次
-            if (retries > 5){
+            if (retries >= 5) {
+                userIds.put(userId, true);
                 gasApplyMapper.deleteByTXHash(transactionHash);
                 continue;
             }
             try {
                 //轮询报错 添加重试次数
                 EthGetTransactionReceipt transactionReceipt = web3j.ethGetTransactionReceipt(transactionHash).send();
-                if (transactionReceipt.hasError()) {
-                    log.error("service:syncGasApplyStatusAndUpdateSummary has error: " + transactionReceipt.getError());
+                if (transactionReceipt == null || transactionReceipt.hasError() || transactionReceipt.getResult() == null) {
+                    log.error("ethGetTransactionReceipt has error: " + JSON.toJSONString(transactionReceipt));
                     gasApplyMapper.updateRetriesByTXHash(transactionHash, retries + 1);
                     continue;
                 }
-
-                Optional<? extends TransactionReceipt> receiptOptional = transactionReceipt.getTransactionReceipt();
-                if (!receiptOptional.isPresent()) {
-                    gasApplyMapper.updateRetriesByTXHash(transactionHash, retries + 1);
-                    continue;
-                }
-                if (receiptOptional.get().getStatus().equals("0x1")){
+                if (StringUtils.equals(transactionReceipt.getResult().getStatus(), "0x1")) {
                     gasApplyMapper.ensureSuccessByTXHash(transactionHash);
-                }else{
+                } else {
+                    userIds.put(userId, true);
                     gasApplyMapper.deleteByTXHash(transactionHash);
                 }
             } catch (IOException e) {
@@ -254,8 +245,7 @@ public class GasService {
             }
         }
         //遍历 userId 更新summary
-        userIds = userIds.stream().distinct().collect(Collectors.toList());
-        for (String userId : userIds) {
+        for (String userId : userIds.keySet()) {
             gasSummaryMapper.updateGasApplySummary(userId);
         }
     }

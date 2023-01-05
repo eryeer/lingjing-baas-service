@@ -55,6 +55,9 @@ public class ParamsConfig {
     @Value("${chain.maas.configAddress}")
     public String maasConfigAddress;
 
+    @Value("${chain.maas.explorerUrl}")
+    public String explorerUrl;
+    
     //privateKey encode
     @Value("${privatekey.encode.key}")
     public String privateEncodeKey;

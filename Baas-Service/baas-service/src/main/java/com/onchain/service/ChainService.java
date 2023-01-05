@@ -6,11 +6,16 @@ import com.github.pagehelper.PageInfo;
 import com.onchain.config.ParamsConfig;
 import com.onchain.constants.CommonConst;
 import com.onchain.constants.ReturnCode;
+import com.onchain.constants.UrlConst;
 import com.onchain.contracts.Maas;
+import com.onchain.entities.ResponseFormat;
 import com.onchain.entities.dao.ChainAccount;
-import com.onchain.entities.dao.GasApply;
 import com.onchain.entities.request.RequestAccountCreate;
+import com.onchain.entities.request.RequestAddressList;
+import com.onchain.entities.response.ResponseAddress;
 import com.onchain.entities.response.ResponseChainAccount;
+import com.onchain.entities.response.ResponseDashboardSummary;
+import com.onchain.entities.response.ResponseTotalSummary;
 import com.onchain.exception.CommonException;
 import com.onchain.mapper.ChainAccountMapper;
 import com.onchain.mapper.GasApplyMapper;
@@ -19,8 +24,13 @@ import com.onchain.util.ECCUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.BeanUtils;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestTemplate;
 import org.web3j.crypto.Credentials;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.DefaultBlockParameterName;
@@ -36,8 +46,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
 
-import static com.onchain.constants.CommonConst.ADDRESS_HEADER;
-import static com.onchain.constants.CommonConst.NONCE_HEADER;
 import static com.onchain.util.CommonUtil.getLineFromStringByLineNum;
 
 @Service
@@ -51,6 +59,7 @@ public class ChainService {
     private final Web3j web3j;
     private final CosService cosService;
     private final GasApplyMapper gasApplyMapper;
+    private final RestTemplate restTemplate;
 
     @Transactional(rollbackFor = Exception.class)
     public ResponseChainAccount accountCreate(String userId, RequestAccountCreate request) {
@@ -58,14 +67,14 @@ public class ChainService {
         String chainUserName = request.getChainUserName();
         String originMessage = request.getMessage();
         // 校验 签名原文 是否有问题
-        if (StringUtils.isEmpty(originMessage)){
+        if (StringUtils.isEmpty(originMessage)) {
             throw new CommonException(ReturnCode.SIGNATURE_ORIGIN_TEXT_FORMAT_ERROR);
         }
         String addressFromSignedMessage = getLineFromStringByLineNum(originMessage, 7);
-        if (StringUtils.isEmpty(addressFromSignedMessage)){
-            throw new  CommonException(ReturnCode.SIGNATURE_ORIGIN_TEXT_FORMAT_ERROR);
+        if (StringUtils.isEmpty(addressFromSignedMessage)) {
+            throw new CommonException(ReturnCode.SIGNATURE_ORIGIN_TEXT_FORMAT_ERROR);
         }
-        if (!addressFromSignedMessage.toLowerCase(Locale.ROOT).equals(request.getChainAddress().toLowerCase(Locale.ROOT))){
+        if (!addressFromSignedMessage.toLowerCase(Locale.ROOT).equals(request.getChainAddress().toLowerCase(Locale.ROOT))) {
             throw new CommonException(ReturnCode.SIGNATURE_ORIGIN_TEXT_FORMAT_ERROR);
         }
         // 校验签名
@@ -233,5 +242,42 @@ public class ChainService {
         if (!addresses.isEmpty()) {
             setGasUsers(addresses, false);
         }
+    }
+
+    public ResponseDashboardSummary getDashboardSummary(String userId) {
+        ResponseDashboardSummary result = ResponseDashboardSummary.builder().sendTxCount(0).deployCount(0).build();
+        String summaryUrl = paramsConfig.explorerUrl + UrlConst.GET_TOTAL_SUMMARY;
+        ResponseFormat<ResponseTotalSummary> resSummary = restTemplate.exchange(summaryUrl,
+                HttpMethod.GET,
+                null,
+                new ParameterizedTypeReference<ResponseFormat<ResponseTotalSummary>>() {
+                }).getBody();
+//        restTemplate.getForObject(summaryUrl, ResponseFormat.class);
+        if (resSummary == null || !ReturnCode.REQUEST_SUCCESS.getValue().equals(resSummary.getReturnCode())) {
+            return null;
+        }
+        BeanUtils.copyProperties(resSummary.getData(), result);
+        List<ResponseChainAccount> accounts = chainAccountMapper.getChainAccountByUserId(userId);
+        result.setAccountCount(accounts.size());
+        RequestAddressList requestAddressList = new RequestAddressList();
+        requestAddressList.setAddressList(accounts.stream().map(ResponseChainAccount::getUserAddress).collect(Collectors.toList()));
+        String getAddressUrl = paramsConfig.explorerUrl + UrlConst.GET_ADDRESS_LIST_BY_ADDRESS;
+        ResponseFormat<List<ResponseAddress>> resAddress = restTemplate.exchange(getAddressUrl,
+                HttpMethod.POST,
+                new HttpEntity<>(requestAddressList),
+                new ParameterizedTypeReference<ResponseFormat<List<ResponseAddress>>>() {
+                }).getBody();
+        //restTemplate.postForObject(getAddressUrl, addressList, ResponseFormat.class);
+        if (resAddress != null && ReturnCode.REQUEST_SUCCESS.getValue().equals(resAddress.getReturnCode()) && !resAddress.getData().isEmpty()) {
+            for (ResponseAddress item : resAddress.getData()) {
+                if (item.getDeployCount() > 0) {
+                    result.setDeployCount(result.getDeployCount() + item.getDeployCount());
+                }
+                if (item.getTxCount() > 0) {
+                    result.setSendTxCount(result.getSendTxCount() + item.getTxCount());
+                }
+            }
+        }
+        return result;
     }
 }

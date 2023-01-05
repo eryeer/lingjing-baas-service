@@ -58,6 +58,8 @@ public class UrlConst {
     public static final String GET_GAS_CLAIM_HISTORY = "/baas/gas/getGasClaimHistory";
     public static final String GET_GAS_CLAIM_SUMMARY = "/baas/gas/getGasClaimSummary";
 
+    public static final String GET_DASHBOARD_SUMMARY = "/baas/dashboard/getDashboardSummary";
+
     public static final String UPLOAD_PDFS = "/baas/pdfs/uploadPdfs";
     public static final String GET_PDFS_LIST = "/baas/pdfs/getPdfsList";
     public static final String DOWNLOAD_PDFS = "/baas/pdfs/downloadPdfs";
@@ -80,6 +82,7 @@ public class UrlConst {
     public static final String GET_ADDRESS_SUMMARY = "/explorer/summary/getAddressSummary";
     public static final String GET_BLOCK_SUMMARY = "/explorer/summary/getBlockSummary";
     public static final String GET_TRANSACTION_SUMMARY = "/explorer/summary/getTransactionSummary";
+    public static final String GET_ADDRESS_LIST_BY_ADDRESS = "/explorer/address/getAddressListByAddress";
 
     // rest cross micro-service
     public static final String REST_GET_FILE_BY_UUID = "/rest/userManage/getFileByUuid";
