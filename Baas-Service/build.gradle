@@ -1,9 +1,9 @@
 buildscript {
     ext {
-        springBootVersion = '2.2.2.RELEASE'
-        springBootManagementVersion = '1.0.8.RELEASE'
-        springCloudVersion = 'Hoxton.SR1'
-        springCloudAlibabaVersion = "2.1.0.RELEASE"
+        springBootVersion = '2.6.11'
+        springBootManagementVersion = '1.0.13.RELEASE'
+        springCloudVersion = '2021.0.4'
+        springCloudAlibabaVersion = "2021.0.4.0"
     }
     repositories {
         maven { url "https://maven.aliyun.com/nexus/content/groups/public/" }
@@ -41,6 +41,8 @@ subprojects {
                 'com.alibaba.cloud:spring-cloud-starter-alibaba-nacos-discovery',
                 'com.alibaba.cloud:spring-cloud-starter-alibaba-nacos-config',
                 'com.alibaba:fastjson:1.2.83',
+                'org.apache.commons:commons-lang3:3.11',
+                'commons-io:commons-io:2.6',
                 'org.projectlombok:lombok',
                 'org.springframework.boot:spring-boot-starter-aop',
                 'io.springfox:springfox-swagger2:2.7.0',
