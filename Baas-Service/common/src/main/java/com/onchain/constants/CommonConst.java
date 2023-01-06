@@ -1,5 +1,7 @@
 package com.onchain.constants;
 
+import java.math.BigDecimal;
+
 public class CommonConst {
     public static final String PRODUCE = "application/json;charset=UTF-8";
     public static final String SPRING_APPLICATION_NAME = "${spring.application.name}";
@@ -173,5 +175,6 @@ public class CommonConst {
     public static final String NONCE_HEADER = "Nonce:";
 
     public static final String ZERO_STR = "0";
+    public static final BigDecimal GWEI = new BigDecimal("1000000000");
 
 }

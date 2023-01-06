@@ -29,11 +29,13 @@ import org.web3j.protocol.exceptions.TransactionException;
 import org.web3j.utils.Convert;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -49,6 +51,7 @@ public class GasService {
     private final ParamsConfig paramsConfig;
     private final Web3j web3j;
     private final GasSummaryMapper gasSummaryMapper;
+    private final ExplorerService explorerService;
 
     @Transactional(rollbackFor = Exception.class)
     public ResponseGasContract createGasContract(String userId, RequestGasCreate requestGasCreate) {
@@ -82,11 +85,12 @@ public class GasService {
     public ResponseUserGasSummary getGasContractSummary(String userId) {
         ResponseUserGasSummary responseUserGasSummary = ResponseUserGasSummary.builder().userId(userId).build();
         List<ResponseChainAccountGasSummary> responseChainAccountGasSummaries = gasApplyMapper.getChainAccountApplySummary(userId);
-        for (ResponseChainAccountGasSummary responseChainAccountGasSummary : responseChainAccountGasSummaries) {
-            BigInteger remain = Web3jUtil.getBalanceByAddress(web3j, responseChainAccountGasSummary.getAccountAddress());
-            responseChainAccountGasSummary.setRemain(remain.toString());
-            if (StringUtils.isEmpty(responseChainAccountGasSummary.getApplyAmount())) {
-                responseChainAccountGasSummary.setApplyAmount("0");
+        if (!responseChainAccountGasSummaries.isEmpty()) {
+            List<ResponseAddress> addressList = explorerService.getAddressList(responseChainAccountGasSummaries.stream().map(ResponseChainAccountGasSummary::getAccountAddress).collect(Collectors.toList()));
+            for (ResponseChainAccountGasSummary responseChainAccountGasSummary : responseChainAccountGasSummaries) {
+                BigInteger remain = addressList.stream().filter(p -> responseChainAccountGasSummary.getAccountAddress().equals(p.getAddress()))
+                        .map(responseAddress -> new BigDecimal(responseAddress.getBalance()).multiply(CommonConst.GWEI).toBigInteger()).findFirst().orElse(BigInteger.ZERO);
+                responseChainAccountGasSummary.setRemain(remain.toString());
             }
         }
         responseUserGasSummary.setChainAccountGasDistribute(responseChainAccountGasSummaries);
