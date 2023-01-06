@@ -35,7 +35,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
-import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -217,22 +216,16 @@ public class GasService {
 
     @Transactional(rollbackFor = Exception.class)
     public void syncGasApplyStatusAndUpdateSummary() {
-        List<GasApply> gasClaimHistoryInApplying = gasApplyMapper.getGasClaimHistoryInApplying();
+        List<GasApply> list = gasApplyMapper.getGasClaimHistoryInApplying();
         HashMap<String, Boolean> userIds = new HashMap<>();
-        ArrayList<GasApply> updateStatusItems = new ArrayList<>();
-        ArrayList<GasApply> updateRetriesItems = new ArrayList<>();
-        for (GasApply responseGasClaimHistory : gasClaimHistoryInApplying) {
-            String transactionHash = responseGasClaimHistory.getTxHash();
-            Integer retries = responseGasClaimHistory.getRetries();
-            String userId = responseGasClaimHistory.getUserId();
-            GasApply update = new GasApply();
+        for (GasApply item : list) {
+            String transactionHash = item.getTxHash();
+            Integer retries = item.getRetries();
+            String userId = item.getUserId();
             //重试次数不能大于5次
             if (retries >= 5) {
                 userIds.put(userId, true);
-                update.setStatus("0");
-                update.setTxHash(transactionHash);
-                updateStatusItems.add(update);
-//                gasApplyMapper.deleteByTXHash(transactionHash);
+                item.setStatus("0");
                 continue;
             }
             try {
@@ -240,42 +233,27 @@ public class GasService {
                 EthGetTransactionReceipt transactionReceipt = web3j.ethGetTransactionReceipt(transactionHash).send();
                 if (transactionReceipt == null || transactionReceipt.hasError() || transactionReceipt.getResult() == null) {
                     log.error("ethGetTransactionReceipt has error: " + JSON.toJSONString(transactionReceipt));
-//                    gasApplyMapper.updateRetriesByTXHash(transactionHash, retries + 1);
-                    update.setTxHash(transactionHash);
-                    update.setRetries(retries + 1);
-                    updateRetriesItems.add(update);
+                    item.setRetries(retries + 1);
                     continue;
                 }
                 if (StringUtils.equals(transactionReceipt.getResult().getStatus(), "0x1")) {
-                    update.setStatus("2");
-                    update.setTxHash(transactionHash);
-                    updateStatusItems.add(update);
-//                    gasApplyMapper.ensureSuccessByTXHash(transactionHash);
+                    item.setStatus("2");
                 } else {
                     userIds.put(userId, true);
-                    update.setStatus("0");
-                    update.setTxHash(transactionHash);
-                    updateStatusItems.add(update);
-//                    gasApplyMapper.deleteByTXHash(transactionHash);
+                    item.setStatus("0");
                 }
             } catch (IOException e) {
                 log.error("task syncGasApplyStatusAndUpdateSummary, error: " + e.getMessage());
-                update.setTxHash(transactionHash);
-                update.setRetries(retries + 1);
-                updateRetriesItems.add(update);
-//                gasApplyMapper.updateRetriesByTXHash(transactionHash, retries + 1);
+                item.setRetries(retries + 1);
             }
         }
         //批量更新状态
-        if (updateStatusItems != null && updateStatusItems.size() > 0) {
-            gasApplyMapper.updateStatus(updateStatusItems);
-        }
-        if (updateRetriesItems != null && updateRetriesItems.size() > 0) {
-            gasApplyMapper.updateRetries(updateRetriesItems);
+        if (list != null && list.size() > 0) {
+            gasApplyMapper.updateStatus(list);
         }
         //遍历 userId 更新summary
-        if (userIds != null && userIds.size() > 0) {
-            gasSummaryMapper.updateGasApplySummary(userIds.keySet().stream().collect(Collectors.toList()));
+        if (userIds.size() > 0) {
+            gasSummaryMapper.updateGasApplySummary(new ArrayList<>(userIds.keySet()));
         }
     }
 

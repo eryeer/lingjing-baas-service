@@ -9,7 +9,6 @@ import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
-import org.bouncycastle.asn1.cmc.BodyPartID;
 
 import java.util.List;
 
@@ -68,33 +67,15 @@ public interface GasApplyMapper {
 
     @Select("select   " + BASIC_COLS + " " +
             "FROM tbl_gas_apply" +
-            " where status = 1" )
+            " where status = 1")
     List<GasApply> getGasClaimHistoryInApplying();
-
-    @Update("update tbl_gas_apply set retries = #{retries} where tx_hash = #{txHash}")
-    void updateRetriesByTXHash(String txHash, Integer retries);
 
     @Update("<script>" +
             "<foreach collection='updateStatusItems' item='item' open='' close=''  separator=';'> " +
             " update tbl_gas_apply " +
-            " set status = #{item.status} " +
+            " set status = #{item.status}, retries = #{item.retries}  " +
             " where tx_hash = #{item.txHash} " +
             "</foreach>" +
             "</script>")
     void updateStatus(@Param("updateStatusItems") List<GasApply> updateStatusItems);
-
-    @Update("<script>" +
-            "<foreach collection='updateRetriesItems' item='item' open='' close=''  separator=';'> " +
-            " update tbl_gas_apply " +
-            " set retries = #{item.status} " +
-            " where tx_hash = #{item.txHash} " +
-            "</foreach>" +
-            "</script>")
-    void updateRetries(@Param("updateRetriesItems") List<GasApply> updateRetriesItems);
-
-    @Update("update tbl_gas_apply set status = 0 where tx_hash = #{txHash}")
-    void deleteByTXHash(String txHash);
-
-    @Update("update tbl_gas_apply set status = 2 where tx_hash = #{txHash}")
-    void ensureSuccessByTXHash(String txHash);
 }
