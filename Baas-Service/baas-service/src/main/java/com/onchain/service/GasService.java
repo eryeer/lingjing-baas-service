@@ -30,10 +30,12 @@ import org.web3j.utils.Convert;
 
 import java.io.IOException;
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -175,7 +177,9 @@ public class GasService {
                 .name(account.getName())
                 .userId(userId).build();
         gasApplyMapper.insertGasApply(gasApply);
-        gasSummaryMapper.updateGasApplySummary(userId);
+        ArrayList<String> userIds = new ArrayList<>();
+        userIds.add(userId);
+        gasSummaryMapper.updateGasApplySummary(userIds);
         // 进行转账操作
         String transactionHash = Web3jUtil.sendTransaction(web3j, signedRawTransaction);
         if (!txHash.equals(transactionHash)) {
@@ -215,14 +219,20 @@ public class GasService {
     public void syncGasApplyStatusAndUpdateSummary() {
         List<GasApply> gasClaimHistoryInApplying = gasApplyMapper.getGasClaimHistoryInApplying();
         HashMap<String, Boolean> userIds = new HashMap<>();
+        ArrayList<GasApply> updateStatusItems = new ArrayList<>();
+        ArrayList<GasApply> updateRetriesItems = new ArrayList<>();
         for (GasApply responseGasClaimHistory : gasClaimHistoryInApplying) {
             String transactionHash = responseGasClaimHistory.getTxHash();
             Integer retries = responseGasClaimHistory.getRetries();
             String userId = responseGasClaimHistory.getUserId();
+            GasApply update = new GasApply();
             //重试次数不能大于5次
             if (retries >= 5) {
                 userIds.put(userId, true);
-                gasApplyMapper.deleteByTXHash(transactionHash);
+                update.setStatus("0");
+                update.setTxHash(transactionHash);
+                updateStatusItems.add(update);
+//                gasApplyMapper.deleteByTXHash(transactionHash);
                 continue;
             }
             try {
@@ -230,23 +240,42 @@ public class GasService {
                 EthGetTransactionReceipt transactionReceipt = web3j.ethGetTransactionReceipt(transactionHash).send();
                 if (transactionReceipt == null || transactionReceipt.hasError() || transactionReceipt.getResult() == null) {
                     log.error("ethGetTransactionReceipt has error: " + JSON.toJSONString(transactionReceipt));
-                    gasApplyMapper.updateRetriesByTXHash(transactionHash, retries + 1);
+//                    gasApplyMapper.updateRetriesByTXHash(transactionHash, retries + 1);
+                    update.setTxHash(transactionHash);
+                    update.setRetries(retries + 1);
+                    updateRetriesItems.add(update);
                     continue;
                 }
                 if (StringUtils.equals(transactionReceipt.getResult().getStatus(), "0x1")) {
-                    gasApplyMapper.ensureSuccessByTXHash(transactionHash);
+                    update.setStatus("2");
+                    update.setTxHash(transactionHash);
+                    updateStatusItems.add(update);
+//                    gasApplyMapper.ensureSuccessByTXHash(transactionHash);
                 } else {
                     userIds.put(userId, true);
-                    gasApplyMapper.deleteByTXHash(transactionHash);
+                    update.setStatus("0");
+                    update.setTxHash(transactionHash);
+                    updateStatusItems.add(update);
+//                    gasApplyMapper.deleteByTXHash(transactionHash);
                 }
             } catch (IOException e) {
                 log.error("task syncGasApplyStatusAndUpdateSummary, error: " + e.getMessage());
-                gasApplyMapper.updateRetriesByTXHash(transactionHash, retries + 1);
+                update.setTxHash(transactionHash);
+                update.setRetries(retries + 1);
+                updateRetriesItems.add(update);
+//                gasApplyMapper.updateRetriesByTXHash(transactionHash, retries + 1);
             }
         }
+        //批量更新状态
+        if (updateStatusItems != null && updateStatusItems.size() > 0) {
+            gasApplyMapper.updateStatus(updateStatusItems);
+        }
+        if (updateRetriesItems != null && updateRetriesItems.size() > 0) {
+            gasApplyMapper.updateRetries(updateRetriesItems);
+        }
         //遍历 userId 更新summary
-        for (String userId : userIds.keySet()) {
-            gasSummaryMapper.updateGasApplySummary(userId);
+        if (userIds != null && userIds.size() > 0) {
+            gasSummaryMapper.updateGasApplySummary(userIds.keySet().stream().collect(Collectors.toList()));
         }
     }
 
