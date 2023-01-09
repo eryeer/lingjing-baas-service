@@ -22,7 +22,6 @@ import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Locale;
-import java.util.concurrent.ExecutionException;
 
 @Slf4j
 public class Web3jUtil {
@@ -86,7 +85,10 @@ public class Web3jUtil {
         address = address.toLowerCase(Locale.ROOT);
         byte[] sigBytes = Numeric.hexStringToByteArray(signature);
         Sign.SignatureData signatureData = sigFromByteArray(sigBytes);
-        String addressRecoverd = null;
+        if (signatureData == null) {
+            return false;
+        }
+        String addressRecovered;
         byte[] digest = message.getBytes(StandardCharsets.UTF_8);
         byte[] data = getEthereumMessageHash(digest);
         for (int i = 0; i < 4; i++) {
@@ -94,8 +96,8 @@ public class Web3jUtil {
                     new ECDSASignature(new BigInteger(1, signatureData.getR()), new BigInteger(1, signatureData.getS())),
                     data);
             if (pubkey != null) {
-                addressRecoverd = "0x" + Keys.getAddress(pubkey);
-                if (addressRecoverd.equals(address)) {
+                addressRecovered = "0x" + Keys.getAddress(pubkey);
+                if (addressRecovered.equals(address)) {
                     return true;
                 }
             }
@@ -134,7 +136,7 @@ public class Web3jUtil {
         }
     }
 
-    public static String sendTransaction(Web3j web3j, String signedRawTransaction) throws InterruptedException, ExecutionException, IOException {
+    public static String sendTransaction(Web3j web3j, String signedRawTransaction) {
         EthSendTransaction ethSendTransaction;
         try {
             ethSendTransaction = web3j.ethSendRawTransaction(signedRawTransaction).send();
@@ -153,7 +155,7 @@ public class Web3jUtil {
         return ethSendTransaction.getTransactionHash();
     }
 
-    public static String getSignedRawTransaction(Web3j web3j, String privateKey, String toAddress, String amount) throws InterruptedException, ExecutionException, IOException {
+    public static String getSignedRawTransaction(Web3j web3j, String privateKey, String toAddress, String amount) throws IOException {
         Credentials credentials = Credentials.create(privateKey);
         EthGetTransactionCount ethGetTransactionCount = web3j.ethGetTransactionCount(credentials.getAddress(), DefaultBlockParameterName.PENDING).send();
         BigInteger nonce = ethGetTransactionCount.getTransactionCount();
