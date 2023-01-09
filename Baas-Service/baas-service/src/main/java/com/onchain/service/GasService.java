@@ -86,10 +86,13 @@ public class GasService {
         List<ResponseChainAccountGasSummary> responseChainAccountGasSummaries = gasApplyMapper.getChainAccountApplySummary(userId);
         if (!responseChainAccountGasSummaries.isEmpty()) {
             List<ResponseAddress> addressList = explorerService.getAddressList(responseChainAccountGasSummaries.stream().map(ResponseChainAccountGasSummary::getAccountAddress).collect(Collectors.toList()));
-            for (ResponseChainAccountGasSummary responseChainAccountGasSummary : responseChainAccountGasSummaries) {
-                BigInteger remain = addressList.stream().filter(p -> StringUtils.equalsIgnoreCase(responseChainAccountGasSummary.getAccountAddress(), p.getAddress()))
+            for (ResponseChainAccountGasSummary item : responseChainAccountGasSummaries) {
+                BigInteger remain = addressList.stream().filter(p -> StringUtils.equalsIgnoreCase(item.getAccountAddress(), p.getAddress()))
                         .map(responseAddress -> new BigDecimal(responseAddress.getBalance()).multiply(CommonConst.GWEI).toBigInteger()).findFirst().orElse(BigInteger.ZERO);
-                responseChainAccountGasSummary.setRemain(remain.toString());
+                item.setRemain(remain.toString());
+                if (StringUtils.isEmpty(item.getApplyAmount())) {
+                    item.setApplyAmount(CommonConst.ZERO_STR);
+                }
             }
         }
         responseUserGasSummary.setChainAccountGasDistribute(responseChainAccountGasSummaries);

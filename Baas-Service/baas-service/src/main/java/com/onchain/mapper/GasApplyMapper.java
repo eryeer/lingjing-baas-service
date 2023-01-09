@@ -25,7 +25,7 @@ public interface GasApplyMapper {
 
     @Select("select tca.name as account_name, tca.user_address as account_address, tga.apply_amount\n" +
             "from (\n" +
-            "select user_address, sum(cast(apply_amount as decimal(60) )) as apply_amount\n" +
+            "select user_address, sum(cast(apply_amount as decimal(60))) as apply_amount\n" +
             "from tbl_gas_apply\n" +
             "where user_id = #{userId} and status != 0  \n" +
             "group by user_address ) tga\n" +
