@@ -1,36 +1,29 @@
 package com.onchain.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.onchain.config.ParamsConfig;
 import com.onchain.constants.CommonConst;
 import com.onchain.constants.ReturnCode;
-import com.onchain.constants.UrlConst;
 import com.onchain.contracts.Maas;
-import com.onchain.entities.ResponseFormat;
 import com.onchain.entities.dao.ChainAccount;
+import com.onchain.entities.dao.GasSummary;
 import com.onchain.entities.request.RequestAccountCreate;
-import com.onchain.entities.request.RequestAddressList;
 import com.onchain.entities.response.ResponseAddress;
 import com.onchain.entities.response.ResponseChainAccount;
 import com.onchain.entities.response.ResponseDashboardSummary;
 import com.onchain.entities.response.ResponseTotalSummary;
 import com.onchain.exception.CommonException;
 import com.onchain.mapper.ChainAccountMapper;
-import com.onchain.mapper.GasApplyMapper;
+import com.onchain.mapper.GasSummaryMapper;
 import com.onchain.untils.Web3jUtil;
 import com.onchain.util.ECCUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
-import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.client.RestTemplate;
 import org.web3j.crypto.Credentials;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.DefaultBlockParameterName;
@@ -40,6 +33,7 @@ import org.web3j.tx.gas.ContractGasProvider;
 import org.web3j.tx.gas.StaticGasProvider;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Date;
 import java.util.List;
@@ -55,11 +49,9 @@ public class ChainService {
 
     private final ChainAccountMapper chainAccountMapper;
     private final ParamsConfig paramsConfig;
-    private final ObjectMapper objectMapper;
     private final Web3j web3j;
-    private final CosService cosService;
-    private final GasApplyMapper gasApplyMapper;
-    private final RestTemplate restTemplate;
+    private final ExplorerService explorerService;
+    private final GasSummaryMapper gasSummaryMapper;
 
     @Transactional(rollbackFor = Exception.class)
     public ResponseChainAccount accountCreate(String userId, RequestAccountCreate request) {
@@ -245,39 +237,47 @@ public class ChainService {
     }
 
     public ResponseDashboardSummary getDashboardSummary(String userId) {
-        ResponseDashboardSummary result = ResponseDashboardSummary.builder().sendTxCount(0).deployCount(0).build();
-        String summaryUrl = paramsConfig.explorerUrl + UrlConst.GET_TOTAL_SUMMARY;
-        ResponseFormat<ResponseTotalSummary> resSummary = restTemplate.exchange(summaryUrl,
-                HttpMethod.GET,
-                null,
-                new ParameterizedTypeReference<ResponseFormat<ResponseTotalSummary>>() {
-                }).getBody();
-//        restTemplate.getForObject(summaryUrl, ResponseFormat.class);
-        if (resSummary == null || !ReturnCode.REQUEST_SUCCESS.getValue().equals(resSummary.getReturnCode())) {
-            return null;
+        ResponseDashboardSummary result = ResponseDashboardSummary.builder()
+                .sendTxCount(0)
+                .deployCount(0)
+                .applyAmount(CommonConst.ZERO_STR)
+                .unApplyAmount(CommonConst.ZERO_STR)
+                .agreementAmount(CommonConst.ZERO_STR)
+                .build();
+        ResponseTotalSummary summary = explorerService.getTotalSummary();
+        if (summary != null) {
+            BeanUtils.copyProperties(summary, result);
         }
-        BeanUtils.copyProperties(resSummary.getData(), result);
         List<ResponseChainAccount> accounts = chainAccountMapper.getChainAccountByUserId(userId);
         result.setAccountCount(accounts.size());
-        RequestAddressList requestAddressList = new RequestAddressList();
-        requestAddressList.setAddressList(accounts.stream().map(ResponseChainAccount::getUserAddress).collect(Collectors.toList()));
-        String getAddressUrl = paramsConfig.explorerUrl + UrlConst.GET_ADDRESS_LIST_BY_ADDRESS;
-        ResponseFormat<List<ResponseAddress>> resAddress = restTemplate.exchange(getAddressUrl,
-                HttpMethod.POST,
-                new HttpEntity<>(requestAddressList),
-                new ParameterizedTypeReference<ResponseFormat<List<ResponseAddress>>>() {
-                }).getBody();
-        //restTemplate.postForObject(getAddressUrl, addressList, ResponseFormat.class);
-        if (resAddress != null && ReturnCode.REQUEST_SUCCESS.getValue().equals(resAddress.getReturnCode()) && !resAddress.getData().isEmpty()) {
-            for (ResponseAddress item : resAddress.getData()) {
-                if (item.getDeployCount() > 0) {
-                    result.setDeployCount(result.getDeployCount() + item.getDeployCount());
-                }
-                if (item.getTxCount() > 0) {
-                    result.setSendTxCount(result.getSendTxCount() + item.getTxCount());
-                }
+        List<ResponseAddress> resAddress = explorerService.getAddressList(accounts.stream().map(ResponseChainAccount::getUserAddress).collect(Collectors.toList()));
+        BigInteger totalBalance = BigInteger.ZERO;
+        for (ResponseAddress item : resAddress) {
+            if (item.getDeployCount() > 0) {
+                result.setDeployCount(result.getDeployCount() + item.getDeployCount());
+            }
+            if (item.getTxCount() > 0) {
+                result.setSendTxCount(result.getSendTxCount() + item.getTxCount());
+            }
+            BigInteger balance = new BigDecimal(item.getBalance()).multiply(CommonConst.GWEI).toBigInteger();
+            if (balance.compareTo(BigInteger.ZERO) > 0) {
+                totalBalance = totalBalance.add(balance);
             }
         }
+        result.setBalanceAmount(totalBalance.toString());
+
+        GasSummary gasSummary = gasSummaryMapper.getGasSummaryInfoByUserId(userId);
+        if (gasSummary == null) {
+            return result;
+        }
+        result.setApplyAmount(gasSummary.getApplyAmount());
+        BigInteger unApplyAmount = new BigInteger(gasSummary.getAgreementAmount()).subtract(new BigInteger(gasSummary.getApplyAmount()));
+        result.setUnApplyAmount(unApplyAmount.toString());
+        result.setAgreementAmount(gasSummary.getAgreementAmount());
         return result;
     }
 }
+
+
+
+

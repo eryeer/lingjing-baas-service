@@ -33,4 +33,13 @@ public class ResponseDashboardSummary {
     private Integer accountCount;
     @ApiModelProperty(value = "已发送交易数")
     private Integer sendTxCount;
+
+    @ApiModelProperty(value = "签约的燃料总量")
+    private String agreementAmount;
+    @ApiModelProperty(value = "已申领燃料量")
+    private String applyAmount;
+    @ApiModelProperty(value = "未申领燃料量")
+    private String unApplyAmount;
+    @ApiModelProperty(value = "可使用燃料量")
+    private String balanceAmount;
 }
