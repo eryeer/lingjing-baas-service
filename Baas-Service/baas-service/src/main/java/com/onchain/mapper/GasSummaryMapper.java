@@ -4,6 +4,7 @@ package com.onchain.mapper;
 import com.onchain.entities.dao.GasSummary;
 import com.onchain.entities.response.ResponseUserGasClaimSummary;
 import org.apache.ibatis.annotations.Insert;
+import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 
 import java.util.List;
@@ -19,14 +20,28 @@ public interface GasSummaryMapper {
             "from tbl_gas_summary where user_id = #{userId} for update;")
     String getRemainAmountByUserId(String userId);
 
-    @Insert("insert into tbl_gas_summary(user_id, apply_amount, apply_time, agreement_amount, agreement_time)\n" +
+//    @Insert("insert into tbl_gas_summary(user_id, apply_amount, apply_time, agreement_amount, agreement_time)\n" +
+//            "select user_id, sum(cast(apply_amount as decimal(60))), max(apply_time),0,0\n" +
+//            "from tbl_gas_apply\n" +
+//            "where status != 0 and user_id = #{userId}\n" +
+//            "on duplicate key update \n" +
+//            "apply_amount = VALUES(apply_amount),\n" +
+//            "apply_time = VALUES(apply_time) ")
+//    void updateGasApplySummary(String userId);
+
+    @Insert("<script>" +
+            "insert into tbl_gas_summary(user_id, apply_amount, apply_time, agreement_amount, agreement_time)\n" +
             "select user_id, sum(cast(apply_amount as decimal(60))), max(apply_time),0,0\n" +
             "from tbl_gas_apply\n" +
-            "where status != 0 and user_id = #{userId}\n" +
+            "where status != 0 and user_id in " +
+            "<foreach collection='userIds' item='userId' open='(' close=')'  separator=','  >" +
+            " #{userId}" +
+            "</foreach>  " +
             "on duplicate key update \n" +
             "apply_amount = VALUES(apply_amount),\n" +
-            "apply_time = VALUES(apply_time) ")
-    void updateGasApplySummary(String userId);
+            "apply_time = VALUES(apply_time) " +
+            "</script>")
+    void updateGasApplySummary(@Param("userIds") List<String> userIds);
 
     @Insert("insert into tbl_gas_summary (user_id, agreement_amount, agreement_time, apply_amount, apply_time) " +
             "select user_id, sum(cast(agreement_amount as decimal(60))) as agreement_amount, max(approved_time) as agreement_time, 0, 0 " +
