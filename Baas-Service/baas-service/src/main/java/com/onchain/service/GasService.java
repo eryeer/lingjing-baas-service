@@ -87,7 +87,7 @@ public class GasService {
         if (!responseChainAccountGasSummaries.isEmpty()) {
             List<ResponseAddress> addressList = explorerService.getAddressList(responseChainAccountGasSummaries.stream().map(ResponseChainAccountGasSummary::getAccountAddress).collect(Collectors.toList()));
             for (ResponseChainAccountGasSummary responseChainAccountGasSummary : responseChainAccountGasSummaries) {
-                BigInteger remain = addressList.stream().filter(p -> responseChainAccountGasSummary.getAccountAddress().equals(p.getAddress()))
+                BigInteger remain = addressList.stream().filter(p -> StringUtils.equalsIgnoreCase(responseChainAccountGasSummary.getAccountAddress(), p.getAddress()))
                         .map(responseAddress -> new BigDecimal(responseAddress.getBalance()).multiply(CommonConst.GWEI).toBigInteger()).findFirst().orElse(BigInteger.ZERO);
                 responseChainAccountGasSummary.setRemain(remain.toString());
             }
