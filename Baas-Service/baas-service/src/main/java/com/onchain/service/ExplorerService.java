@@ -50,8 +50,8 @@ public class ExplorerService {
                 new HttpEntity<>(requestAddressList),
                 new ParameterizedTypeReference<ResponseFormat<List<ResponseAddress>>>() {
                 }).getBody();
-        if (resAddress == null || ReturnCode.REQUEST_SUCCESS.getValue().equals(resAddress.getReturnCode())) {
-            log.error("getTotgetAddressListalSummary error:" + JSON.toJSONString(resAddress));
+        if (resAddress == null || !ReturnCode.REQUEST_SUCCESS.getValue().equals(resAddress.getReturnCode())) {
+            log.error("getAddressList error:" + JSON.toJSONString(resAddress));
             return new ArrayList<>();
         }
         return resAddress.getData();
