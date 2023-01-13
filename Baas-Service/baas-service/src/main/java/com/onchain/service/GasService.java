@@ -25,16 +25,15 @@ import org.springframework.transaction.annotation.Transactional;
 import org.web3j.crypto.Hash;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.methods.response.EthGetTransactionReceipt;
-import org.web3j.protocol.exceptions.TransactionException;
 import org.web3j.utils.Convert;
 
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 @Service
@@ -66,7 +65,7 @@ public class GasService {
                 .feedback("")
                 .userId(userId).build();
         gasContractMapper.createGasContract(gasContract);
-        cosFileMapper.markFileUsed(Arrays.asList(requestGasCreate.getContractFileUUID()));
+        cosFileMapper.markFileUsed(Collections.singletonList(requestGasCreate.getContractFileUUID()));
         ResponseGasContract responseGasContract = gasContractMapper.getGasContractByFlowId(standardFlowId);
         responseGasContract.setContractFile(cosService.getCosFile(responseGasContract.getContractFileUUID()));
         return responseGasContract;
@@ -87,10 +86,13 @@ public class GasService {
         List<ResponseChainAccountGasSummary> responseChainAccountGasSummaries = gasApplyMapper.getChainAccountApplySummary(userId);
         if (!responseChainAccountGasSummaries.isEmpty()) {
             List<ResponseAddress> addressList = explorerService.getAddressList(responseChainAccountGasSummaries.stream().map(ResponseChainAccountGasSummary::getAccountAddress).collect(Collectors.toList()));
-            for (ResponseChainAccountGasSummary responseChainAccountGasSummary : responseChainAccountGasSummaries) {
-                BigInteger remain = addressList.stream().filter(p -> responseChainAccountGasSummary.getAccountAddress().equals(p.getAddress()))
+            for (ResponseChainAccountGasSummary item : responseChainAccountGasSummaries) {
+                BigInteger remain = addressList.stream().filter(p -> StringUtils.equalsIgnoreCase(item.getAccountAddress(), p.getAddress()))
                         .map(responseAddress -> new BigDecimal(responseAddress.getBalance()).multiply(CommonConst.GWEI).toBigInteger()).findFirst().orElse(BigInteger.ZERO);
-                responseChainAccountGasSummary.setRemain(remain.toString());
+                item.setRemain(remain.toString());
+                if (StringUtils.isEmpty(item.getApplyAmount())) {
+                    item.setApplyAmount(CommonConst.ZERO_STR);
+                }
             }
         }
         responseUserGasSummary.setChainAccountGasDistribute(responseChainAccountGasSummaries);
@@ -152,7 +154,7 @@ public class GasService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public void acquireGas(String userId, RequestAcRequireGas requestAccGasRequire) throws InterruptedException, ExecutionException, IOException, TransactionException {
+    public void acquireGas(String userId, RequestAcRequireGas requestAccGasRequire) throws IOException {
         ResponseChainAccount account = chainAccountMapper.getChainAccountByAddress(requestAccGasRequire.getApplyAccountAddress());
         if (account == null) {
             throw new CommonException(ReturnCode.CHAIN_ACCOUNT_NOT_EXIST);
@@ -179,7 +181,9 @@ public class GasService {
                 .name(account.getName())
                 .userId(userId).build();
         gasApplyMapper.insertGasApply(gasApply);
-        gasSummaryMapper.updateGasApplySummary(userId);
+        ArrayList<String> userIds = new ArrayList<>();
+        userIds.add(userId);
+        gasSummaryMapper.updateGasApplySummary(userIds);
         // 进行转账操作
         String transactionHash = Web3jUtil.sendTransaction(web3j, signedRawTransaction);
         if (!txHash.equals(transactionHash)) {
@@ -187,7 +191,7 @@ public class GasService {
         }
     }
 
-    public PageInfo<ResponseChainAccountGasClaimSummary> getChainAccountListForGasManagement(Integer pageNumber, Integer pageSize, String userId, String userAddress, String name, Long applyStartTime, Long applyEndTime) throws IOException {
+    public PageInfo<ResponseChainAccountGasClaimSummary> getChainAccountListForGasManagement(Integer pageNumber, Integer pageSize, String userId, String userAddress, String name, Long applyStartTime, Long applyEndTime) {
         PageHelper.startPage(pageNumber, pageSize);
         List<ResponseChainAccountGasClaimSummary> chainAccountGasInfoList = gasApplyMapper.getChainAccountGasInfoList(userId, userAddress, applyStartTime, applyEndTime, name);
         for (ResponseChainAccountGasClaimSummary chainAccountGasApplyInfo : chainAccountGasInfoList) {
@@ -217,16 +221,19 @@ public class GasService {
 
     @Transactional(rollbackFor = Exception.class)
     public void syncGasApplyStatusAndUpdateSummary() {
-        List<GasApply> gasClaimHistoryInApplying = gasApplyMapper.getGasClaimHistoryInApplying();
+        List<GasApply> list = gasApplyMapper.getGasClaimHistoryInApplying();
+        if (list == null || list.isEmpty()) {
+            return;
+        }
         HashMap<String, Boolean> userIds = new HashMap<>();
-        for (GasApply responseGasClaimHistory : gasClaimHistoryInApplying) {
-            String transactionHash = responseGasClaimHistory.getTxHash();
-            Integer retries = responseGasClaimHistory.getRetries();
-            String userId = responseGasClaimHistory.getUserId();
+        for (GasApply item : list) {
+            String transactionHash = item.getTxHash();
+            Integer retries = item.getRetries();
+            String userId = item.getUserId();
             //重试次数不能大于5次
             if (retries >= 5) {
                 userIds.put(userId, true);
-                gasApplyMapper.deleteByTXHash(transactionHash);
+                item.setStatus("0");
                 continue;
             }
             try {
@@ -234,23 +241,27 @@ public class GasService {
                 EthGetTransactionReceipt transactionReceipt = web3j.ethGetTransactionReceipt(transactionHash).send();
                 if (transactionReceipt == null || transactionReceipt.hasError() || transactionReceipt.getResult() == null) {
                     log.error("ethGetTransactionReceipt has error: " + JSON.toJSONString(transactionReceipt));
-                    gasApplyMapper.updateRetriesByTXHash(transactionHash, retries + 1);
+                    item.setRetries(retries + 1);
                     continue;
                 }
                 if (StringUtils.equals(transactionReceipt.getResult().getStatus(), "0x1")) {
-                    gasApplyMapper.ensureSuccessByTXHash(transactionHash);
+                    item.setStatus("2");
                 } else {
                     userIds.put(userId, true);
-                    gasApplyMapper.deleteByTXHash(transactionHash);
+                    item.setStatus("0");
                 }
             } catch (IOException e) {
                 log.error("task syncGasApplyStatusAndUpdateSummary, error: " + e.getMessage());
-                gasApplyMapper.updateRetriesByTXHash(transactionHash, retries + 1);
+                item.setRetries(retries + 1);
             }
         }
+        //批量更新状态
+        if (list.size() > 0) {
+            gasApplyMapper.updateStatus(list);
+        }
         //遍历 userId 更新summary
-        for (String userId : userIds.keySet()) {
-            gasSummaryMapper.updateGasApplySummary(userId);
+        if (userIds.size() > 0) {
+            gasSummaryMapper.updateGasApplySummary(new ArrayList<>(userIds.keySet()));
         }
     }
 
