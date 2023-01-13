@@ -4,7 +4,7 @@ mainClassName = 'com.onchain.BaasServiceApplication'
 dependencies {
     implementation(project(':common'),
             'org.springframework.boot:spring-boot-starter-web',
-            'org.springframework.boot:spring-boot-starter-actuator',
+//            'org.springframework.boot:spring-boot-starter-actuator',
             'org.springframework.cloud:spring-cloud-starter-zipkin:2.2.8.RELEASE',
             "mysql:mysql-connector-java",
             'org.mybatis.spring.boot:mybatis-spring-boot-starter',
