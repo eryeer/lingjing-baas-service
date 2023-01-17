@@ -1,16 +1,22 @@
 bootJar {
     enabled = false
 }
-jar {
-    enabled = true
-}
+
 dependencies {
-    implementation("org.springframework.cloud:spring-cloud-starter-openfeign",
-            'org.springframework.cloud:spring-cloud-starter-netflix-hystrix:2.2.10.RELEASE',
-            "com.itextpdf:itextpdf:5.5.11",
-            "com.itextpdf:itext-asian:5.2.0",
-            "javax.servlet:javax.servlet-api",
+    implementation(
+            'org.springframework.boot:spring-boot-starter-aop',
+            "org.springframework.cloud:spring-cloud-starter-openfeign",
             "org.springframework.boot:spring-boot-starter-validation",
+            'org.springframework.cloud:spring-cloud-starter-netflix-hystrix:2.2.10.RELEASE',
+            'com.alibaba.cloud:spring-cloud-starter-alibaba-nacos-discovery',
+            'io.springfox:springfox-boot-starter:3.0.0',
+
+            "com.itextpdf:itextpdf:5.5.11",
+            "javax.servlet:javax.servlet-api",
             'com.jcraft:jsch:0.1.54',
+            'javax.xml.bind:jaxb-api:2.1',
+            'commons-io:commons-io:2.6',
     )
 }
+
+

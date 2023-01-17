@@ -5,28 +5,24 @@ buildscript {
         springCloudVersion = '2021.0.4'
         springCloudAlibabaVersion = "2021.0.4.0"
     }
-    repositories {
-        maven { url "https://maven.aliyun.com/nexus/content/groups/public/" }
-        mavenCentral()
-    }
-    dependencies {
-        classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
-    }
+}
+
+plugins {
+    id 'org.springframework.boot' version "${springBootVersion}" apply(false)
+    id 'io.spring.dependency-management' version "${springBootManagementVersion}"
+    id 'java'
 }
 
 allprojects {
     group = 'com.onchain'
 //    version = '1.0-SNAPSHOT'
+    sourceCompatibility = '1.8'
 }
 
 subprojects {
     apply plugin: 'java'
-//    apply plugin: 'application'
-    apply plugin: 'idea'
     apply plugin: 'org.springframework.boot'
     apply plugin: 'io.spring.dependency-management'
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
 
     repositories {
         maven { url "https://maven.aliyun.com/nexus/content/groups/public/" }
@@ -35,34 +31,18 @@ subprojects {
 
     dependencies {
         implementation(
-                'javax.xml.bind:jaxb-api:2.1',
-                'io.jsonwebtoken:jjwt-api:0.11.2',
                 'org.springframework.boot:spring-boot-starter-log4j2',
-                'com.alibaba.cloud:spring-cloud-starter-alibaba-nacos-discovery',
-                'com.alibaba.cloud:spring-cloud-starter-alibaba-nacos-config',
-                'com.alibaba:fastjson:1.2.83',
                 'org.apache.commons:commons-lang3:3.11',
-                'commons-io:commons-io:2.6',
+                'com.alibaba:fastjson:1.2.83',
+                'io.jsonwebtoken:jjwt-api:0.11.2',
                 'org.projectlombok:lombok',
-                'org.springframework.boot:spring-boot-starter-aop',
-                'com.github.DNAProject:DNA-java-sdk:2.0.0',
-                'org.apache.logging.log4j:log4j-api:2.17.0',
-                'org.apache.logging.log4j:log4j-core:2.17.0',
-                'org.apache.logging.log4j:log4j-jul:2.17.0',
-                'org.apache.logging.log4j:log4j-slf4j-impl:2.17.0',
-                'io.springfox:springfox-boot-starter:3.0.0',
+                'org.junit.jupiter:junit-jupiter',
         )
 
-        runtime 'io.jsonwebtoken:jjwt-impl:0.11.2',
+        runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.2',
                 'io.jsonwebtoken:jjwt-jackson:0.11.2'
 
         annotationProcessor 'org.projectlombok:lombok'
-
-        testImplementation(
-                "org.springframework:spring-test",
-                'org.springframework.boot:spring-boot-starter-test',
-                "junit:junit:4.12"
-        )
     }
 
     dependencyManagement {
@@ -70,6 +50,9 @@ subprojects {
             mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
             mavenBom "com.alibaba.cloud:spring-cloud-alibaba-dependencies:${springCloudAlibabaVersion}"
         }
+    }
+    test {
+        useJUnitPlatform()
     }
 
     configurations {

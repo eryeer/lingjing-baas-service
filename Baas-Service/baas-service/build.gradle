@@ -4,11 +4,15 @@ mainClassName = 'com.onchain.BaasServiceApplication'
 dependencies {
     implementation(project(':common'),
             'org.springframework.boot:spring-boot-starter-web',
+            'io.springfox:springfox-boot-starter:3.0.0',
+            'com.alibaba.cloud:spring-cloud-starter-alibaba-nacos-discovery',
+            'com.alibaba.cloud:spring-cloud-starter-alibaba-nacos-config',
+            'org.springframework.cloud:spring-cloud-starter-bootstrap',
+
 //            'org.springframework.boot:spring-boot-starter-actuator',
             'org.springframework.cloud:spring-cloud-starter-zipkin:2.2.8.RELEASE',
             "mysql:mysql-connector-java",
             'org.mybatis.spring.boot:mybatis-spring-boot-starter',
-            'org.springframework.cloud:spring-cloud-starter-bootstrap',
             'com.github.pagehelper:pagehelper-spring-boot-starter:1.4.6',
             'org.springframework.boot:spring-boot-starter-data-redis',
             "javax.validation:validation-api",
