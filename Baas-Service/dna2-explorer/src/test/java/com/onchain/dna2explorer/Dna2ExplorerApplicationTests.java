@@ -1,7 +1,7 @@
 package com.onchain.dna2explorer;
 
 import com.onchain.dna2explorer.model.dao.Transfer;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Field;
 

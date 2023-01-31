@@ -1,14 +1,14 @@
 package com.onchain.dna2explorer;
 
 import com.google.common.collect.Sets;
+import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
-import java.util.Map;
 import java.util.Set;
 
-public class Test {
+public class SimTest {
 
-    @org.junit.Test
+    @Test
     public void test(){
         HashMap<String, Long> m1 = new HashMap<>();
         m1.put("1", 2l);
