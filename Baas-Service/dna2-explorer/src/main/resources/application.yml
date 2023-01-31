@@ -1,0 +1,46 @@
+server:
+  port: ${PORT:8702} #服务端口
+  tomcat:
+    accept-count: 1200
+    max-connections: 1000
+    max-threads: 1000
+    min-spare-threads: 100
+
+spring:
+  application:
+    name: dna2-explorer #指定服务名
+  profiles:
+    active: ${ENV:dev}
+  jackson:
+    serialization:
+      write-dates-as-timestamps: true
+
+mybatis:
+  configuration:
+    map-underscore-to-camel-case: true
+
+pagehelper:
+  helper-dialect: mysql
+  reasonable: true
+  support-methods-arguments: true
+  params: count=countSql
+
+hikari:
+  master:
+    driver-class-name: com.mysql.jdbc.Driver
+    minimum-idle: 10
+    maximum-pool-size: 15
+    connection-test-query: SELECT 1
+
+management:
+  endpoint:
+    health:
+      show-details: always
+  endpoints:
+    web:
+      exposure:
+        include: ${endPointInclude:health,metrics,loggers,prometheus,info,env}
+version: 0.1
+
+
+

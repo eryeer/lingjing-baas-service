@@ -11,8 +11,10 @@ dependencies {
             'com.github.pagehelper:pagehelper-spring-boot-starter:1.2.5',
             'org.springframework.boot:spring-boot-starter-data-redis',
             "com.tencentcloudapi:tencentcloud-sdk-java:4.0.11",
+            "org.springframework.cloud:spring-cloud-starter-openfeign",
             "com.qcloud:cos_api:5.6.24",
-            'org.web3j:core:4.5.10',
+            'com.github.pagehelper:pagehelper-spring-boot-starter:1.2.5',
+            'org.web3j:core:4.7.0',
     )
 }
 

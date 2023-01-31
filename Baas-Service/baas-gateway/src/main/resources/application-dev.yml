@@ -9,11 +9,11 @@ spring:
             - Path=/baas/** # 断言，路径相匹配的进行路由
         #          filters:
         #            - SetRequestHeader=clientType, C
-        #        - id: explorer_route # 路由的id
-        #          #匹配后提供服务的路由地址
-        #          uri: lb://dna2-explorer
-        #          predicates:
-        #            - Path=/explorer/** # 断言，路径相匹配的进行路由
+        - id: explorer_route # 路由的id
+          #匹配后提供服务的路由地址
+          uri: lb://dna2-explorer
+          predicates:
+            - Path=/explorer/** # 断言，路径相匹配的进行路由
         #        - id: crosschain_route # 路由的id
         #          #匹配后提供服务的路由地址
         #          uri: lb://baas-crosschain

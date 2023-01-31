@@ -2,3 +2,4 @@ rootProject.name = 'Baas-Service'
 include 'common'
 include("baas-service")
 include("baas-gateway")
+include("dna2-explorer")

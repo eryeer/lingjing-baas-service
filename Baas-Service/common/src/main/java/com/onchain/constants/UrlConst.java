@@ -7,6 +7,7 @@ public class UrlConst {
     public static final String SEATA_STORAGE = "storage/deductStorage";
 
     public static final String USER_MANAGE_SERVICE = "baas-service";
+    public static final String EXPLORER_SERVICE = "dna2-explorer";
 
     public static final String REGISTER_USER = "/baas/user/registerUser";
     public static final String CHECK_USER_REGISTER = "/baas/user/checkUserRegister";
@@ -83,6 +84,14 @@ public class UrlConst {
     public static final String GET_BLOCK_SUMMARY = "/explorer/summary/getBlockSummary";
     public static final String GET_TRANSACTION_SUMMARY = "/explorer/summary/getTransactionSummary";
     public static final String GET_ADDRESS_LIST_BY_ADDRESS = "/explorer/address/getAddressListByAddress";
+    public static final String GET_TRANSFER_LIST_BY_ADDRESS = "/explorer/address/getTransferListByAddress";
+    public static final String GET_TRANSFER_LIST_BY_ADDRESS_AND_TIME = "/explorer/address/downloadTransferList";
+    public static final String GET_TRANSACTION_LIST_BY_ADDRESS_AND_TIME = "/explorer/address/downloadTransactionList";
+    public static final String UPLOAD_ABI = "/explorer/contract/uploadAbi";
+    public static final String GET_TOKEN_HOLDER = "/explorer/token/getTokenHolder";
+
+    //external-api
+    public static final String EXTERNAL_GET_TOKEN_HOLDER = "/external/token/getTokenHolder";
 
     // rest cross micro-service
     public static final String REST_GET_FILE_BY_UUID = "/rest/userManage/getFileByUuid";
@@ -102,7 +111,10 @@ public class UrlConst {
     public static final String ASSET_RIGHTS = "/baas/sj/assetRights";
 
     // 不需要登录的接口
-    public static final String[] NOT_LOGIN_URLS = {REGISTER_USER, CHECK_USER_REGISTER, LOGIN, REFRESH_TOKEN, SEND_VERIFY_CODE, GET_SERVER_TIME, GET_RETURN_CODES, UPLOAD_FILE, RESET_PASSWORD};
+    public static final String[] NOT_LOGIN_URLS = {REGISTER_USER, CHECK_USER_REGISTER, LOGIN, REFRESH_TOKEN, SEND_VERIFY_CODE, GET_SERVER_TIME, GET_RETURN_CODES, UPLOAD_FILE, RESET_PASSWORD,
+ GET_BLOCK_LIST, GET_BLOCK , GET_TRANSACTION_LIST, GET_TRANSACTION, GET_ADDRESS_LIST , GET_ADDRESS_LIST_BY_ADDRESS , GET_ADDRESS, GET_TRANSACTION_LIST_BY_ADDRESS,
+   GET_TRANSFER_LIST_BY_ADDRESS , GET_TRANSFER_LIST_BY_ADDRESS_AND_TIME , GET_TRANSACTION_LIST_BY_ADDRESS_AND_TIME , GET_TOTAL_SUMMARY , GET_ADDRESS_SUMMARY, GET_BLOCK_SUMMARY , GET_TRANSACTION_SUMMARY , UPLOAD_ABI, GET_TOKEN_HOLDER ,
+    };
     // 所有角色都可以访问的接口
     public static final String[] COMMON_URLS = {LOGOUT, GET_USER_BY_ID, CHANGE_PASSWORD, CHANGE_PHONE_NUMBER, GET_PLATFORM_INFO, UPDATE_FILE, GET_TOOLS,
             GET_BLOCK_LIST, GET_BLOCK, GET_TRANSACTION_LIST, GET_TRANSACTION, GET_ADDRESS_LIST, GET_ADDRESS, GET_TRANSACTION_LIST_BY_ADDRESS, GET_TOTAL_SUMMARY, GET_ADDRESS_SUMMARY, GET_BLOCK_SUMMARY, GET_TRANSACTION_SUMMARY,

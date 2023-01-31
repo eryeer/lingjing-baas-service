@@ -8,6 +8,7 @@ import com.onchain.entities.ResponseFormat;
 import com.onchain.entities.request.RequestAddressList;
 import com.onchain.entities.response.ResponseAddress;
 import com.onchain.entities.response.ResponseTotalSummary;
+import com.onchain.feign.ExplorerFeignService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.ParameterizedTypeReference;
@@ -24,16 +25,10 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ExplorerService {
 
-    private final ParamsConfig paramsConfig;
-    private final RestTemplate restTemplate;
+    private final ExplorerFeignService explorerService;
 
     public ResponseTotalSummary getTotalSummary() {
-        String summaryUrl = paramsConfig.explorerUrl + UrlConst.GET_TOTAL_SUMMARY;
-        ResponseFormat<ResponseTotalSummary> resSummary = restTemplate.exchange(summaryUrl,
-                HttpMethod.GET,
-                null,
-                new ParameterizedTypeReference<ResponseFormat<ResponseTotalSummary>>() {
-                }).getBody();
+        ResponseFormat<ResponseTotalSummary> resSummary = explorerService.getTotalSummary();
         if (resSummary == null || !ReturnCode.REQUEST_SUCCESS.getValue().equals(resSummary.getReturnCode())) {
             log.error("getTotalSummary error:" + JSON.toJSONString(resSummary));
             return null;
@@ -44,12 +39,7 @@ public class ExplorerService {
     public List<ResponseAddress> getAddressList(List<String> addressList) {
         RequestAddressList requestAddressList = new RequestAddressList();
         requestAddressList.setAddressList(addressList);
-        String getAddressUrl = paramsConfig.explorerUrl + UrlConst.GET_ADDRESS_LIST_BY_ADDRESS;
-        ResponseFormat<List<ResponseAddress>> resAddress = restTemplate.exchange(getAddressUrl,
-                HttpMethod.POST,
-                new HttpEntity<>(requestAddressList),
-                new ParameterizedTypeReference<ResponseFormat<List<ResponseAddress>>>() {
-                }).getBody();
+        ResponseFormat<List<ResponseAddress>> resAddress = explorerService.getAddressListByAddress(requestAddressList);
         if (resAddress == null || !ReturnCode.REQUEST_SUCCESS.getValue().equals(resAddress.getReturnCode())) {
             log.error("getAddressList error:" + JSON.toJSONString(resAddress));
             return new ArrayList<>();

@@ -18,6 +18,7 @@ temp/
 !baas-service/
 !contract/
 !gradle/
+!dna2-explorer
 
 !src/
 !lib/
