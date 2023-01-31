@@ -19,7 +19,7 @@ dependencies {
             "com.tencentcloudapi:tencentcloud-sdk-java:4.0.11",
             "org.springframework.cloud:spring-cloud-starter-openfeign",
             "com.qcloud:cos_api:5.6.24",
-            'com.github.pagehelper:pagehelper-spring-boot-starter:1.2.5',
+            'com.github.pagehelper:pagehelper-spring-boot-starter:1.4.1',
             'org.web3j:core:4.7.0',
     )
 }

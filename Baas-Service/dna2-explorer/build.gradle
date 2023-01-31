@@ -28,7 +28,7 @@ dependencies {
     implementation('org.springframework.boot:spring-boot-starter-web'),
     implementation('org.springframework.boot:spring-boot-starter-aop'),
     implementation('org.springframework.boot:spring-boot-starter-data-redis'),
-    implementation('com.github.pagehelper:pagehelper-spring-boot-starter:1.2.5'),
+    implementation('com.github.pagehelper:pagehelper-spring-boot-starter:1.4.1'),
     implementation('com.tencentcloudapi:tencentcloud-sdk-java-common:3.1.572'),
     implementation('com.tencentcloudapi:tencentcloud-sdk-java-captcha:3.1.572'),
     implementation('org.apache.poi:poi:3.9'),
