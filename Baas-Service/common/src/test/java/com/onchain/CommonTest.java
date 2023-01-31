@@ -5,12 +5,12 @@ import com.onchain.util.ECCUtils;
 import com.onchain.util.SHA;
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Hex;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Field;
 import java.nio.charset.StandardCharsets;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class CommonTest {
 
@@ -54,11 +54,11 @@ public class CommonTest {
             itemSet.append(name);
             itemSet.append("}, ");
         }
-        System.out.println(cols.toString());
+        System.out.println(cols);
         System.out.println(itemInsert.toString().replace("item.", ""));
         System.out.println(itemSet.toString().replace("item.", ""));
-        System.out.println(itemInsert.toString());
-        System.out.println(itemSet.toString());
+        System.out.println(itemInsert);
+        System.out.println(itemSet);
 
     }
 

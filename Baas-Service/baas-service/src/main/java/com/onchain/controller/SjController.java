@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.onchain.aop.operlog.OperLogAnnotation;
 import com.onchain.config.ParamsConfig;
 import com.onchain.constants.CommonConst;
+import com.onchain.constants.ReturnCode;
 import com.onchain.constants.UrlConst;
 import com.onchain.entities.ResponseFormat;
 import com.onchain.entities.SjResponse;
@@ -17,6 +18,7 @@ import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -83,7 +85,12 @@ public class SjController {
     @PostMapping(value = UrlConst.ASSET_UPDATE)
     @ApiOperation(value = "数交所资产更新", notes = "数交所资产更新")
     @OperLogAnnotation(description = "assetUpdate")
-    public ResponseFormat<?> assetUpdate(@Valid @RequestBody RequestAssetUpdate request) {
+    public ResponseFormat<?> assetUpdate(@Valid @RequestBody RequestAssetUpdate request,
+                                         @RequestHeader(CommonConst.HEADER_API_TOKEN) String apiToken) {
+        if (!StringUtils.equals(paramsConfig.apiToken, apiToken)) {
+            return new ResponseFormat<>(ReturnCode.API_TOKEN_FAIL);
+        }
+
         String timestamp = "" + System.currentTimeMillis();
         TreeMap<String, String> params = new TreeMap<>();
         params.put("apiTime", timestamp);
@@ -108,7 +115,12 @@ public class SjController {
     @PostMapping(value = UrlConst.ASSET_CUSTOMER)
     @ApiOperation(value = "数交所资产客户关联", notes = "数交所资产客户关联")
     @OperLogAnnotation(description = "assetCustomer")
-    public ResponseFormat<?> assetCustomer(@Valid @RequestBody RequestAssetCustomer request) {
+    public ResponseFormat<?> assetCustomer(@Valid @RequestBody RequestAssetCustomer request,
+                                           @RequestHeader(CommonConst.HEADER_API_TOKEN) String apiToken) {
+        if (!StringUtils.equals(paramsConfig.apiToken, apiToken)) {
+            return new ResponseFormat<>(ReturnCode.API_TOKEN_FAIL);
+        }
+
         String timestamp = "" + System.currentTimeMillis();
         TreeMap<String, String> params = new TreeMap<>();
         params.put("apiTime", timestamp);
@@ -131,7 +143,12 @@ public class SjController {
     @PostMapping(value = UrlConst.ASSET_RIGHTS)
     @ApiOperation(value = "数交所资产权益兑换", notes = "数交所资产权益兑换")
     @OperLogAnnotation(description = "assetRights")
-    public ResponseFormat<?> assetRights(@Valid @RequestBody RequestAssetRights request) {
+    public ResponseFormat<?> assetRights(@Valid @RequestBody RequestAssetRights request,
+                                         @RequestHeader(CommonConst.HEADER_API_TOKEN) String apiToken) {
+        if (!StringUtils.equals(paramsConfig.apiToken, apiToken)) {
+            return new ResponseFormat<>(ReturnCode.API_TOKEN_FAIL);
+        }
+
         String timestamp = "" + System.currentTimeMillis();
         TreeMap<String, String> params = new TreeMap<>();
         params.put("apiTime", timestamp);

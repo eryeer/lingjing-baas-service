@@ -6,3 +6,6 @@ spring:
       config:
         server-addr: ${CONFIG:121.4.146.202:8848} # config center
         file-extension: yml
+        #        username: nacos
+        #        password: nacos
+        #        enabled: false
