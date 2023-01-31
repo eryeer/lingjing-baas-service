@@ -1,0 +1,45 @@
+//plugins {
+//    id 'org.springframework.boot' version '2.5.4'
+//    id 'io.spring.dependency-management' version '1.0.12.RELEASE'
+//    id 'java'
+//}
+
+//group = 'com.onchain'
+//sourceCompatibility = '1.8'
+
+//repositories {
+//    maven { url "https://maven.aliyun.com/nexus/content/groups/public/" }
+//    mavenCentral()
+//}
+
+apply plugin: 'application'
+mainClassName = 'com.onchain.dna2explorer.Dna2ExplorerApplication'
+
+dependencies {
+
+    implementation(project(':common'),
+
+
+    implementation('org.springframework.boot:spring-boot-starter-log4j2'),
+    implementation('com.google.guava:guava:22.0'),
+    implementation('org.springframework.boot:spring-boot-starter-web'),
+    implementation('org.springframework.boot:spring-boot-starter-aop'),
+    implementation('org.springframework.boot:spring-boot-starter-data-redis'),
+    implementation('com.github.pagehelper:pagehelper-spring-boot-starter:1.2.5'),
+    implementation('com.tencentcloudapi:tencentcloud-sdk-java-common:3.1.572'),
+    implementation('com.tencentcloudapi:tencentcloud-sdk-java-captcha:3.1.572'),
+    implementation('org.apache.poi:poi:3.9'),
+            implementation('org.web3j:core:4.7.0'),
+    runtimeOnly('mysql:mysql-connector-java')
+    )
+
+
+}
+
+configurations {
+    all*.exclude module: 'spring-boot-starter-logging'
+}
+
+//test {
+//    useJUnitPlatform()
+//}
