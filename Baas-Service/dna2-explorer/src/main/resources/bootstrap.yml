@@ -1,0 +1,8 @@
+spring:
+  cloud:
+    nacos:
+      discovery:
+        server-addr: ${DISCOVERY:121.4.146.202:8848} # register center
+      config:
+        server-addr: ${CONFIG:121.4.146.202:8848} # config center
+        file-extension: yml

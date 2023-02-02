@@ -15,6 +15,7 @@ public enum ReturnCode {
     TOKEN_NOT_MATCH(12011, " token failed 令牌校验失败"),
     ACCESS_TOKEN_FAIL(12013, "accessToken校验失败"),
     REFRESH_TOKEN_FAIL(12015, "refreshToken校验失败"),
+    API_TOKEN_FAIL(12016, "apiToken校验失败"),
 
     //网络错误,网络超时，系统调用失败（如系统内调用，系统外调用， occur error，如redis，服务间调用超时，httpclient调用，区块链连接节点错误）  [14xxx]
     HYSTRIX_FALLBACK(14030, " 接口熔断打回"),

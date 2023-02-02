@@ -3,8 +3,10 @@ mainClassName = 'com.onchain.BaasGatewayApplication'
 
 dependencies {
     implementation(project(':common'),
-            "org.springframework.cloud:spring-cloud-starter-zipkin",
+            'org.springframework.cloud:spring-cloud-starter-zipkin:2.2.8.RELEASE',
             'org.springframework.cloud:spring-cloud-starter-gateway',
+            'org.springframework.cloud:spring-cloud-starter-bootstrap',
+            "org.springframework.cloud:spring-cloud-loadbalancer",
     )
 }
 

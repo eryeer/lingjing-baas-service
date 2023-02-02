@@ -7,6 +7,8 @@ build/
 .DS_Store
 .nb-gradle
 *.iml
+*.log
+*.log.gz
 classes/
 webapps/
 out/
@@ -18,6 +20,7 @@ temp/
 !baas-service/
 !contract/
 !gradle/
+!dna2-explorer
 
 !src/
 !lib/

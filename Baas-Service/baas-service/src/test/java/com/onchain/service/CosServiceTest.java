@@ -10,9 +10,9 @@ import com.qcloud.cos.model.GeneratePresignedUrlRequest;
 import com.qcloud.cos.model.PutObjectRequest;
 import com.qcloud.cos.model.PutObjectResult;
 import com.qcloud.cos.region.Region;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,8 +38,8 @@ public class CosServiceTest {
 
     String PaymentCommitmentKey = CommonConst.PAYMENT_COMMIT_KEY;
 
-    @Before
-    public void setUp() throws Exception {
+    @BeforeEach
+    public void setUp() {
         String regionName = "ap-shanghai";
 
         // 1 初始化用户身份信息（secretId, secretKey）。
@@ -58,7 +58,7 @@ public class CosServiceTest {
         testKey = "example/obj";
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
         cosClient.shutdown();
     }

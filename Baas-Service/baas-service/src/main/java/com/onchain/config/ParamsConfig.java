@@ -57,7 +57,7 @@ public class ParamsConfig {
 
     @Value("${chain.maas.explorerUrl}")
     public String explorerUrl;
-    
+
     //privateKey encode
     @Value("${privatekey.encode.key}")
     public String privateEncodeKey;
@@ -98,5 +98,8 @@ public class ParamsConfig {
 
     @Value("${sj2.assetRightsUrl}")
     public String sj2AssetRightsUrl;
+
+    @Value("${api.token}")
+    public String apiToken;
 
 }

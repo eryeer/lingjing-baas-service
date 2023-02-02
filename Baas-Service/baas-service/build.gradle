@@ -4,15 +4,24 @@ mainClassName = 'com.onchain.BaasServiceApplication'
 dependencies {
     implementation(project(':common'),
             'org.springframework.boot:spring-boot-starter-web',
-            'org.springframework.boot:spring-boot-starter-actuator',
-            "org.springframework.cloud:spring-cloud-starter-zipkin",
+            'io.springfox:springfox-boot-starter:3.0.0',
+            'com.alibaba.cloud:spring-cloud-starter-alibaba-nacos-discovery',
+            'com.alibaba.cloud:spring-cloud-starter-alibaba-nacos-config',
+            'org.springframework.cloud:spring-cloud-starter-bootstrap',
+
+//            'org.springframework.boot:spring-boot-starter-actuator',
+            'org.springframework.cloud:spring-cloud-starter-zipkin:2.2.8.RELEASE',
             "mysql:mysql-connector-java",
-            "org.mybatis.spring.boot:mybatis-spring-boot-starter:1.3.0",
-            'com.github.pagehelper:pagehelper-spring-boot-starter:1.2.5',
+            'org.mybatis.spring.boot:mybatis-spring-boot-starter',
+            'com.github.pagehelper:pagehelper-spring-boot-starter:1.4.6',
             'org.springframework.boot:spring-boot-starter-data-redis',
+            "javax.validation:validation-api",
             "com.tencentcloudapi:tencentcloud-sdk-java:4.0.11",
+            "org.springframework.cloud:spring-cloud-starter-openfeign",
+            "org.springframework.cloud:spring-cloud-loadbalancer",
             "com.qcloud:cos_api:5.6.24",
-            'org.web3j:core:4.5.10',
+            'com.github.pagehelper:pagehelper-spring-boot-starter:1.4.1',
+            'org.web3j:core:4.7.0',
     )
 }
 

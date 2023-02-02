@@ -9,24 +9,23 @@ import springfox.documentation.builders.RequestHandlerSelectors;
 import springfox.documentation.service.ApiInfo;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
-import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 import java.sql.Timestamp;
 import java.util.Date;
 
+//@EnableOpenApi
 @Configuration
-@EnableSwagger2
 @Profile({"dev", "uat", "local", "pre", "info"})
 public class SwaggerConfig {
 
     @Bean
     public Docket createRestApi() {
-        return new Docket(DocumentationType.SWAGGER_2)
+        return new Docket(DocumentationType.OAS_30)
                 .apiInfo(apiInfo())
                 .directModelSubstitute(Date.class, Long.class)//将Date类型全部转为Long类型
                 .directModelSubstitute(Timestamp.class, Long.class)//将Timestamp类型全部转为Long类型
                 .select()
-                .apis(RequestHandlerSelectors.basePackage("com.onchain"))
+                .apis(RequestHandlerSelectors.basePackage("com.onchain.controller"))
                 .paths(PathSelectors.any())
                 .build();
     }
