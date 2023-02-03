@@ -25,11 +25,11 @@ public interface TransactionMapper {
     Integer insert(@Param("list") List<Transaction> transactions);
 
     @Select("<script> " +
-            "select t.*, a.type from " +
+            "select t.*, a.type as to_address_type from " +
             "(select id from tbl_transaction " +
             "<where> 1 = 1 " +
-            "<if test='blockNumber != null'>AND a.block_number = #{blockNumber} </if> " +
-            "<if test='address != null'>AND (a.to_address = #{address} or a.from_address = #{address} or a.contract_address = #{address}) </if> " +
+            "<if test='blockNumber != null'>AND block_number = #{blockNumber} </if> " +
+            "<if test='address != null'>AND (to_address = #{address} or from_address = #{address} or contract_address = #{address}) </if> " +
             "</where>" +
             "order by block_number desc, tx_index limit #{offset},#{pageSize}) l " +
             "join tbl_transaction t on l.id = t.id " +
@@ -41,8 +41,8 @@ public interface TransactionMapper {
     @Select("<script> " +
             "select count(1) from tbl_transaction " +
             "<where> 1 = 1 " +
-            "<if test='blockNumber != null'>AND a.block_number = #{blockNumber} </if> " +
-            "<if test='address != null'>AND (a.to_address = #{address} or a.from_address = #{address} or a.contract_address = #{address}) </if> " +
+            "<if test='blockNumber != null'>AND block_number = #{blockNumber} </if> " +
+            "<if test='address != null'>AND (to_address = #{address} or from_address = #{address} or contract_address = #{address}) </if> " +
             "</where>" +
             "</script>")
     @Options(useCache = false)
