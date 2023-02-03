@@ -9,13 +9,13 @@ spring:
     host: ${REDIS_HOST:121.4.146.202}
     password: ${REDIS_PASSWORD:password}
     port: ${REDIS_PORT:6379}
-#
-#  zipkin:
-#    base-url: ${ZIPKIN:http://172.168.3.64:9411}
-#  sleuth:
-#    sampler:
-#      #采样取值介于 0到1之间，1则表示全部收集
-#      probability: 1
+
+  zipkin:
+    base-url: ${ZIPKIN:http://121.4.146.202:9411}
+  sleuth:
+    sampler:
+      #采样取值介于 0到1之间，1则表示全部收集
+      probability: 1
 
 dna:
   node:

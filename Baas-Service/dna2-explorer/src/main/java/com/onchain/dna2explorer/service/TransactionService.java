@@ -1,7 +1,6 @@
 package com.onchain.dna2explorer.service;
 
 import com.alibaba.fastjson.JSONArray;
-import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.onchain.dna2explorer.constant.Constant;
 import com.onchain.dna2explorer.exception.CommonException;
@@ -40,17 +39,23 @@ public class TransactionService {
     private final TableHeightMapper tableHeightMapper;
 
     public PageInfo<ResponseTransaction> getTransactionList(Integer pageNumber, Integer pageSize, Long blockNumber) {
-        PageHelper.startPage(pageNumber, pageSize);
-        List<ResponseTransaction> list = transactionMapper.getTransactionList(blockNumber, null);
+//        PageHelper.startPage(pageNumber, pageSize);
+        List<ResponseTransaction> list = transactionMapper.getTransactionList(blockNumber, null, pageSize * (pageNumber - 1), pageSize);
         setTxMethodName(list);
-        return new PageInfo<>(list);
+        PageInfo<ResponseTransaction> result = new PageInfo<>(list);
+        Integer total = transactionMapper.getTransactionCount(blockNumber, null);
+        result.setTotal(total);
+        return result;
     }
 
     public PageInfo<ResponseTransaction> getTransactionListByAddress(Integer pageNumber, Integer pageSize, String address) {
-        PageHelper.startPage(pageNumber, pageSize);
-        List<ResponseTransaction> list = transactionMapper.getTransactionList(null, address);
+//        PageHelper.startPage(pageNumber, pageSize);
+        List<ResponseTransaction> list = transactionMapper.getTransactionList(null, address, pageSize * (pageNumber - 1), pageSize);
         setTxMethodName(list);
-        return new PageInfo<>(list);
+        PageInfo<ResponseTransaction> result = new PageInfo<>(list);
+        Integer total = transactionMapper.getTransactionCount(null, address);
+        result.setTotal(total);
+        return result;
     }
 
     public void getLatest5kTransactionListByAddress(String address, long startTime, long endTime, HttpServletResponse response) throws CommonException {

@@ -25,16 +25,28 @@ public interface TransactionMapper {
     Integer insert(@Param("list") List<Transaction> transactions);
 
     @Select("<script> " +
-            "select a.*, b.type as to_address_type from tbl_transaction a " +
-            "left join tbl_account b on a.to_address = b.address " +
+            "select t.*, a.type from " +
+            "(select id from tbl_transaction " +
             "<where> 1 = 1 " +
             "<if test='blockNumber != null'>AND a.block_number = #{blockNumber} </if> " +
             "<if test='address != null'>AND (a.to_address = #{address} or a.from_address = #{address} or a.contract_address = #{address}) </if> " +
             "</where>" +
-            " order by block_number desc, tx_index " +
+            "order by block_number desc, tx_index limit #{offset},#{pageSize}) l " +
+            "join tbl_transaction t on l.id = t.id " +
+            "left join tbl_account a on t.to_address = a.address " +
             "</script>")
     @Options(useCache = false)
-    List<ResponseTransaction> getTransactionList(@Param("blockNumber") Long blockNumber, @Param("address") String address);
+    List<ResponseTransaction> getTransactionList(Long blockNumber, String address, Integer offset, Integer pageSize);
+
+    @Select("<script> " +
+            "select count(1) from tbl_transaction " +
+            "<where> 1 = 1 " +
+            "<if test='blockNumber != null'>AND a.block_number = #{blockNumber} </if> " +
+            "<if test='address != null'>AND (a.to_address = #{address} or a.from_address = #{address} or a.contract_address = #{address}) </if> " +
+            "</where>" +
+            "</script>")
+    @Options(useCache = false)
+    Integer getTransactionCount(Long blockNumber, String address);
 
     @Select("select " + COLS + " from tbl_transaction where tx_hash = #{txHash}")
     ResponseTransaction getTransaction(String txHash);

@@ -25,6 +25,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -52,6 +53,9 @@ public class AddressController {
     public ResponseFormat<List<ResponseAddress>> getAddressListByAddress(@Valid @RequestBody RequestAddressList request) {
         if (request.getAddressList().size() > 50) {
             return new ResponseFormat<>(ReturnCode.PARAMETER_FAILED, "query limit exceeded");
+        }
+        if (request.getAddressList().isEmpty()) {
+            return new ResponseFormat<>(new ArrayList<>());
         }
         List<ResponseAddress> result = addressService.getAddressList(request.getAddressList());
         return new ResponseFormat<>(result);
