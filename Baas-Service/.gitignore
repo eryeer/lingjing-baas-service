@@ -20,7 +20,7 @@ temp/
 !baas-service/
 !contract/
 !gradle/
-!dna2-explorer
+!dna2-explorer/
 
 !src/
 !lib/
