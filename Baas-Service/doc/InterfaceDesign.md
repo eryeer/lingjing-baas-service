@@ -87,11 +87,11 @@
 - url: /baas/user/submitUserKyc
 - auth: 所有角色
 - 行为：提交用户KYC信息
-- 校验：校验图片格式，图片大小不超过7M，统一社会信用码格式，身份证号格式，字段非空校验
+- 校验：统一社会信用码格式，身份证号格式，字段非空校验
 
 ### 2.1.11. approveUserKyc
 
-- 功能说明：审批用户
+- 功能说明：审批用户kyc信息（包括新增和变更）
 - url: /baas/user/approveUserKyc
 - auth: PM
 - 行为：PM审批用户注册申请，同意或拒绝，拒绝时审批意见必填
@@ -112,6 +112,30 @@
 - auth: PM
 - 行为：PM查询用户核验记录列表
 - 校验：accessToken校验，角色校验，查询条件校验
+
+### 2.1.14 submitUserKycUpdate
+
+- 功能说明：提交用户kyc变更信息
+- url: /baas/user/submitUserKycUpdate
+- auth: 普通用户
+- 行为：提交用户KYC变更信息
+- 校验：统一社会信用码格式，身份证号格式，字段非空校验
+
+### 2.1.15. getKycUpdateById
+
+- 功能说明：获取某个用户KYC变更信息
+- url: /baas/user/getKycUpdateById/{userId}
+- auth: 所有用户
+- 行为：个人可以获取自己的信息，平台管理员可获取全部信息
+- 校验：accessToken校验，角色校验，userId非空校验
+
+### 2.1.16. markKycNotify
+
+- 功能说明：标记KYC变更反馈信息为不再提示
+- url: /baas/user/markKycNotify
+- auth: 普通用户
+- 行为：标记KYC变更反馈信息为不再提示
+- 校验：accessToken校验，角色校验
 
 ## 2.2. 链账户管理
 
