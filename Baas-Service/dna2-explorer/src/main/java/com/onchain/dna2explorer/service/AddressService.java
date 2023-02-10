@@ -9,9 +9,12 @@ import com.onchain.dna2explorer.model.dao.Account;
 import com.onchain.dna2explorer.model.dao.Transaction;
 import com.onchain.dna2explorer.model.response.ResponseAddress;
 import com.onchain.dna2explorer.model.response.ResponseTransfer;
+import com.onchain.dna2explorer.model.response.ResponseTransferPageInfo;
 import com.onchain.dna2explorer.utils.CsvUtil;
+import com.onchain.entities.response.ResponseUserContractInfo;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.DefaultBlockParameter;
@@ -58,10 +61,17 @@ public class AddressService {
         return result;
     }
 
-    public PageInfo<ResponseTransfer> getTransferListByAddress(Integer pageNumber, Integer pageSize, String address) {
-        PageHelper.startPage(pageNumber, pageSize);
-        List<ResponseTransfer> list = transferMapper.getTransferList(address);
-        return new PageInfo<>(list);
+    public ResponseTransferPageInfo getTransferListByAddress(Integer pageNumber, Integer pageSize, String address) {
+        Integer offset = (pageNumber - 1)*pageSize;
+        List<ResponseTransfer> list = transferMapper.getTransferList(address, offset, pageSize);
+        ResponseTransferPageInfo responseTransferPageInfo = new ResponseTransferPageInfo();
+        responseTransferPageInfo.setTransferList(list);
+        responseTransferPageInfo.setPageNum(pageNumber);
+        responseTransferPageInfo.setPageSize(pageSize);
+        Integer total = transferMapper.getTransferListCountByTransferFrom(address);
+        total = total + transferMapper.getTransferListCountByTransferTo(address);
+        responseTransferPageInfo.setTotal(total);
+        return responseTransferPageInfo;
     }
 
     // get balance and nonce for the accounts

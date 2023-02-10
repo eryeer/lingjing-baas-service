@@ -281,6 +281,16 @@
 - 行为：更新上传文件到COS，返回文件uuid,原始文件名和临时url
 - 校验：文件大小校验（10M），文件名校验, userId校验
 
+## 2.6. 合约相关接口
+
+### 2.6.1. getContractByChainAccountAddress
+
+- 功能说明: 获取改用户下的所有链账户的部署合约的信息
+- url: /baas/contract/getContractByChainAccountAddress
+- auth: 企业用户/个人用户
+- 行为: 通过查询用户id信息，获取链上该用户关联的链用户部署的合约的信息，可分页查询
+- 校验：accessToken校验
+
 # 3. 接口参数设计参见swagger
 
 # 4. 字典代码
@@ -356,3 +366,5 @@
 - 功能说明：临时文件清理
 - 执行时间或周期: 每天
 - 行为：每天清理更新时间超过14天的临时文件
+
+

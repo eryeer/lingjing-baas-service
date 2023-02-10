@@ -1,9 +1,12 @@
 package com.onchain.dna2explorer.service;
 
 import com.alibaba.fastjson.JSONArray;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import com.onchain.dna2explorer.constant.Constant;
 import com.onchain.dna2explorer.constants.ReturnCode;
 import com.onchain.dna2explorer.exception.CommonException;
+import com.onchain.dna2explorer.mapper.AccountMapper;
 import com.onchain.dna2explorer.mapper.ContractMapper;
 import com.onchain.dna2explorer.mapper.MethodMapMapper;
 import com.onchain.dna2explorer.mapper.TransactionMapper;
@@ -12,6 +15,9 @@ import com.onchain.dna2explorer.model.dao.MethodMap;
 import com.onchain.dna2explorer.model.dao.Transaction;
 import com.onchain.dna2explorer.model.response.ResponseAddress;
 import com.onchain.dna2explorer.utils.EthUtil;
+import com.onchain.entities.response.ResponseChainAccount;
+import com.onchain.entities.response.ResponseContractHolderInfo;
+import com.onchain.entities.response.ResponseUserContractInfo;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -35,6 +41,7 @@ public class ContractService {
 
     private final TransactionMapper transactionMapper;
     private final ContractMapper contractMapper;
+    private final AccountMapper accountMapper;
     private final MethodMapMapper methodMapMapper;
     private final Web3j web3j;
 
@@ -152,6 +159,25 @@ public class ContractService {
         return result;
     }
 
+    public ResponseContractHolderInfo getContract(List<String> userAddressList, String contractAddress, Long startTime, Long endTime, Integer pageNumber, Integer pageSize) {
+        Date start = null, end = null;
+        if (startTime != null && endTime != null) {
+            start = new Date(startTime);
+            end = new Date(endTime);
+        }
+        Integer offset = (pageNumber - 1) *pageSize;
+        List<ResponseUserContractInfo> contracts = contractMapper.getContractByCreatorAddress(userAddressList, contractAddress, start, end, offset, pageSize);
+        for (ResponseUserContractInfo contract : contracts) {
+            ResponseAddress responseAddress = accountMapper.getAddress(contract.getContractAddress());
+            contract.setTxCount(responseAddress.getTxCount());
+        }
+
+        Integer total = contractMapper.getContractCountByCreatorAddress(userAddressList, contractAddress, start, end);
+        ResponseContractHolderInfo responseContractHolderInfo = ResponseContractHolderInfo.builder().userContractInfos(contracts)
+                .pageNum(pageNumber).pageSize(pageSize)
+                .total(total).build();
+        return responseContractHolderInfo;
+    }
 
 
 }
