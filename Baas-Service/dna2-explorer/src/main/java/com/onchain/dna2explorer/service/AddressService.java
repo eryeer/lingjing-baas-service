@@ -65,7 +65,7 @@ public class AddressService {
         Integer offset = (pageNumber - 1)*pageSize;
         List<ResponseTransfer> list = transferMapper.getTransferList(address, offset, pageSize);
         ResponseTransferPageInfo responseTransferPageInfo = new ResponseTransferPageInfo();
-        responseTransferPageInfo.setTransferList(list);
+        responseTransferPageInfo.setList(list);
         responseTransferPageInfo.setPageNum(pageNumber);
         responseTransferPageInfo.setPageSize(pageSize);
         Integer total = transferMapper.getTransferListCountByTransferFrom(address);

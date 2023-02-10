@@ -25,5 +25,5 @@ public class ResponseTransferPageInfo {
     @ApiModelProperty(value =  "记录总大小")
     private Integer total;
     @ApiModelProperty(value = "链账户的合约信息")
-    private List<ResponseTransfer> transferList;
+    private List<ResponseTransfer> list;
 }
