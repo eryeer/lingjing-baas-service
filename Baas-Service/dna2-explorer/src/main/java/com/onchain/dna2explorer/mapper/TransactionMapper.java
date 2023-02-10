@@ -2,9 +2,11 @@ package com.onchain.dna2explorer.mapper;
 
 import com.onchain.dna2explorer.model.dao.Transaction;
 import com.onchain.dna2explorer.model.response.ResponseTransaction;
+import com.onchain.entities.response.ResponseUserContractInfo;
 import org.apache.ibatis.annotations.*;
 import org.springframework.stereotype.Repository;
 
+import java.util.Date;
 import java.util.List;
 
 @Repository
@@ -85,4 +87,29 @@ public interface TransactionMapper {
             "</script>")
     @Options(useCache = false)
     List<ResponseTransaction> getLatest5KTransactionList(@Param("address") String address, @Param("startTime") Long startTime, @Param("endTime") Long endTime);
+
+    @Select("<script> " +
+            "select from_address as chainAccountAddress, contract_address as contractAddress, create_time  from tbl_transaction " +
+            "<where>  from_address in " +
+            "<foreach collection='userAddressList' item='userAddress' separator=',' open=' (' close=') ' > " +
+            "#{userAddress} " +
+            "</foreach> " +
+            "<if test='contractAddress != null'> AND contract_address = #{contractAddress} </if> " +
+            "<if test='startTime != null and endTime != null'> AND create_time between #{startTime} and #{endTime} </if> " +
+            "</where>" +
+            " order by contractAddress desc limit #{offset}, #{pageSize}" +
+            "</script>")
+    List<ResponseUserContractInfo> getContractByCreatorAddress(List<String> userAddressList, String contractAddress, Date startTime, Date endTime, Integer offset, Integer pageSize);
+
+    @Select("<script> " +
+            "select count(contract_address) from tbl_transaction  " +
+            "<where>  from_address in " +
+            "<foreach collection='userAddressList' item='userAddress' separator=',' open='(' close=')' > " +
+            "#{userAddress} " +
+            "</foreach> " +
+            "<if test='contractAddress != null'> AND contract_address = #{contractAddress} </if> " +
+            "<if test='startTime != null and endTime != null'> AND create_time between #{startTime} and #{endTime} </if> " +
+            "</where>" +
+            "</script>")
+    Integer getContractCountByCreatorAddress(List<String> userAddressList, String contractAddress, Date startTime, Date endTime);
 }

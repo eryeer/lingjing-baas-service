@@ -166,13 +166,13 @@ public class ContractService {
             end = new Date(endTime);
         }
         Integer offset = (pageNumber - 1) *pageSize;
-        List<ResponseUserContractInfo> contracts = contractMapper.getContractByCreatorAddress(userAddressList, contractAddress, start, end, offset, pageSize);
+        List<ResponseUserContractInfo> contracts = transactionMapper.getContractByCreatorAddress(userAddressList, contractAddress, start, end, offset, pageSize);
         for (ResponseUserContractInfo contract : contracts) {
             ResponseAddress responseAddress = accountMapper.getAddress(contract.getContractAddress());
             contract.setTxCount(responseAddress.getTxCount());
         }
 
-        Integer total = contractMapper.getContractCountByCreatorAddress(userAddressList, contractAddress, start, end);
+        Integer total = transactionMapper.getContractCountByCreatorAddress(userAddressList, contractAddress, start, end);
         ResponseContractHolderInfo responseContractHolderInfo = ResponseContractHolderInfo.builder().userContractInfos(contracts)
                 .pageNum(pageNumber).pageSize(pageSize)
                 .total(total).build();
