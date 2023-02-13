@@ -243,6 +243,10 @@ public class ContractService {
         if (contractByCreatorAddress == null || !ReturnCode.REQUEST_SUCCESS.getValue().equals(contractByCreatorAddress.getReturnCode())) {
             log.error("getAddressList error:" + JSON.toJSONString(contractByCreatorAddress));
             ResponseContractHolderInfo responseContractHolderInfo = new ResponseContractHolderInfo();
+            responseContractHolderInfo.setUserContractInfos(new ArrayList<>());
+            responseContractHolderInfo.setTotal(0);
+            responseContractHolderInfo.setPageNum(1);
+            responseContractHolderInfo.setPageSize(10);
             return responseContractHolderInfo;
         }
         return contractByCreatorAddress.getData();
