@@ -89,7 +89,7 @@ public interface TransactionMapper {
     List<ResponseTransaction> getLatest5KTransactionList(@Param("address") String address, @Param("startTime") Long startTime, @Param("endTime") Long endTime);
 
     @Select("<script> " +
-            "select from_address as chainAccountAddress, contract_address as contractAddress, create_time  from tbl_transaction " +
+            "select from_address as chainAccountAddress, contract_address as contractAddress, create_time as deploy_time  from tbl_transaction " +
             "<where> tx_type = 1 and  from_address in " +
             "<foreach collection='userAddressList' item='userAddress' separator=',' open=' (' close=') ' > " +
             "#{userAddress} " +
@@ -97,7 +97,7 @@ public interface TransactionMapper {
             "<if test='contractAddress != null'> AND contract_address = #{contractAddress} </if> " +
             "<if test='startTime != null and endTime != null'> AND create_time between #{startTime} and #{endTime} </if> " +
             "</where>" +
-            " order by contractAddress desc limit #{offset}, #{pageSize}" +
+            " order by create_time desc limit #{offset}, #{pageSize}" +
             "</script>")
     List<ResponseUserContractInfo> getContractByCreatorAddress(List<String> userAddressList, String contractAddress, Date startTime, Date endTime, Integer offset, Integer pageSize);
 
