@@ -90,7 +90,7 @@ public interface TransactionMapper {
 
     @Select("<script> " +
             "select from_address as chainAccountAddress, contract_address as contractAddress, create_time  from tbl_transaction " +
-            "<where>  from_address in " +
+            "<where> tx_type = 1 and  from_address in " +
             "<foreach collection='userAddressList' item='userAddress' separator=',' open=' (' close=') ' > " +
             "#{userAddress} " +
             "</foreach> " +
@@ -103,7 +103,7 @@ public interface TransactionMapper {
 
     @Select("<script> " +
             "select count(contract_address) from tbl_transaction  " +
-            "<where>  from_address in " +
+            "<where> tx_type = 1 and  from_address in " +
             "<foreach collection='userAddressList' item='userAddress' separator=',' open='(' close=')' > " +
             "#{userAddress} " +
             "</foreach> " +
