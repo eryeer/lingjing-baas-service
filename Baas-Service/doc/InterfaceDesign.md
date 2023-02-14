@@ -131,11 +131,19 @@
 
 ### 2.1.16. markKycNotify
 
-- 功能说明：标记KYC变更反馈信息为不再提示
+- 功能说明：标记KYC变更反馈信息不再提示
 - url: /baas/user/markKycNotify
 - auth: 普通用户
 - 行为：标记KYC变更反馈信息为不再提示
 - 校验：accessToken校验，角色校验
+
+### 2.1.17. getKycUpdateList
+
+- 功能说明：根据查询条件查询用户KYC变更列表（查询条件： 认证状态（必填），认证类型，手机号，用户姓名，企业名称，身份证号，统一社会信用代码，申请日期，认证时间）
+- url: /baas/user/getKycUpdateList
+- auth: PM
+- 行为：PM查询用户KYC列表
+- 校验：accessToken校验，角色校验，查询条件校验
 
 ## 2.2. 链账户管理
 

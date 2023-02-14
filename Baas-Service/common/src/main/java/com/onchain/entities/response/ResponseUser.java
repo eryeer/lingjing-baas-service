@@ -45,6 +45,8 @@ public class ResponseUser {
     private String approveFeedback;
     @ApiModelProperty(value = "审批时间")
     private Long approveTime;
+    @ApiModelProperty(value = "是否有Kyc变更信息")
+    private Boolean hasKycNotify;
 
     @ApiModelProperty(value = "营业执照正本文件id")
     private String businessLicenseFileUuid;

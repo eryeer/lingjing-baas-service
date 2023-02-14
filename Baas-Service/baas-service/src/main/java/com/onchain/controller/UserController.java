@@ -127,6 +127,39 @@ public class UserController {
         return new ResponseFormat<>();
     }
 
+    @PostMapping(value = UrlConst.SUBMIT_USER_KYC_UPDATE)
+    @ApiOperation(value = "提交用户KYC变更", notes = "提交用户KYC变更")
+    @OperLogAnnotation(description = "submitUserKycUpdate")
+    public ResponseFormat<?> submitUserKycUpdate(@Valid @RequestBody RequestSubmitUserKyc request,
+                                                 @RequestHeader(CommonConst.HEADER_ACCESS_TOKEN) String accessToken) throws CommonException {
+        User user = jwtService.parseToken(accessToken);
+        userService.submitUserKycUpdate(request, user.getUserId());
+        return new ResponseFormat<>();
+    }
+
+    @GetMapping(value = UrlConst.GET_KYC_UPDATE_BY_ID)
+    @ApiOperation(value = "获取用户Kyc变更信息", notes = "获取用户Kyc变更信息")
+    @OperLogAnnotation(description = "getKycUpdateById")
+    public ResponseFormat<ResponseUser> getKycUpdateById(@RequestParam String userId,
+                                                         @RequestHeader(CommonConst.HEADER_ACCESS_TOKEN) String accessToken) throws CommonException {
+        User user = jwtService.parseToken(accessToken);
+        if (!StringUtils.equals(userId, user.getUserId()) && !StringUtils.equals(CommonConst.PM, user.getRole())) {
+            return new ResponseFormat<>(ReturnCode.USER_ROLE_ERROR, "Wrong userId or Role.");
+        }
+
+        ResponseUser result = userService.getKycUpdateById(userId);
+        return new ResponseFormat<>(result);
+    }
+
+    @PostMapping(value = UrlConst.MARK_KYC_NOTIFY)
+    @ApiOperation(value = "标记KYC变更反馈信息不再提示", notes = "标记KYC变更反馈信息不再提示")
+    @OperLogAnnotation(description = "markKycNotify")
+    public ResponseFormat<?> markKycNotify(@RequestHeader(CommonConst.HEADER_ACCESS_TOKEN) String accessToken) throws CommonException {
+        User user = jwtService.parseToken(accessToken);
+        userService.markKycNotify(user.getUserId(), false);
+        return new ResponseFormat<>();
+    }
+
     @PostMapping(value = UrlConst.APPROVE_USER_KYC)
     @ApiOperation(value = "审批用户KYC", notes = "审批用户KYC")
     @OperLogAnnotation(description = "approveUser")
@@ -150,7 +183,7 @@ public class UserController {
     @OperLogAnnotation(description = "getUserList")
     public ResponseFormat<PageInfo<ResponseUser>> getUserList(@RequestParam(name = "pageNumber") @Min(1) Integer pageNumber,
                                                               @RequestParam(name = "pageSize") @Min(1) @Max(50) Integer pageSize,
-                                                              @RequestParam(required = true) @NotBlank String approveStatus,
+                                                              @RequestParam @NotBlank String approveStatus,
                                                               @RequestParam(required = false) String userType,
                                                               @RequestParam(required = false) String phoneNumber,
                                                               @RequestParam(required = false) String userName,
@@ -168,6 +201,32 @@ public class UserController {
         }
 
         PageInfo<ResponseUser> result = userService.getUserList(pageNumber, pageSize, approveStatus, userType, userName, companyName, phoneNumber, idNumber, uniSocialCreditCode, startApplyTime, endApplyTime, startApproveTime, endApproveTime);
+        return new ResponseFormat<>(result);
+    }
+
+    @GetMapping(value = UrlConst.GET_KYC_UPDATE_LIST)
+    @ApiOperation(value = "查询用户KYC变更列表", notes = "查询用户KYC变更列表")
+    @OperLogAnnotation(description = "getKycUpdateList")
+    public ResponseFormat<PageInfo<ResponseUser>> getKycUpdateList(@RequestParam(name = "pageNumber") @Min(1) Integer pageNumber,
+                                                                   @RequestParam(name = "pageSize") @Min(1) @Max(50) Integer pageSize,
+                                                                   @RequestParam @NotBlank String approveStatus,
+                                                                   @RequestParam(required = false) String userType,
+                                                                   @RequestParam(required = false) String phoneNumber,
+                                                                   @RequestParam(required = false) String userName,
+                                                                   @RequestParam(required = false) String companyName,
+                                                                   @RequestParam(required = false) String idNumber,
+                                                                   @RequestParam(required = false) String uniSocialCreditCode,
+                                                                   @RequestParam(required = false) Long startApplyTime,
+                                                                   @RequestParam(required = false) Long endApplyTime,
+                                                                   @RequestParam(required = false) Long startApproveTime,
+                                                                   @RequestParam(required = false) Long endApproveTime,
+                                                                   @RequestHeader(CommonConst.HEADER_ACCESS_TOKEN) String accessToken) throws CommonException {
+        User user = jwtService.parseToken(accessToken);
+        if (!StringUtils.equals(CommonConst.PM, user.getRole())) {
+            return new ResponseFormat<>(ReturnCode.USER_ROLE_ERROR);
+        }
+
+        PageInfo<ResponseUser> result = userService.getKycUpdateList(pageNumber, pageSize, approveStatus, userType, userName, companyName, phoneNumber, idNumber, uniSocialCreditCode, startApplyTime, endApplyTime, startApproveTime, endApproveTime);
         return new ResponseFormat<>(result);
     }
 

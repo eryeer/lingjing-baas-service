@@ -18,7 +18,6 @@ import com.onchain.util.CommonUtil;
 import com.onchain.util.ECCUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.NotImplementedException;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
@@ -159,6 +158,20 @@ public class UserService {
         return new PageInfo<>(users);
     }
 
+    public PageInfo<ResponseUser> getKycUpdateList(Integer pageNumber, Integer pageSize, String approveStatus, String userType, String userName, String companyName, String phoneNumber,
+                                                   String idNumber, String uniSocialCreditCode, Long startApplyTime, Long endApplyTime, Long startApproveTime, Long endApproveTime) {
+        PageHelper.startPage(pageNumber, pageSize);
+        List<ResponseUser> users = userMapper.getKycUpdateList(approveStatus, userType, userName, companyName, phoneNumber, idNumber, uniSocialCreditCode, startApplyTime, endApplyTime, startApproveTime, endApproveTime);
+        for (ResponseUser user : users) {
+            user.setIdaFile(cosService.getCosFile(user.getIdaFileUuid()));
+            user.setIdbFile(cosService.getCosFile(user.getIdbFileUuid()));
+            user.setBusinessLicenseFile(cosService.getCosFile(user.getBusinessLicenseFileUuid()));
+            user.setLegalPersonIdaFile(cosService.getCosFile(user.getLegalPersonIdaFileUuid()));
+            user.setLegalPersonIdbFile(cosService.getCosFile(user.getLegalPersonIdbFileUuid()));
+        }
+        return new PageInfo<>(users);
+    }
+
     public ResponseUser getUserById(String userId) throws CommonException {
         ResponseUser user = userMapper.getResponseUserById(userId);
         if (user == null) {
@@ -189,16 +202,30 @@ public class UserService {
 
     @Transactional(rollbackFor = Exception.class)
     public void approveUser(String userId, String approveStatus, String feedback, String kycType) throws CommonException {
+        User user = User.builder().userId(userId).approveStatus(approveStatus).approveFeedback(feedback).approveTime(new Date().getTime()).build();
         if (StringUtils.equals(CommonConst.KYC_NEW, kycType)) {
-            User user = User.builder().userId(userId).approveStatus(approveStatus).approveFeedback(feedback).approveTime(new Date().getTime()).build();
-            if (StringUtils.equalsAny(user.getApproveStatus(), CommonConst.PENDING)) {
+            // check current pending
+            User current = userMapper.getUserById(userId);
+            if (!StringUtils.equals(current.getApproveStatus(), CommonConst.PENDING)) {
                 throw new CommonException(ReturnCode.USER_APPROVE_STATUS_ERROR);
             }
             userMapper.approveUser(user);
             userMapper.insertApproveHistory(user.getUserId(), kycType);
         }
         if (StringUtils.equals(CommonConst.KYC_UPDATE, kycType)) {
-            throw new NotImplementedException("核验变更未实现");
+            User current = userMapper.getKycUpdateById(userId);
+            if (current == null || !StringUtils.equals(current.getApproveStatus(), CommonConst.PENDING)) {
+                throw new CommonException(ReturnCode.USER_APPROVE_STATUS_ERROR);
+            }
+            userMapper.approveKycUpdate(user);
+            userMapper.insertKycUpdateHistory(user.getUserId(), kycType);
+            if (StringUtils.equals(approveStatus, CommonConst.APPROVED)) {
+                current.setApproveStatus(approveStatus);
+                current.setApproveFeedback(feedback);
+                current.setApproveTime(user.getApproveTime());
+                userMapper.updateUser(current);
+            }
+            userMapper.markKycNotify(userId, true);
         }
     }
 
@@ -230,6 +257,49 @@ public class UserService {
                 user.getBusinessLicenseCopyFileUuid(), user.getBusinessLicenseFileUuid()));
     }
 
+    @Transactional(rollbackFor = Exception.class)
+    public void submitUserKycUpdate(RequestSubmitUserKyc request, String userId) {
+        User user = userMapper.getUserById(userId);
+        if (user == null) {
+            throw new CommonException(ReturnCode.USER_NOT_EXIST);
+        }
+        if (!StringUtils.equals(user.getApproveStatus(), CommonConst.APPROVED)) {
+            throw new CommonException(ReturnCode.USER_APPROVE_STATUS_ERROR);
+        }
+        User kycUpdate = userMapper.getKycUpdateById(userId);
+        if (kycUpdate != null && StringUtils.equals(kycUpdate.getApproveStatus(), CommonConst.PENDING)) {
+            throw new CommonException(ReturnCode.USER_APPROVE_STATUS_ERROR);
+        }
+        BeanUtils.copyProperties(request, user);
+        user.setApplyTime(new Date().getTime());
+        user.setApproveStatus(CommonConst.PENDING);
+        if (kycUpdate == null) {
+            userMapper.insertKycUpdate(user);
+        } else {
+            userMapper.updateKyc(user);
+        }
+        cosFileMapper.markFileUsed(Arrays.asList(user.getIdaFileUuid(), user.getIdbFileUuid(), user.getLegalPersonIdaFileUuid(), user.getLegalPersonIdbFileUuid(),
+                user.getBusinessLicenseCopyFileUuid(), user.getBusinessLicenseFileUuid()));
+    }
+
+    public void markKycNotify(String userId, Boolean hasKycNotify) {
+        userMapper.markKycNotify(userId, hasKycNotify);
+    }
+
+    public ResponseUser getKycUpdateById(String userId) throws CommonException {
+        ResponseUser user = userMapper.getResKycUpdateById(userId);
+        if (user == null) {
+            throw new CommonException(ReturnCode.USER_KYC_UPDATE_NOT_EXIST);
+        }
+
+        user.setIdaFile(cosService.getCosFile(user.getIdaFileUuid()));
+        user.setIdbFile(cosService.getCosFile(user.getIdbFileUuid()));
+        user.setBusinessLicenseFile(cosService.getCosFile(user.getBusinessLicenseFileUuid()));
+        user.setLegalPersonIdaFile(cosService.getCosFile(user.getLegalPersonIdaFileUuid()));
+        user.setLegalPersonIdbFile(cosService.getCosFile(user.getLegalPersonIdbFileUuid()));
+        return user;
+    }
+
     public PageInfo<ResponseUser> getUserKycRecordList(Integer pageNumber, Integer pageSize, String approveStatus, String userType, String kycType, String userName, String companyName, String phoneNumber,
                                                        String idNumber, String uniSocialCreditCode, Long startApplyTime, Long endApplyTime, Long startApproveTime, Long endApproveTime) {
         PageHelper.startPage(pageNumber, pageSize);
@@ -243,4 +313,5 @@ public class UserService {
         }
         return new PageInfo<>(users);
     }
+
 }

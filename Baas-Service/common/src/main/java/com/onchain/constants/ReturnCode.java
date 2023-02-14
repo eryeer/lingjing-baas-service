@@ -53,6 +53,7 @@ public enum ReturnCode {
     USER_ORIGINAL_PASSWORD_ERROR(19013, "原密码错误"),
     USER_REJECTED(19014, "用户认证被拒绝"),
     USER_APPROVE_STATUS_ERROR(19015, "用户认证状态错误"),
+    USER_KYC_UPDATE_NOT_EXIST(19016, "用户认证变更不存在"),
 
     //验证码错误 【191xx】
     VERIFY_CODE_ERROR(19101, "验证码错误"),
