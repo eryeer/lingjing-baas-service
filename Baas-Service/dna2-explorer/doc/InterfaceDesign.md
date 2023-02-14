@@ -113,6 +113,14 @@
 - 行为：上传合约ABI文件
 - 校验：authkey 校验
 
+### 3.5.2 getContractByCreatorAddress
+
+- 功能说明：查询给出的链账户表列中账户部署的合约信息
+- url: /explorer/contract/getContractByCreatorAddress
+- auth: 已登录，任意角色
+- 行为：查询给出的链账户表列中账户部署的合约信息，可分页查询
+- 校验：authkey 校验
+
 ## 3.6 External-Api
 
 ### 3.6.1 getTokenHolder

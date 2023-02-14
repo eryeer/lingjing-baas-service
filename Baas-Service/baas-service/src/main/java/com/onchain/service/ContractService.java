@@ -7,16 +7,17 @@ import com.github.pagehelper.PageInfo;
 import com.onchain.config.ParamsConfig;
 import com.onchain.constants.CommonConst;
 import com.onchain.constants.ReturnCode;
+import com.onchain.entities.ResponseFormat;
 import com.onchain.entities.dao.ChainAccount;
+import com.onchain.entities.dao.Contract;
 import com.onchain.entities.dao.ContractApp;
 import com.onchain.entities.dao.ContractDeploy;
 import com.onchain.entities.request.RequestContractDeploy;
 import com.onchain.entities.request.RequestContractParameter;
 import com.onchain.entities.request.RequestContractUpdate;
-import com.onchain.entities.response.ResponseContractApp;
-import com.onchain.entities.response.ResponseContractDepoly;
-import com.onchain.entities.response.ResponseContractTemplate;
+import com.onchain.entities.response.*;
 import com.onchain.exception.CommonException;
+import com.onchain.feign.ExplorerFeignService;
 import com.onchain.mapper.ChainAccountMapper;
 import com.onchain.mapper.ContractAppMapper;
 import com.onchain.mapper.CosFileMapper;
@@ -27,6 +28,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.web3j.abi.FunctionEncoder;
 import org.web3j.abi.Utils;
 import org.web3j.abi.datatypes.DynamicArray;
@@ -41,6 +43,8 @@ import org.web3j.protocol.exceptions.TransactionException;
 import org.web3j.tx.RawTransactionManager;
 import org.web3j.tx.gas.StaticGasProvider;
 
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -64,6 +68,7 @@ public class ContractService {
     private final LoginLogMapper loginLogMapper;
     private final CosFileMapper cosFileMapper;
     private final CosService cosService;
+    private final ExplorerFeignService explorerService;
 
     public void appCreate(String userId, String appName, String templateType) {
         if (!StringUtils.equalsAny(templateType, CommonConst.PROOF, CommonConst.VOTE, CommonConst.CUSTOM)) {
@@ -224,5 +229,26 @@ public class ContractService {
         app.setContractFileUuids(JSON.toJSONString(request.getContractFileUuidList()));
         contractAppMapper.updateContractApp(app);
         cosFileMapper.markFileUsed(request.getContractFileUuidList());
+    }
+
+    public ResponseContractHolderInfo getContractByChainAccountAddress(Integer pageNumber,Integer pageSize, String userId, String chainAccountAddress, String contractAddress, Long startTime, Long endTime){
+        List<String> chainAccounts = new ArrayList<>();
+        if (StringUtils.isEmpty(chainAccountAddress)) {
+            List<ResponseChainAccount> responseChainAccountList = chainAccountMapper.getChainAccountByUserId(userId);
+            chainAccounts = responseChainAccountList.stream().map(ResponseChainAccount::getUserAddress).collect(Collectors.toList());
+        }else {
+            chainAccounts.add(chainAccountAddress);
+        }
+        ResponseFormat<ResponseContractHolderInfo> contractByCreatorAddress = explorerService.getContractByCreatorAddress(pageNumber, pageSize, chainAccounts, contractAddress, startTime, endTime);
+        if (contractByCreatorAddress == null || !ReturnCode.REQUEST_SUCCESS.getValue().equals(contractByCreatorAddress.getReturnCode())) {
+            log.error("getAddressList error:" + JSON.toJSONString(contractByCreatorAddress));
+            ResponseContractHolderInfo responseContractHolderInfo = new ResponseContractHolderInfo();
+            responseContractHolderInfo.setUserContractInfos(new ArrayList<>());
+            responseContractHolderInfo.setTotal(0);
+            responseContractHolderInfo.setPageNum(1);
+            responseContractHolderInfo.setPageSize(10);
+            return responseContractHolderInfo;
+        }
+        return contractByCreatorAddress.getData();
     }
 }

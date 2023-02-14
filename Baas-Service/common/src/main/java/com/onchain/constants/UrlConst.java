@@ -42,6 +42,7 @@ public class UrlConst {
     public static final String GET_CONTRACT_TEMPLATES = "/baas/contract/getContractTemplates";
     public static final String DEPLOY = "/baas/contract/deploy";
     public static final String UPDATE_FILE_LIST = "/baas/contract/updateFileList";
+    public static final String GET_CONTRACT_BY_CHAIN_ACCOUNT_ADDRESS = "/baas/contract/getContractByChainAccountAddress";
 
     public static final String ACCOUNT_CREATE = "/baas/chain/accountCreate";
     public static final String PRIVATE_KEY_CUSTODY = "/baas/chain/privateKeyCustody";
@@ -93,6 +94,7 @@ public class UrlConst {
     public static final String GET_TRANSACTION_LIST_BY_ADDRESS_AND_TIME = "/explorer/address/downloadTransactionList";
     public static final String UPLOAD_ABI = "/explorer/contract/uploadAbi";
     public static final String GET_TOKEN_HOLDER = "/explorer/token/getTokenHolder";
+    public static final String GET_CONTRACT_BY_CREATOR_ADDRESS = "/explorer/contract/getContractByCreatorAddress";
 
     //external-api
     public static final String EXTERNAL_GET_TOKEN_HOLDER = "/external/token/getTokenHolder";

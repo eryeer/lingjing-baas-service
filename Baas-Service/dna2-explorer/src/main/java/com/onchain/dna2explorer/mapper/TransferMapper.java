@@ -30,9 +30,29 @@ public interface TransferMapper {
             "<where> 1 = 1 " +
             "<if test='address != null'>AND (a.transfer_from = #{address} or a.transfer_to = #{address}) </if> " +
             "</where>" +
-            " order by block_number desc " +
+            " order by block_number desc limit #{offset}, #{pageSize} " +
             "</script>")
-    List<ResponseTransfer> getTransferList(@Param("address") String address);
+    List<ResponseTransfer> getTransferList(@Param("address") String address, Integer offset, Integer pageSize);
+
+    @Select("<script> " +
+            "select count(a.transfer_from) " +
+            "from tbl_transfer a " +
+            "left join tbl_contract b on a.contract_address = b.address " +
+            "<where> " +
+            "<if test='address != null'>a.transfer_from = #{address}  </if> " +
+            "</where>" +
+            "</script>")
+    Integer getTransferListCountByTransferFrom(@Param("address") String address);
+
+    @Select("<script> " +
+            "select count(a.transfer_from) " +
+            "from tbl_transfer a " +
+            "left join tbl_contract b on a.contract_address = b.address " +
+            "<where> " +
+            "<if test='address != null'> a.transfer_to = #{address} </if> " +
+            "</where>" +
+            "</script>")
+    Integer getTransferListCountByTransferTo(@Param("address") String address);
 
     @Select("select max(block_number) " +
             "from tbl_transfer ")

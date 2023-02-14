@@ -3,12 +3,14 @@ package com.onchain.dna2explorer.mapper;
 
 import com.onchain.dna2explorer.model.dao.Contract;
 import com.onchain.dna2explorer.model.response.ResponseContract;
+import com.onchain.entities.response.ResponseUserContractInfo;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 import org.springframework.stereotype.Repository;
 
+import java.util.Date;
 import java.util.List;
 
 @Repository
