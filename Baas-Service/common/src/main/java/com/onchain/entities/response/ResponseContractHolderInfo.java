@@ -22,5 +22,7 @@ public class ResponseContractHolderInfo {
     private Integer total;
     @ApiModelProperty(value = "链账户的合约信息")
     private List<ResponseUserContractInfo> userContractInfos;
+    @ApiModelProperty(value = "已部署的合约总数")
+    private Integer deployedCount;
 
 }

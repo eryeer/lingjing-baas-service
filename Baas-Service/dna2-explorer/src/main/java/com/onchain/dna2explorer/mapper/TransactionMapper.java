@@ -112,4 +112,14 @@ public interface TransactionMapper {
             "</where>" +
             "</script>")
     Integer getContractCountByCreatorAddress(List<String> userAddressList, String contractAddress, Date startTime, Date endTime);
+
+    @Select("<script> " +
+            "select count(contract_address) from tbl_transaction  " +
+            "<where> tx_type = 1 and  from_address in " +
+            "<foreach collection='userAddressList' item='userAddress' separator=',' open='(' close=')' > " +
+            "#{userAddress} " +
+            "</foreach> " +
+            "</where>" +
+            "</script>")
+    Integer getTotalContractCountByCreatorAddress(List<String> userAddressList);
 }

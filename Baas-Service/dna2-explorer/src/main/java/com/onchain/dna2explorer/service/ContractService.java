@@ -176,6 +176,8 @@ public class ContractService {
         ResponseContractHolderInfo responseContractHolderInfo = ResponseContractHolderInfo.builder().userContractInfos(contracts)
                 .pageNum(pageNumber).pageSize(pageSize)
                 .total(total).build();
+        Integer deployedCount = transactionMapper.getTotalContractCountByCreatorAddress(userAddressList);
+        responseContractHolderInfo.setDeployedCount(deployedCount);
         return responseContractHolderInfo;
     }
 
