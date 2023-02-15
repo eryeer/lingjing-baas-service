@@ -48,7 +48,7 @@ public class ResponseUser {
     @ApiModelProperty(value = "是否有Kyc变更信息")
     private Boolean hasKycNotify;
     @ApiModelProperty(value = "核验类型")
-    private Boolean kycType;
+    private String kycType;
 
     @ApiModelProperty(value = "营业执照正本文件id")
     private String businessLicenseFileUuid;
