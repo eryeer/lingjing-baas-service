@@ -64,6 +64,7 @@ public class UrlConst {
     public static final String GET_BLOCK_SUMMARY = "/explorer/summary/getBlockSummary";
     public static final String GET_TRANSACTION_SUMMARY = "/explorer/summary/getTransactionSummary";
     public static final String UPLOAD_ABI = "/explorer/contract/uploadAbi";
+//    public static final String GET_CONTRACT_BY_CREATOR_ADDRESS = "/explorer/contract/getContractByCreatorAddress";
     public static final String GET_TOKEN_HOLDER = "/explorer/token/getTokenHolder";
 
     // rest cross micro-service

@@ -9,7 +9,9 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import springfox.documentation.oas.annotations.EnableOpenApi;
 
+@EnableOpenApi
 @SpringBootApplication
 @MapperScan(basePackages = {"com.onchain.dna2explorer.mapper"})
 @EnableTransactionManagement

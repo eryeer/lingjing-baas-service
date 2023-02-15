@@ -12,6 +12,7 @@ import com.onchain.dna2explorer.model.request.RequestDownloadTx;
 import com.onchain.dna2explorer.model.response.ResponseAddress;
 import com.onchain.dna2explorer.model.response.ResponseTransaction;
 import com.onchain.dna2explorer.model.response.ResponseTransfer;
+import com.onchain.dna2explorer.model.response.ResponseTransferPageInfo;
 import com.onchain.dna2explorer.service.AddressService;
 import com.onchain.dna2explorer.service.CaptchaService;
 import com.onchain.dna2explorer.service.TransactionService;
@@ -82,10 +83,10 @@ public class AddressController {
     @GetMapping(value = UrlConst.GET_TRANSFER_LIST_BY_ADDRESS)
     @ApiOperation(value = "根据地址获取转账列表", notes = "根据地址获取转账列表")
     @OperLogAnnotation(description = "getTransferListByAddress")
-    public ResponseFormat<PageInfo<ResponseTransfer>> getTransferListByAddress(@RequestParam(name = "pageNumber") @Min(1) Integer pageNumber,
+    public ResponseFormat<ResponseTransferPageInfo> getTransferListByAddress(@RequestParam(name = "pageNumber") @Min(1) Integer pageNumber,
                                                                                @RequestParam(name = "pageSize") @Min(1) @Max(50) Integer pageSize,
                                                                                @RequestParam String address) {
-        PageInfo<ResponseTransfer> result = addressService.getTransferListByAddress(pageNumber, pageSize, address);
+        ResponseTransferPageInfo result = addressService.getTransferListByAddress(pageNumber, pageSize, address);
         return new ResponseFormat<>(result);
     }
 

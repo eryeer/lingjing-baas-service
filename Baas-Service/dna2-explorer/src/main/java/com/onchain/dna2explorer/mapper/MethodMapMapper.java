@@ -1,6 +1,7 @@
 package com.onchain.dna2explorer.mapper;
 
 
+import com.onchain.dna2explorer.model.dao.Contract;
 import com.onchain.dna2explorer.model.dao.MethodMap;
 import org.apache.ibatis.annotations.CacheNamespace;
 import org.apache.ibatis.annotations.Insert;
