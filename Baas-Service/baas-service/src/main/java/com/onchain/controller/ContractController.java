@@ -105,7 +105,7 @@ public class ContractController {
         return new ResponseFormat<>();
     }
 
-    @PostMapping(value = UrlConst.GET_CONTRACT_BY_CHAIN_ACCOUNT_ADDRESS)
+    @GetMapping(value = UrlConst.GET_CONTRACT_BY_CHAIN_ACCOUNT_ADDRESS)
     @ApiOperation(value = "根据链账户地址查询合约", notes = "根据链账户地址查询合约")
     @OperLogAnnotation(description = "getContractByChainAccountAddress")
     public ResponseFormat<?> getContractByChainAccountAddress(@RequestParam(name = "pageNumber") @Min(1) Integer pageNumber,
