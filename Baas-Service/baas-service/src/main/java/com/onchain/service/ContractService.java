@@ -247,6 +247,7 @@ public class ContractService {
             responseContractHolderInfo.setTotal(0);
             responseContractHolderInfo.setPageNum(1);
             responseContractHolderInfo.setPageSize(10);
+            responseContractHolderInfo.setDeployedCount(0);
             return responseContractHolderInfo;
         }
         return contractByCreatorAddress.getData();
