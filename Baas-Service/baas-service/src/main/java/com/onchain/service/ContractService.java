@@ -247,15 +247,8 @@ public class ContractService {
             responseContractHolderInfo.setTotal(0);
             responseContractHolderInfo.setPageNum(1);
             responseContractHolderInfo.setPageSize(10);
-            responseContractHolderInfo.setUserDeployedCount(0);
             return responseContractHolderInfo;
         }
-        ResponseContractHolderInfo responseContractHolderInfo = contractByCreatorAddress.getData();
-        Integer userDeployedCount = new Integer(0);
-        for (ResponseUserContractInfo userContractInfo : responseContractHolderInfo.getUserContractInfos()) {
-            userDeployedCount = userDeployedCount + userContractInfo.getTxCount();
-        }
-        responseContractHolderInfo.setUserDeployedCount(userDeployedCount);
-        return responseContractHolderInfo;
+        return contractByCreatorAddress.getData();
     }
 }

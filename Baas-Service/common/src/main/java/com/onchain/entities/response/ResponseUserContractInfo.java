@@ -21,7 +21,7 @@ public class ResponseUserContractInfo {
     private String chainAccountAddress;
     @ApiModelProperty(value = "合约地址")
     private String contractAddress;
-    @ApiModelProperty(value = "合约数量")
+    @ApiModelProperty(value = "交易数量")
     private Integer txCount;
     @ApiModelProperty(value = "部署时间")
     private Date deployTime;
