@@ -135,7 +135,7 @@ public interface UserMapper {
                                         String idNumber, String uniSocialCreditCode, Long startApplyTime, Long endApplyTime, Long startApproveTime, Long endApproveTime);
 
     @Select("<script> " +
-            "select " + BASIC_COLS + " from tbl_approve_history " +
+            "select " + BASIC_COLS + ", kyc_type from tbl_approve_history " +
             "<where> status != '0' and role !='PM' " +
             "<if test='approveStatus != null'>AND approve_Status = #{approveStatus} </if> " +
             "<if test='userType != null'>AND user_Type = #{userType} </if> " +
