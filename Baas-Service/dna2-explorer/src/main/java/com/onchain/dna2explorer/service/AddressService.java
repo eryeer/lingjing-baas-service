@@ -68,8 +68,7 @@ public class AddressService {
         responseTransferPageInfo.setList(list);
         responseTransferPageInfo.setPageNum(pageNumber);
         responseTransferPageInfo.setPageSize(pageSize);
-        Integer total = transferMapper.getTransferListCountByTransferFrom(address);
-        total = total + transferMapper.getTransferListCountByTransferTo(address);
+        Integer total = transferMapper.getTransferListCount(address);
         responseTransferPageInfo.setTotal(total);
         return responseTransferPageInfo;
     }
