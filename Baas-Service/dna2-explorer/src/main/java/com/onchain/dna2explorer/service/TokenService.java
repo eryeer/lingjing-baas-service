@@ -3,13 +3,10 @@ package com.onchain.dna2explorer.service;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.google.common.collect.Sets;
-import com.onchain.dna2explorer.constants.ReturnCode;
-import com.onchain.dna2explorer.exception.CommonException;
-import com.onchain.dna2explorer.exception.NotFoundTokenException;
 import com.onchain.dna2explorer.exception.TransferInformationException;
+import com.onchain.dna2explorer.mapper.TableHeightMapper;
 import com.onchain.dna2explorer.mapper.TokenMapper;
 import com.onchain.dna2explorer.mapper.TransferMapper;
-import com.onchain.dna2explorer.mapper.TableHeightMapper;
 import com.onchain.dna2explorer.model.dao.NFTHolder;
 import com.onchain.dna2explorer.model.dao.Transfer;
 import com.onchain.dna2explorer.model.response.ResponseAccountNFTHolder;
@@ -37,30 +34,30 @@ public class TokenService {
 
     public ResponseNFTHolder getNFTHolderListByContractAddress(Integer pageNumber, Integer pageSize, String contractAddress) {
         PageHelper.startPage(pageNumber, pageSize);
-        contractAddress = contractAddress.toLowerCase(Locale.ROOT);
+        contractAddress = contractAddress.toLowerCase();
+        ResponseNFTHolder responseNFTHolder = ResponseNFTHolder.builder()
+                .holderCount(0L)
+                .contractAddress(contractAddress)
+                .responseAccountNFTHolderPageInfo(new PageInfo<>(new ArrayList<>(0)))
+                .build();
         List<ResponseAccountNFTHolder> list = tokenMapper.getNFTHolderByContractAddress(contractAddress);
-        List<Long> idsRank = tokenMapper.getNFTHolderIdByContractAddress(contractAddress);
+        if (list == null || list.isEmpty()) {
+            return responseNFTHolder;
+        }
         Long sum = tokenMapper.getNFTTokenSumByContractAddress(contractAddress);
         if (null == sum || sum == 0) {
-            throw new NotFoundTokenException(ReturnCode.CONTRACT_TOKEN_NONE);
+            return responseNFTHolder;
         }
-        for (ResponseAccountNFTHolder responseNFTHolder : list) {
-            double percentage = (double) responseNFTHolder.getCount().intValue() / sum.intValue();
-            responseNFTHolder.setPercentage(percentage);
-            if (!idsRank.contains(responseNFTHolder.getId())) {
-                throw new NotFoundTokenException(ReturnCode.CONTRACT_TOKEN_NONE);
-            }
-            long rank = idsRank.indexOf(responseNFTHolder.getId());
-            responseNFTHolder.setRank(rank + 1);
+        for (int i = 0; i < list.size(); i++) {
+            double percentage = list.get(i).getCount().intValue() / sum.floatValue();
+            list.get(i).setPercentage(percentage);
+            list.get(i).setRank((long) (i + 1));
         }
         PageInfo<ResponseAccountNFTHolder> responseAccountNFTHolderPageInfo = new PageInfo<>(list);
-        ResponseNFTHolder responseNFTHolder = new ResponseNFTHolder();
-        responseNFTHolder.setContractAddress(contractAddress);
         responseNFTHolder.setHolderCount(responseAccountNFTHolderPageInfo.getTotal());
         responseNFTHolder.setResponseAccountNFTHolderPageInfo(responseAccountNFTHolderPageInfo);
         return responseNFTHolder;
     }
-
 
     @Transactional(rollbackFor = Exception.class)
     public void countingNFTHolder(Long batchExecuteSize) throws TransferInformationException {
