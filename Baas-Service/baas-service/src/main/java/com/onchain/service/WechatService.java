@@ -56,7 +56,7 @@ public class WechatService {
     public ResponseWeSign getSignature(String url) throws CommonException {
         String ticket = getApiTicket();
         String timestamp = "" + System.currentTimeMillis() / 1000;
-        String noncestr = RandomStringUtils.randomAlphabetic(10);
+        String noncestr = RandomStringUtils.randomAlphanumeric(10);
         ResponseWeSign result = ResponseWeSign.builder()
                 .noncestr(noncestr)
                 .timestamp(timestamp)
