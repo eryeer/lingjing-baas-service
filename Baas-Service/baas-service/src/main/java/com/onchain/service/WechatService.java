@@ -5,6 +5,7 @@ import com.onchain.config.ParamsConfig;
 import com.onchain.constants.CommonConst;
 import com.onchain.constants.ReturnCode;
 import com.onchain.entities.response.ResponseWeAccess;
+import com.onchain.entities.response.ResponseWeSign;
 import com.onchain.exception.CommonException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -52,10 +53,14 @@ public class WechatService {
     }
 
     // 获取微信公众号签名
-    public String getSignature(String url) throws CommonException {
+    public ResponseWeSign getSignature(String url) throws CommonException {
         String ticket = getApiTicket();
         String timestamp = "" + System.currentTimeMillis() / 1000;
         String noncestr = RandomStringUtils.randomAlphabetic(10);
+        ResponseWeSign result = ResponseWeSign.builder()
+                .noncestr(noncestr)
+                .timestamp(timestamp)
+                .build();
         TreeMap<String, String> params = new TreeMap<>();
         params.put("noncestr", noncestr);
         params.put("jsapi_ticket", ticket);
@@ -70,7 +75,8 @@ public class WechatService {
         }
         String signString = signSrc.toString();
         log.info("signString: " + signString);
-        return DigestUtils.sha1Hex(signString);
+        result.setSignature(DigestUtils.sha1Hex(signString));
+        return result;
     }
 
 }
