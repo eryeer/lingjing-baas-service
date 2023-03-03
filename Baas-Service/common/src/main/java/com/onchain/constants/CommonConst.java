@@ -92,6 +92,7 @@ public class CommonConst {
     public static final String HEADER_ACCESS_TOKEN = "accessToken";
     public static final String HEADER_CLIENT_TYPE = "clientType";
     public static final String HEADER_API_TOKEN = "apiToken";
+    public static final String WECHAT_TOKEN = "wechatToken";
 
     //权限集合 authority_${userId}
     public static final String USER_AUTHORITY = "authority_";

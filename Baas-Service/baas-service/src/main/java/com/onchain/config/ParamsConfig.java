@@ -102,4 +102,10 @@ public class ParamsConfig {
     @Value("${api.token}")
     public String apiToken;
 
+    @Value("${wechat.appId}")
+    public String wechatAppId;
+
+    @Value("${wechat.appSecret}")
+    public String wechatAppSecret;
+
 }

@@ -115,6 +115,7 @@ public class UrlConst {
     public static final String ASSET_UPDATE = "/baas/sj/assetUpdate";
     public static final String ASSET_CUSTOMER = "/baas/sj/assetCustomer";
     public static final String ASSET_RIGHTS = "/baas/sj/assetRights";
+    public static final String WECHAT_SIGNATURE = "/baas/wechat/wechatSignature";
 
     // 不需要登录的接口
     public static final String[] NOT_LOGIN_URLS = {REGISTER_USER, CHECK_USER_REGISTER, LOGIN, REFRESH_TOKEN, SEND_VERIFY_CODE, GET_SERVER_TIME, GET_RETURN_CODES, UPLOAD_FILE, RESET_PASSWORD,

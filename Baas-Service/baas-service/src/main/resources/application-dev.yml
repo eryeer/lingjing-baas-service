@@ -60,6 +60,10 @@ sj:
   getTokenUrl: https://chainbridge.chinadep.com/platform/api/platform/token
   refreshTokenUrl: https://chainbridge.chinadep.com/platform/api/platform/refreshToken
 
+wechat:
+  appId: wx88fb37e63492da21
+  appSecret: 2fd4359fbe09d863b5c56edfaadfd38b
+
 api:
   token: ${API_TOKEN:LJTLQeinkPgjG75IK}
 
