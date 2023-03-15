@@ -12,9 +12,19 @@ public class Web3jConfig {
     @Value("${dna.node.restUrl}")
     private String nodeAddress;
 
+    @Value("${dna.node.syncNodeUrl}")
+    private String syncNodeUrl;
+
+    public String getSyncNodeUrl() {
+        return syncNodeUrl;
+    }
+
+    public String getNodeAddress(){
+        return nodeAddress;
+    }
+
     @Bean
     public Web3j getHttpWeb3j() {
         return Web3j.build(new HttpService(nodeAddress));
     }
-
 }

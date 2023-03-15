@@ -181,5 +181,6 @@ public class CommonConst {
     //需要统计高度的表名称
     public static final String TBL_TRANSFER_ID_FOR_TOKEN_HOLDER = "tbl_transfer_id_for_token_holder";
     public static final String TBL_TRANSACTION_BLOCK_HEIGHT_FOR_TRANSFER = "tbl_transaction_block_height_for_transfer";
+    public static final String TBL_TRANSACTION_BLOCK_HEIGHT_FOR_INTERNAL_TXNS = "tbl_transaction_block_height_for_internal_txns";
 
 }

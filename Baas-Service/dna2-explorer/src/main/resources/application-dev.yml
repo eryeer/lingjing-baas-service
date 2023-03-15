@@ -20,6 +20,7 @@ spring:
 dna:
   node:
     restUrl: ${NODE_URL:https://test-node.lingjing-eco.com.cn}
+    syncNodeUrl: ${SYNC_NODE_URL:http://43.142.51.74:8545}
 
 cloud:
   captcha:
