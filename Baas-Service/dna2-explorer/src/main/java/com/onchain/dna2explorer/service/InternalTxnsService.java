@@ -88,7 +88,6 @@ public class InternalTxnsService {
                 .output(result.getOutput())
                 .gas(Numeric.decodeQuantity(result.getGas()).longValue())
                 .gasUsed(Numeric.decodeQuantity(result.getGasUsed()).longValue())
-                .value(Numeric.decodeQuantity(result.getValue()).divide(Constant.GWeiFactor).toString())
                 .type(result.getType())
                 .parentId(parentId)
                 .txHash(tx.getTxHash())
@@ -101,12 +100,22 @@ public class InternalTxnsService {
         if (StringUtils.isEmpty(result.getRevertReason())) {
             internalTxn.setRevertReason("");
         }
+        String value = result.getValue();
+        if (StringUtils.isEmpty(value)){
+            log.warn(String.format("txhash: %s ,value is null", tx.getTxHash()));
+            internalTxn.setValue("0x0");
+        }else if (value.equals("0x")){
+            log.warn(String.format("txhash: %s ,value is 0x", tx.getTxHash()));
+            internalTxn.setValue("0x0");
+        }else {
+            internalTxn.setValue(Numeric.decodeQuantity(result.getValue()).divide(Constant.GWeiFactor).toString());
+        }
         if (StringUtils.isEmpty(result.getOutput())) {
-            log.error(String.format("txhash: %s ,output is null", tx.getTxHash()));
+            log.warn(String.format("txhash: %s ,output is null", tx.getTxHash()));
             internalTxn.setOutput("0x");
         }
         if (StringUtils.isEmpty(result.getInput())) {
-            log.error(String.format("txhash: %s ,input is null", tx.getTxHash()));
+            log.warn(String.format("txhash: %s ,input is null", tx.getTxHash()));
             internalTxn.setInput("0x");
         }
         internalTxnsMapper.insert(internalTxn);
