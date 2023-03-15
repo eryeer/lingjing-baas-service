@@ -101,6 +101,14 @@ public class InternalTxnsService {
         if (StringUtils.isEmpty(result.getRevertReason())) {
             internalTxn.setRevertReason("");
         }
+        if (StringUtils.isEmpty(result.getOutput())) {
+            log.error(String.format("txhash: %s ,output is null", tx.getTxHash()));
+            internalTxn.setOutput("0x");
+        }
+        if (StringUtils.isEmpty(result.getInput())) {
+            log.error(String.format("txhash: %s ,input is null", tx.getTxHash()));
+            internalTxn.setInput("0x");
+        }
         internalTxnsMapper.insert(internalTxn);
         Long id = internalTxn.getId();
         if (null != result.getCalls()) {
