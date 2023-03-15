@@ -25,6 +25,7 @@ import org.apache.http.util.EntityUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.web3j.utils.Numeric;
+import sun.reflect.generics.factory.GenericsFactory;
 
 import java.io.IOException;
 import java.util.List;
@@ -86,8 +87,6 @@ public class InternalTxnsService {
                 .toAddress(result.getTo())
                 .input(result.getInput())
                 .output(result.getOutput())
-                .gas(Numeric.decodeQuantity(result.getGas()).longValue())
-                .gasUsed(Numeric.decodeQuantity(result.getGasUsed()).longValue())
                 .type(result.getType())
                 .parentId(parentId)
                 .txHash(tx.getTxHash())
@@ -109,6 +108,26 @@ public class InternalTxnsService {
             internalTxn.setValue("0x0");
         }else {
             internalTxn.setValue(Numeric.decodeQuantity(result.getValue()).divide(Constant.GWeiFactor).toString());
+        }
+        String gas = result.getGas();
+        if (StringUtils.isEmpty(gas)){
+            log.warn(String.format("txhash: %s ,gas is null", tx.getTxHash()));
+            internalTxn.setGas(0l);
+        }else if (gas.equals("0x")){
+            log.warn(String.format("txhash: %s ,gas is 0x", tx.getTxHash()));
+            internalTxn.setGas(0l);
+        }else {
+            internalTxn.setGas(Numeric.decodeQuantity(result.getGas()).longValue());
+        }
+        String gasUsed = result.getGasUsed();
+        if (StringUtils.isEmpty(gasUsed)){
+            log.warn(String.format("txhash: %s ,gasUsed is null", tx.getTxHash()));
+            internalTxn.setGasUsed(0l);
+        }else if (gasUsed.equals("0x")){
+            log.warn(String.format("txhash: %s ,gasUsed is 0x", tx.getTxHash()));
+            internalTxn.setGasUsed(0l);
+        }else {
+            internalTxn.setGasUsed(Numeric.decodeQuantity(result.getGasUsed()).longValue());
         }
         if (StringUtils.isEmpty(result.getOutput())) {
             log.warn(String.format("txhash: %s ,output is null", tx.getTxHash()));
