@@ -102,10 +102,10 @@ public class InternalTxnsService {
         String value = result.getValue();
         if (StringUtils.isEmpty(value)){
             log.warn(String.format("txhash: %s ,value is null", tx.getTxHash()));
-            internalTxn.setValue("0x0");
+            internalTxn.setValue("0");
         }else if (value.equals("0x")){
             log.warn(String.format("txhash: %s ,value is 0x", tx.getTxHash()));
-            internalTxn.setValue("0x0");
+            internalTxn.setValue("0");
         }else {
             internalTxn.setValue(Numeric.decodeQuantity(result.getValue()).divide(Constant.GWeiFactor).toString());
         }
