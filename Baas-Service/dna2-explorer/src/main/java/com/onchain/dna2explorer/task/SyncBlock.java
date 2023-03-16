@@ -54,7 +54,7 @@ public class SyncBlock {
         EthBlock.Block blk = web3j.ethGetBlockByNumber(DefaultBlockParameter.valueOf(BigInteger.valueOf(blockNumber)), true)
                 .send().getBlock();
 
-        log.warn(String.format("blockNumber is %d, block exist  ", blockNumber, blk !=null));
+        if (blk ==null) log.warn(String.format("blockNumber is %d, block exist :/ ", blockNumber));
         Block block = ConverterFunctionUtil.toDbBlock.apply(blk);
         List<Transaction> transactions = new ArrayList<>();
         List<Account> accounts = new ArrayList<>();
