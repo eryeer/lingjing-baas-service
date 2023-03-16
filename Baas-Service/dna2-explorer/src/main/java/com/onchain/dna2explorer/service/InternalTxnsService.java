@@ -100,41 +100,27 @@ public class InternalTxnsService {
             internalTxn.setRevertReason("");
         }
         String value = result.getValue();
-        if (StringUtils.isEmpty(value)){
-            log.warn(String.format("txhash: %s ,value is null", tx.getTxHash()));
-            internalTxn.setValue("0");
-        }else if (value.equals("0x")){
-            log.warn(String.format("txhash: %s ,value is 0x", tx.getTxHash()));
+        if (StringUtils.isEmpty(value) || value.equals("0x")){
             internalTxn.setValue("0");
         }else {
             internalTxn.setValue(Numeric.decodeQuantity(result.getValue()).divide(Constant.GWeiFactor).toString());
         }
         String gas = result.getGas();
-        if (StringUtils.isEmpty(gas)){
-            log.warn(String.format("txhash: %s ,gas is null", tx.getTxHash()));
-            internalTxn.setGas(0l);
-        }else if (gas.equals("0x")){
-            log.warn(String.format("txhash: %s ,gas is 0x", tx.getTxHash()));
+        if (StringUtils.isEmpty(gas) || gas.equals("0x")){
             internalTxn.setGas(0l);
         }else {
             internalTxn.setGas(Numeric.decodeQuantity(result.getGas()).longValue());
         }
         String gasUsed = result.getGasUsed();
-        if (StringUtils.isEmpty(gasUsed)){
-            log.warn(String.format("txhash: %s ,gasUsed is null", tx.getTxHash()));
-            internalTxn.setGasUsed(0l);
-        }else if (gasUsed.equals("0x")){
-            log.warn(String.format("txhash: %s ,gasUsed is 0x", tx.getTxHash()));
+        if (StringUtils.isEmpty(gasUsed) || gasUsed.equals("0x")){
             internalTxn.setGasUsed(0l);
         }else {
             internalTxn.setGasUsed(Numeric.decodeQuantity(result.getGasUsed()).longValue());
         }
         if (StringUtils.isEmpty(result.getOutput())) {
-            log.warn(String.format("txhash: %s ,output is null", tx.getTxHash()));
             internalTxn.setOutput("0x");
         }
         if (StringUtils.isEmpty(result.getInput())) {
-            log.warn(String.format("txhash: %s ,input is null", tx.getTxHash()));
             internalTxn.setInput("0x");
         }
         internalTxnsMapper.insert(internalTxn);
