@@ -26,7 +26,6 @@ public class InternalTxn {
     private String input;
     private String output;
     private String error;
-    private String revertReason;
     private Long parentId;
     private String txHash;
     private Long blockTime;

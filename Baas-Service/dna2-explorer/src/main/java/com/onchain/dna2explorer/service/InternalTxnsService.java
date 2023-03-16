@@ -91,13 +91,9 @@ public class InternalTxnsService {
                 .parentId(parentId)
                 .txHash(tx.getTxHash())
                 .error(result.getError())
-                .revertReason(result.getRevertReason())
                 .build();
         if (StringUtils.isEmpty(result.getError())) {
             internalTxn.setError("");
-        }
-        if (StringUtils.isEmpty(result.getRevertReason())) {
-            internalTxn.setRevertReason("");
         }
         String value = result.getValue();
         if (StringUtils.isEmpty(value) || value.equals("0x")){

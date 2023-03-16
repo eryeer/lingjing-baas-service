@@ -221,7 +221,6 @@ create table tbl_internal_txns
     input         mediumtext                            not null comment 'call data',
     output        mediumtext                            not null comment 'return data',
     error         mediumtext                            not null comment 'error',
-    revert_reason mediumtext                            not null comment 'Solidity revert reason',
     parent_id     bigint      default 0                 not null,
 
     tx_hash       varchar(66)                           not null comment 'transaction hash',
