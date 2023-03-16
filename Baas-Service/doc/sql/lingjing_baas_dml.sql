@@ -52,7 +52,7 @@ create table tbl_internal_txns
     status        varchar(20) default ''                not null,
 
     type          varchar(20)                           not null comment 'sub-call type',
-    value         varchar(30)                           not null comment 'value of transfer in wei',
+    value         varchar(30)                           not null comment 'value of transfer in Gwei',
     from_address  varchar(42)                           not null comment 'hex string of the caller account address',
     to_address    varchar(42)                           not null comment 'hex string of the receiver account address',
     gas           bigint                                not null comment 'gas limit, in wei',

@@ -99,7 +99,7 @@ public class InternalTxnsService {
         if (StringUtils.isEmpty(value) || value.equals("0x")){
             internalTxn.setValue("0");
         }else {
-            internalTxn.setValue(Numeric.decodeQuantity(result.getValue()).toString());
+            internalTxn.setValue(Numeric.decodeQuantity(result.getValue()).divide(Constant.GWeiFactor).toString());
         }
         String gas = result.getGas();
         if (StringUtils.isEmpty(gas) || gas.equals("0x")){
