@@ -34,8 +34,7 @@ public interface InternalTxnsMapper {
             "</script>")
     List<ResponseInternalTx> getInternalTxList(@Param("address") String address);
 
-    @Select("<script> " +
-            "select " + COLS +
+    @Select("select " + COLS +
             "from tbl_internal_txns " +
             "where tx_hash = #{txHash} " +
             " order by id ")
