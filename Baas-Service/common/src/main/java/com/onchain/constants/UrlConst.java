@@ -90,6 +90,7 @@ public class UrlConst {
     public static final String GET_TRANSACTION_SUMMARY = "/explorer/summary/getTransactionSummary";
     public static final String GET_ADDRESS_LIST_BY_ADDRESS = "/explorer/address/getAddressListByAddress";
     public static final String GET_TRANSFER_LIST_BY_ADDRESS = "/explorer/address/getTransferListByAddress";
+    public static final String GET_INTERNAL_TX_LIST_BY_ADDRESS = "/explorer/address/getInternalTxListByAddress";
     public static final String GET_TRANSFER_LIST_BY_ADDRESS_AND_TIME = "/explorer/address/downloadTransferList";
     public static final String GET_TRANSACTION_LIST_BY_ADDRESS_AND_TIME = "/explorer/address/downloadTransactionList";
     public static final String UPLOAD_ABI = "/explorer/contract/uploadAbi";
@@ -120,7 +121,7 @@ public class UrlConst {
     // 不需要登录的接口
     public static final String[] NOT_LOGIN_URLS = {REGISTER_USER, CHECK_USER_REGISTER, LOGIN, REFRESH_TOKEN, SEND_VERIFY_CODE, GET_SERVER_TIME, GET_RETURN_CODES, UPLOAD_FILE, RESET_PASSWORD,
             GET_BLOCK_LIST, GET_BLOCK, GET_TRANSACTION_LIST, GET_TRANSACTION, GET_ADDRESS_LIST, GET_ADDRESS_LIST_BY_ADDRESS, GET_ADDRESS, GET_TRANSACTION_LIST_BY_ADDRESS,
-            GET_TRANSFER_LIST_BY_ADDRESS, GET_TRANSFER_LIST_BY_ADDRESS_AND_TIME, GET_TRANSACTION_LIST_BY_ADDRESS_AND_TIME, GET_TOTAL_SUMMARY, GET_ADDRESS_SUMMARY, GET_BLOCK_SUMMARY,
+            GET_TRANSFER_LIST_BY_ADDRESS, GET_INTERNAL_TX_LIST_BY_ADDRESS, GET_TRANSFER_LIST_BY_ADDRESS_AND_TIME, GET_TRANSACTION_LIST_BY_ADDRESS_AND_TIME, GET_TOTAL_SUMMARY, GET_ADDRESS_SUMMARY, GET_BLOCK_SUMMARY,
             GET_TRANSACTION_SUMMARY, UPLOAD_ABI, GET_TOKEN_HOLDER, GET_CONTRACT_BY_CREATOR_ADDRESS,
             WECHAT_SIGNATURE
     };

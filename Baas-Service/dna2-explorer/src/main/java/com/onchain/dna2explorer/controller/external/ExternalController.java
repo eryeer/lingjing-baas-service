@@ -1,7 +1,7 @@
 package com.onchain.dna2explorer.controller.external;
 
+import com.onchain.constants.UrlConst;
 import com.onchain.dna2explorer.aop.operlog.OperLogAnnotation;
-import com.onchain.dna2explorer.constants.UrlConst;
 import com.onchain.dna2explorer.model.dao.ResponseFormat;
 import com.onchain.dna2explorer.model.response.ResponseNFTHolder;
 import com.onchain.dna2explorer.service.TokenService;

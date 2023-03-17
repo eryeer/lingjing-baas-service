@@ -37,6 +37,7 @@ public class TransactionService {
     private final AccountMapper accountMapper;
     private final TransferMapper transferMapper;
     private final TableHeightMapper tableHeightMapper;
+    private final InternalTxnsService internalTxnsService;
 
     public PageInfo<ResponseTransaction> getTransactionList(Integer pageNumber, Integer pageSize, Long blockNumber) {
 //        PageHelper.startPage(pageNumber, pageSize);
@@ -94,8 +95,13 @@ public class TransactionService {
         setFullEventName(txLogList);
         tx.setLogList(txLogList);
 
+        // ERC20/ERC721 转账记录
         List<ResponseTransferLog> transferLogs = getTransferLogList(tx);
         tx.setErcTransferLog(transferLogs);
+
+        // 内部交易列表
+        List<ResponseInternalTx> internalTxList = internalTxnsService.getInternalTxListByTxHash(txHash);
+        tx.setInternalTxns(internalTxList);
         return tx;
     }
 

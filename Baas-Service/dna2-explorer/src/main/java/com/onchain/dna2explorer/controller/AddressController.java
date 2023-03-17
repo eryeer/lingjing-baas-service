@@ -1,20 +1,21 @@
 package com.onchain.dna2explorer.controller;
 
 import com.github.pagehelper.PageInfo;
+import com.onchain.constants.UrlConst;
 import com.onchain.dna2explorer.aop.limit.RequestLimit;
 import com.onchain.dna2explorer.aop.operlog.OperLogAnnotation;
 import com.onchain.dna2explorer.constants.ReturnCode;
-import com.onchain.dna2explorer.constants.UrlConst;
 import com.onchain.dna2explorer.exception.CommonException;
 import com.onchain.dna2explorer.model.dao.ResponseFormat;
 import com.onchain.dna2explorer.model.request.RequestAddressList;
 import com.onchain.dna2explorer.model.request.RequestDownloadTx;
 import com.onchain.dna2explorer.model.response.ResponseAddress;
+import com.onchain.dna2explorer.model.response.ResponseInternalTx;
 import com.onchain.dna2explorer.model.response.ResponseTransaction;
-import com.onchain.dna2explorer.model.response.ResponseTransfer;
 import com.onchain.dna2explorer.model.response.ResponseTransferPageInfo;
 import com.onchain.dna2explorer.service.AddressService;
 import com.onchain.dna2explorer.service.CaptchaService;
+import com.onchain.dna2explorer.service.InternalTxnsService;
 import com.onchain.dna2explorer.service.TransactionService;
 import io.swagger.annotations.ApiOperation;
 import lombok.AllArgsConstructor;
@@ -38,6 +39,7 @@ public class AddressController {
     private final AddressService addressService;
     private final CaptchaService captchaService;
     private final TransactionService transactionService;
+    private final InternalTxnsService internalTxnsService;
 
     @GetMapping(value = UrlConst.GET_ADDRESS_LIST)
     @ApiOperation(value = "获取地址列表", notes = "获取地址列表")
@@ -84,9 +86,19 @@ public class AddressController {
     @ApiOperation(value = "根据地址获取转账列表", notes = "根据地址获取转账列表")
     @OperLogAnnotation(description = "getTransferListByAddress")
     public ResponseFormat<ResponseTransferPageInfo> getTransferListByAddress(@RequestParam(name = "pageNumber") @Min(1) Integer pageNumber,
-                                                                               @RequestParam(name = "pageSize") @Min(1) @Max(50) Integer pageSize,
-                                                                               @RequestParam String address) {
+                                                                             @RequestParam(name = "pageSize") @Min(1) @Max(50) Integer pageSize,
+                                                                             @RequestParam String address) {
         ResponseTransferPageInfo result = addressService.getTransferListByAddress(pageNumber, pageSize, address);
+        return new ResponseFormat<>(result);
+    }
+
+    @GetMapping(value = UrlConst.GET_INTERNAL_TX_LIST_BY_ADDRESS)
+    @ApiOperation(value = "根据地址获取内部交易列表", notes = "根据地址获取内部交易列表")
+    @OperLogAnnotation(description = "getInternalTxListByAddress")
+    public ResponseFormat<PageInfo<ResponseInternalTx>> getInternalTxListByAddress(@RequestParam(name = "pageNumber") @Min(1) Integer pageNumber,
+                                                                                   @RequestParam(name = "pageSize") @Min(1) @Max(50) Integer pageSize,
+                                                                                   @RequestParam String address) {
+        PageInfo<ResponseInternalTx> result = internalTxnsService.getInternalTxListByAddress(pageNumber, pageSize, address);
         return new ResponseFormat<>(result);
     }
 
@@ -98,8 +110,7 @@ public class AddressController {
         captchaService.sendCaptcha(requestDownloadTx.getTicket(), requestDownloadTx.getRandomStr());
         addressService.getLatest5kTransferListByAddress(requestDownloadTx.getAddress(), requestDownloadTx.getStartTime(), requestDownloadTx.getEndTime(), response);
     }
-
-
+    
     @PostMapping(value = UrlConst.GET_TRANSACTION_LIST_BY_ADDRESS_AND_TIME)
     @ApiOperation(value = "下载指定时间区间内某地址的前5000笔交易文件", notes = "下载指定时间区间内某地址的前5000笔交易文件")
     @OperLogAnnotation(description = "downloadTransactionList")

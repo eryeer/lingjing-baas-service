@@ -60,4 +60,6 @@ public class ResponseTransaction {
     private List<ResponseTxLog> logList;
     @ApiModelProperty(value = "ERC转账列表")
     private List<ResponseTransferLog> ercTransferLog;
+    @ApiModelProperty(value = "内部交易列表")
+    private List<ResponseInternalTx> internalTxns;
 }

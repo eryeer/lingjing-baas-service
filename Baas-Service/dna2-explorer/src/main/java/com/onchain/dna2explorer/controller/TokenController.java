@@ -1,7 +1,7 @@
 package com.onchain.dna2explorer.controller;
 
+import com.onchain.constants.UrlConst;
 import com.onchain.dna2explorer.aop.operlog.OperLogAnnotation;
-import com.onchain.dna2explorer.constants.UrlConst;
 import com.onchain.dna2explorer.model.dao.ResponseFormat;
 import com.onchain.dna2explorer.model.response.ResponseNFTHolder;
 import com.onchain.dna2explorer.service.TokenService;
@@ -28,8 +28,8 @@ public class TokenController {
     @ApiOperation(value = "可以获取token信息持有信息", notes = "对外接口 可以获取token信息持有信息")
     @OperLogAnnotation(description = "getTokenHolder")
     public ResponseFormat<ResponseNFTHolder> getTokenHolder(@RequestParam(name = "pageNumber") @Min(1) Integer pageNumber,
-                                                                            @RequestParam(name = "pageSize") @Min(1) @Max(50) Integer pageSize,
-                                                                            @RequestParam String contractAddress) {
+                                                            @RequestParam(name = "pageSize") @Min(1) @Max(50) Integer pageSize,
+                                                            @RequestParam String contractAddress) {
         ResponseNFTHolder result = tokenService.getNFTHolderListByContractAddress(pageNumber, pageSize, contractAddress);
         return new ResponseFormat<>(result);
     }

@@ -69,6 +69,14 @@
 - 行为：根据发送或接收地址分页查询交易列表，按区块高度倒排，再按交易序号排序。必填参数：地址
 - 校验：无
 
+### 3.3.4. getInternalTxListByAddress
+
+- 功能说明：根据地址获取内部交易列表
+- url: /explorer/address/getInternalTxListByAddress
+- auth: 已登录，任意角色
+- 行为：根据发送或接收地址分页查询内部交易列表，按id倒排。必填参数：地址
+- 校验：无
+
 ## 3.4. Summary
 
 ### 3.4.1. getTotalSummary
