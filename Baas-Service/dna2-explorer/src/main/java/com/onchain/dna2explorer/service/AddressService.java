@@ -73,32 +73,6 @@ public class AddressService {
         return responseTransferPageInfo;
     }
 
-    // get balance and nonce for the accounts
-    public void updateAccounts(List<Account> accounts) throws Exception {
-        List<CompletableFuture<?>> futures = new ArrayList<>();
-
-        for (Account account : accounts) {
-            futures.add(web3j
-                    .ethGetBalance(account.getAddress(), DefaultBlockParameter.valueOf(Constant.LatestBlockNumberKey))
-                    .sendAsync()
-                    .thenApply(balance -> {
-                        account.setBalance(balance.getBalance().divide(Constant.GWeiFactor).toString());
-                        return balance;
-                    })
-            );
-            futures.add(web3j
-                    .ethGetTransactionCount(account.getAddress(), DefaultBlockParameter.valueOf(Constant.LatestBlockNumberKey))
-                    .sendAsync()
-                    .thenApply(count -> {
-                        account.setNonce(count.getTransactionCount().intValue());
-                        return count;
-                    })
-            );
-        }
-
-        CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).get();
-    }
-
 
     public void getLatest5kTransferListByAddress(String address, long startTime, long endTime, HttpServletResponse response) throws CommonException {
         List<ResponseTransfer> transferList = transferMapper.getLatest5KTransferList(address, startTime, endTime);

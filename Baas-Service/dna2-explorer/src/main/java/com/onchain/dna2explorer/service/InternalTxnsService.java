@@ -16,6 +16,7 @@ import com.onchain.dna2explorer.model.dao.Transaction;
 import com.onchain.dna2explorer.model.response.ResponseDebugTraceTransaction;
 import com.onchain.dna2explorer.model.response.ResponseInternalTx;
 import com.onchain.dna2explorer.model.response.ResponseRpc;
+import com.onchain.dna2explorer.utils.EthUtil;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -142,8 +143,9 @@ public class InternalTxnsService {
                     .blockTime(tx.getBlockTime())
                     .nonce(0)
                     .build();
-
-            updateAccount(account);
+            ArrayList<Account> accounts = new ArrayList<>();
+            accounts.add(account);
+            EthUtil.updateAccounts(web3j, accounts);
             accountMapper.merge(account);
         }
         Long id = internalTxn.getId();
@@ -178,28 +180,6 @@ public class InternalTxnsService {
             }
         }
         return result;
-    }
-    public void updateAccount(Account account) throws Exception {
-        List<CompletableFuture<?>> futures = new ArrayList<>();
-
-        futures.add(web3j
-                .ethGetBalance(account.getAddress(), DefaultBlockParameter.valueOf(Constant.LatestBlockNumberKey))
-                .sendAsync()
-                .thenApply(balance -> {
-                    account.setBalance(balance.getBalance().divide(Constant.GWeiFactor).toString());
-                    return balance;
-                })
-        );
-        futures.add(web3j
-                .ethGetTransactionCount(account.getAddress(), DefaultBlockParameter.valueOf(Constant.LatestBlockNumberKey))
-                .sendAsync()
-                .thenApply(count -> {
-                    account.setNonce(count.getTransactionCount().intValue());
-                    return count;
-                })
-        );
-
-        CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).get();
     }
 
 }
