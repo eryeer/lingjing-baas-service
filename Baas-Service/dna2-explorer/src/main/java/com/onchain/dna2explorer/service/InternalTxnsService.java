@@ -142,6 +142,7 @@ public class InternalTxnsService {
                     .type(1)
                     .blockTime(tx.getBlockTime())
                     .nonce(0)
+                    .txCount(0L)
                     .build();
             ArrayList<Account> accounts = new ArrayList<>();
             accounts.add(account);
