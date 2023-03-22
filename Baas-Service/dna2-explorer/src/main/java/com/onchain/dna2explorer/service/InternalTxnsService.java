@@ -62,7 +62,7 @@ public class InternalTxnsService {
         HttpPost httpPost = new HttpPost(web3jConfig.getSyncNodeUrl());
         httpPost.setHeader("Content-Type", "application/json;charset=UTF-8");
         for (Transaction tx : txs) {
-            if (tx.getData().length() == 0 || tx.getData().equals("0x")){
+            if (StringUtils.isEmpty(tx.getData()) || tx.getData().equals("0x")){
                 continue;
             }
             String txHash = tx.getTxHash();
