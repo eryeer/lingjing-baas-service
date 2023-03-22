@@ -56,5 +56,5 @@ public interface AccountMapper {
             "on duplicate key update " +
             "  balance = VALUES(balance), nonce = VALUES(nonce) " +
             "</script>")
-    void merge(@Param("addresses") Account item);
+    void merge(@Param("item") Account item);
 }
