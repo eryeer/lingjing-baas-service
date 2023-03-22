@@ -6,9 +6,11 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.onchain.dna2explorer.config.Web3jConfig;
 import com.onchain.dna2explorer.constant.Constant;
+import com.onchain.dna2explorer.mapper.AccountMapper;
 import com.onchain.dna2explorer.mapper.InternalTxnsMapper;
 import com.onchain.dna2explorer.mapper.TableHeightMapper;
 import com.onchain.dna2explorer.mapper.TransactionMapper;
+import com.onchain.dna2explorer.model.dao.Account;
 import com.onchain.dna2explorer.model.dao.InternalTxn;
 import com.onchain.dna2explorer.model.dao.Transaction;
 import com.onchain.dna2explorer.model.response.ResponseDebugTraceTransaction;
@@ -27,11 +29,14 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.web3j.protocol.Web3j;
+import org.web3j.protocol.core.DefaultBlockParameter;
 import org.web3j.utils.Numeric;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 import static com.onchain.dna2explorer.constant.Constant.DEBUG_TRACETRANSACTION_PARAMS;
 import static com.onchain.dna2explorer.constants.CommonConst.TBL_TRANSACTION_BLOCK_HEIGHT_FOR_INTERNAL_TXNS;
@@ -45,13 +50,21 @@ public class InternalTxnsService {
     private final TableHeightMapper tableHeightMapper;
     private final Web3jConfig web3jConfig;
 
+    private final AccountMapper accountMapper;
+
+    private final Web3j web3j;
+
+
     @Transactional(rollbackFor = Exception.class)
-    public void syncInternalTransaction(Long startNumber, Long endNumber) throws IOException {
+    public void syncInternalTransaction(Long startNumber, Long endNumber) throws Exception {
         CloseableHttpClient httpClient = HttpClients.createDefault();
         List<Transaction> txs = transactionMapper.getTransactionListByBlockNumber(startNumber, endNumber);
         HttpPost httpPost = new HttpPost(web3jConfig.getSyncNodeUrl());
         httpPost.setHeader("Content-Type", "application/json;charset=UTF-8");
         for (Transaction tx : txs) {
+            if (tx.getData().length() == 0 || tx.getData().equals("0x")){
+                continue;
+            }
             String txHash = tx.getTxHash();
             String params = String.format(DEBUG_TRACETRANSACTION_PARAMS, txHash);
             StringEntity entity = new StringEntity(params, ContentType.create("text/json", "UTF-8"));
@@ -80,7 +93,9 @@ public class InternalTxnsService {
         tableHeightMapper.updateTableHeightByTableName(TBL_TRANSACTION_BLOCK_HEIGHT_FOR_INTERNAL_TXNS, endNumber);
     }
 
-    private void parseInsert(Transaction tx, ResponseDebugTraceTransaction result, Long parentId) {
+
+
+    private void parseInsert(Transaction tx, ResponseDebugTraceTransaction result, Long parentId) throws Exception {
         InternalTxn internalTxn = InternalTxn.builder().blockNumber(tx.getBlockNumber())
                 .blockTime(tx.getBlockTime())
                 .fromAddress(result.getFrom())
@@ -120,6 +135,17 @@ public class InternalTxnsService {
             internalTxn.setInput("0x");
         }
         internalTxnsMapper.insert(internalTxn);
+        if (internalTxn.getType().equals("CREATE") || internalTxn.getType().equals("CREATE2")){
+            Account account = Account.builder()
+                    .address(internalTxn.getToAddress())
+                    .type(1)
+                    .blockTime(tx.getBlockTime())
+                    .nonce(0)
+                    .build();
+
+            updateAccount(account);
+            accountMapper.merge(account);
+        }
         Long id = internalTxn.getId();
         if (null != result.getCalls()) {
             for (ResponseDebugTraceTransaction subCall : result.getCalls()) {
@@ -153,4 +179,27 @@ public class InternalTxnsService {
         }
         return result;
     }
+    public void updateAccount(Account account) throws Exception {
+        List<CompletableFuture<?>> futures = new ArrayList<>();
+
+        futures.add(web3j
+                .ethGetBalance(account.getAddress(), DefaultBlockParameter.valueOf(Constant.LatestBlockNumberKey))
+                .sendAsync()
+                .thenApply(balance -> {
+                    account.setBalance(balance.getBalance().divide(Constant.GWeiFactor).toString());
+                    return balance;
+                })
+        );
+        futures.add(web3j
+                .ethGetTransactionCount(account.getAddress(), DefaultBlockParameter.valueOf(Constant.LatestBlockNumberKey))
+                .sendAsync()
+                .thenApply(count -> {
+                    account.setNonce(count.getTransactionCount().intValue());
+                    return count;
+                })
+        );
+
+        CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).get();
+    }
+
 }

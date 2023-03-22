@@ -49,4 +49,12 @@ public interface AccountMapper {
 
     @Select("select " + COLS + " from tbl_account where address = #{address}")
     ResponseAddress getAddress(String address);
+
+    @Insert("<script>" +
+            "insert into tbl_account(address, type, balance, tx_count, nonce, block_time) values " +
+            "( #{item.address},  #{item.type},  #{item.balance}, #{item.txCount}, #{item.nonce}, #{item.blockTime} ) " +
+            "on duplicate key update " +
+            "  balance = VALUES(balance), nonce = VALUES(nonce) " +
+            "</script>")
+    void merge(@Param("addresses") Account item);
 }
