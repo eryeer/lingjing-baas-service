@@ -39,4 +39,9 @@ public interface InternalTxnsMapper {
             "where tx_hash = #{txHash} " +
             " order by id ")
     List<ResponseInternalTx> getInternalTxListByTxHash(@Param("txHash") String txHash);
+
+    @Select("select " + COLS +
+            "from tbl_internal_txns " +
+            "where to_address = #{address} and (type = 'create' or type = 'create2') ")
+    ResponseInternalTx getCreateInternalTx(@Param("address") String address);
 }

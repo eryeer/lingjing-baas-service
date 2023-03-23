@@ -8,13 +8,12 @@ import com.onchain.dna2explorer.mapper.*;
 import com.onchain.dna2explorer.model.dao.Account;
 import com.onchain.dna2explorer.model.dao.Transaction;
 import com.onchain.dna2explorer.model.response.ResponseAddress;
+import com.onchain.dna2explorer.model.response.ResponseInternalTx;
 import com.onchain.dna2explorer.model.response.ResponseTransfer;
 import com.onchain.dna2explorer.model.response.ResponseTransferPageInfo;
 import com.onchain.dna2explorer.utils.CsvUtil;
-import com.onchain.entities.response.ResponseUserContractInfo;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.DefaultBlockParameter;
@@ -35,6 +34,7 @@ public class AddressService {
     private final ContractMapper contractMapper;
     private final TokenMapper tokenMapper;
     private final Web3j web3j;
+    private final InternalTxnsMapper internalTxnsMapper;
 
     public PageInfo<ResponseAddress> getAddressList(Integer pageNumber, Integer pageSize) {
         PageHelper.startPage(pageNumber, pageSize);
@@ -53,8 +53,14 @@ public class AddressService {
             if (tx != null) {
                 result.setCreator(tx.getFromAddress());
                 result.setCreateTxHash(tx.getTxHash());
+            } else {
+                ResponseInternalTx internalTx = internalTxnsMapper.getCreateInternalTx(address);
+                if (internalTx != null) {
+                    result.setCreator(internalTx.getFromAddress());
+                    result.setCreateTxHash(internalTx.getTxHash());
+                }
             }
-            Long sum =tokenMapper.getNFTHolderSumByContractAddress(address);
+            Long sum = tokenMapper.getNFTHolderSumByContractAddress(address);
             result.setTokenHolderSum(sum);
             result.setContractInfo(contractMapper.getResponseContract(address));
         }
@@ -62,7 +68,7 @@ public class AddressService {
     }
 
     public ResponseTransferPageInfo getTransferListByAddress(Integer pageNumber, Integer pageSize, String address) {
-        Integer offset = (pageNumber - 1)*pageSize;
+        Integer offset = (pageNumber - 1) * pageSize;
         List<ResponseTransfer> list = transferMapper.getTransferList(address, offset, pageSize);
         ResponseTransferPageInfo responseTransferPageInfo = new ResponseTransferPageInfo();
         responseTransferPageInfo.setList(list);
