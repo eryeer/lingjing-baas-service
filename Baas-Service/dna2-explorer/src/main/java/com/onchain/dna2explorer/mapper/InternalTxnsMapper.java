@@ -42,6 +42,6 @@ public interface InternalTxnsMapper {
 
     @Select("select " + COLS +
             "from tbl_internal_txns " +
-            "where to_address = #{address} and (type = 'create' or type = 'create2') ")
+            "where to_address = #{address} and (type = 'CREATE' or type = 'CREATE2') ")
     ResponseInternalTx getCreateInternalTx(@Param("address") String address);
 }
