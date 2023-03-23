@@ -10,6 +10,7 @@ import com.onchain.dna2explorer.model.dao.TxLog;
 import com.onchain.dna2explorer.service.AddressService;
 import com.onchain.dna2explorer.service.BlockService;
 import com.onchain.dna2explorer.utils.ConverterFunctionUtil;
+import com.onchain.dna2explorer.utils.EthUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -64,7 +65,7 @@ public class SyncBlock {
             transactions = ConverterFunctionUtil.toTransactions.apply(blk);
             Map<String, TransactionReceipt> transactionReceiptMap = updateTransactions(transactions);
             accounts = getAddresses(transactionReceiptMap, block);
-            addressService.updateAccounts(accounts);
+            EthUtil.updateAccounts(web3j, accounts);
             logs = getAllLogs(block, transactionReceiptMap);
         }
         blockService.storeBlock(block, transactions, accounts, logs);

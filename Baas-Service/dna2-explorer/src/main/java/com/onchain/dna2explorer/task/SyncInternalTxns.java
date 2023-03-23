@@ -39,7 +39,7 @@ public class SyncInternalTxns {
         }
     }
 
-    private void syncInternalTxnList() throws IOException {
+    private void syncInternalTxnList() throws Exception {
         Long startNumber = tableHeightMapper.getLastestTableHeightByTableName(TBL_TRANSACTION_BLOCK_HEIGHT_FOR_INTERNAL_TXNS);
         if (startNumber == null) {
             startNumber = 1L;

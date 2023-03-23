@@ -1,5 +1,7 @@
 package com.onchain.dna2explorer.utils;
 
+import com.onchain.dna2explorer.constant.Constant;
+import com.onchain.dna2explorer.model.dao.Account;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.codec.digest.MessageDigestAlgorithms;
 import org.web3j.abi.FunctionEncoder;
@@ -11,6 +13,7 @@ import org.web3j.crypto.Hash;
 import org.web3j.crypto.Keys;
 import org.web3j.crypto.Sign;
 import org.web3j.protocol.Web3j;
+import org.web3j.protocol.core.DefaultBlockParameter;
 import org.web3j.protocol.core.DefaultBlockParameterName;
 import org.web3j.protocol.core.methods.request.Transaction;
 import org.web3j.protocol.core.methods.response.AbiDefinition;
@@ -21,9 +24,11 @@ import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
@@ -182,5 +187,31 @@ public class EthUtil {
         System.arraycopy(message, 0, result, prefix.length, message.length);
 
         return Hash.sha3(result);
+    }
+
+    // get balance and nonce for the accounts
+    public static void updateAccounts(Web3j web3j, List<Account> accounts) throws Exception {
+        List<CompletableFuture<?>> futures = new ArrayList<>();
+
+        for (Account account : accounts) {
+            futures.add(web3j
+                    .ethGetBalance(account.getAddress(), DefaultBlockParameter.valueOf(Constant.LatestBlockNumberKey))
+                    .sendAsync()
+                    .thenApply(balance -> {
+                        account.setBalance(balance.getBalance().divide(Constant.GWeiFactor).toString());
+                        return balance;
+                    })
+            );
+            futures.add(web3j
+                    .ethGetTransactionCount(account.getAddress(), DefaultBlockParameter.valueOf(Constant.LatestBlockNumberKey))
+                    .sendAsync()
+                    .thenApply(count -> {
+                        account.setNonce(count.getTransactionCount().intValue());
+                        return count;
+                    })
+            );
+        }
+
+        CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).get();
     }
 }
