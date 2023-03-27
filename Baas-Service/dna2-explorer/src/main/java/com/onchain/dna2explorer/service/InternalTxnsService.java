@@ -31,13 +31,10 @@ import org.apache.http.util.EntityUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.web3j.protocol.Web3j;
-import org.web3j.protocol.core.DefaultBlockParameter;
 import org.web3j.utils.Numeric;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 
 import static com.onchain.dna2explorer.constant.Constant.DEBUG_TRACETRANSACTION_PARAMS;
 import static com.onchain.dna2explorer.constants.CommonConst.TBL_TRANSACTION_BLOCK_HEIGHT_FOR_INTERNAL_TXNS;
@@ -63,7 +60,7 @@ public class InternalTxnsService {
         HttpPost httpPost = new HttpPost(web3jConfig.getSyncNodeUrl());
         httpPost.setHeader("Content-Type", "application/json;charset=UTF-8");
         for (Transaction tx : txs) {
-            if (StringUtils.isEmpty(tx.getData()) || tx.getData().equals("0x")){
+            if (StringUtils.isEmpty(tx.getData()) || tx.getData().equals("0x")) {
                 continue;
             }
             String txHash = tx.getTxHash();
@@ -93,7 +90,6 @@ public class InternalTxnsService {
         }
         tableHeightMapper.updateTableHeightByTableName(TBL_TRANSACTION_BLOCK_HEIGHT_FOR_INTERNAL_TXNS, endNumber);
     }
-
 
 
     private void parseInsert(Transaction tx, ResponseDebugTraceTransaction result, Long parentId) throws Exception {
@@ -136,7 +132,7 @@ public class InternalTxnsService {
             internalTxn.setInput("0x");
         }
         internalTxnsMapper.insert(internalTxn);
-        if (internalTxn.getType().equals("CREATE") || internalTxn.getType().equals("CREATE2")){
+        if (internalTxn.getType().equals("CREATE") || internalTxn.getType().equals("CREATE2")) {
             Account account = Account.builder()
                     .address(internalTxn.getToAddress())
                     .type(1)
@@ -176,8 +172,8 @@ public class InternalTxnsService {
             if (parent != null) {
                 if (parent.getCalls() == null) {
                     parent.setCalls(new ArrayList<>());
-                    parent.getCalls().add(item);
                 }
+                parent.getCalls().add(item);
             }
         }
         return result;
