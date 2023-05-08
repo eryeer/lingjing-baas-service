@@ -273,20 +273,10 @@ public class CaptchaUtil {
                 g.drawLine(i, (int) d, i, 0);
                 g.drawLine(i, (int) d + h1, i, h1);
             }
-
+            
         }
 
     }
-
-    /*public static void main(String[] args) throws IOException {
-        File dir = new File("/home/wxuser/captcha");
-        int w = 45, h = 80;
-        for (int i = 0; i < 20; i++) {
-            String verifyCode = generateVerifyCode(4);
-            File file = new File(dir, verifyCode + ".jpg");
-            outputImage(w * verifyCode.length(), h, file, verifyCode);
-        }
-    }*/
 
 
 }
