@@ -214,10 +214,11 @@ mysql 5.7
 
 ## 2.3. 后端搭建
 
-项目地址： https://e.gitee.com/onchain_1/repos/onchain_1/lingjing-baas-service/sources
+项目地址： https://e.gitee.com/onchain_1/repos/onchain_1/lingjing-baas-service/tree/jiuquan-bsn
 
 // 安装项目
 $ git clone https://gitee.com/onchain_1/lingjing-baas-service.git Lingjing-Baas-Service
+$ git checkout jiuquan-bsn
 
 // 编译(使用推荐使用 gradle 6.9 版本)
 $ gradle build
