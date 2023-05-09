@@ -216,6 +216,8 @@ mysql 5.7
 
 项目地址： https://e.gitee.com/onchain_1/repos/onchain_1/lingjing-baas-service/tree/jiuquan-bsn
 
+```shell
+
 // 安装项目
 $ git clone https://gitee.com/onchain_1/lingjing-baas-service.git Lingjing-Baas-Service
 $ git checkout jiuquan-bsn
@@ -229,8 +231,6 @@ $ cp Baas-Service/dna2-explorer/build/libs/dna2-explorer.jar /your/install/folde
 // 修改启动参数配置
 $ cd /your/install/folder
 $ vi start.sh
-
-```shell
 #!/bin/bash
 
 JDBC_URL="jdbc:mysql://127.0.0.1:3306/dna2_explorer?characterEncoding=utf-8&serverTimezone=Asia/Shanghai&allowMultiQueries=true&rewriteBatchedStatements=true"
@@ -245,29 +245,31 @@ nohup java -jar -DENV=dev \
 -DNODE_URL=http://127.0.0.1:8545 \
 dna2-explorer.jar > Explorer.log 2>&1  &
 
-```
-
 // 启动，后台开始同步区块到数据库
+
 $ ./start.sh
+```
 
 ## 2.4. 前端搭建
 
-https://e.gitee.com/onchain_1/repos/onchain_1/lingjing-baas-web/sources
+https://e.gitee.com/onchain_1/repos/onchain_1/DNA2.0-explorer-web/sources
 
+```shell
 // 安装项目
-$ git clone https://gitee.com/onchain_1/lingjing-baas-web.git Lingjing-Baas-Web
+$ git clone https://gitee.com/onchain_1/DNA2.0-explorer-web.git Lingjing-Explorer-Web
 
 // 安装依赖
 $ yarn install
 
 // cd 到目录，比如管理端
-$ cd Lingjing-Baas-Web/manager
+$ cd Lingjing-Explorer-Web/manager
 
 // 运行
 $ yarn serve
 
 // 打包
 $ yarn build
+```
 
 # 3. 共识节点和账户治理
 
