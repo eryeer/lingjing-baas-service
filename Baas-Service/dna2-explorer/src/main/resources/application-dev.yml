@@ -22,11 +22,3 @@ dna:
     restUrl: ${NODE_URL:https://test-node.lingjing-eco.com.cn}
     syncNodeUrl: ${SYNC_NODE_URL:http://127.0.0.1:8545}
 
-cloud:
-  captcha:
-    secretId: AKIDYxA9tQksmRs41B7oHVVGm47vVrQBuRmv
-    secretKey: zlKhsrdCZjgRzKSOL6dyHMDpCMHxOaYH
-    userIp: 116.227.210.109
-    captchaAppId: 194416799
-    appSecretKey: rJjiPgUHdsIVLic2c3nFj4hP6
-    endPoint: captcha.tencentcloudapi.com
